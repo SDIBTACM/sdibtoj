@@ -56,8 +56,15 @@ $Rank=intval($row[0])+1;
 <?
  if($OJ_MAIL)
    echo "<a href=mail.php?to_user=$user>$MSG_MAIL</a>";
+   echo "<br>";
+$sql="SELECT * FROM `loginlog` WHERE `user_id`='$user_mysql' order by `time` desc LIMIT 0,1";
+$result=mysql_query($sql) or die(mysql_error());
+$row=mysql_fetch_row($result);
+echo "Last Loginned Time:".$row[3];
+mysql_free_result($result);
+
 ?>
- 	</caption>
+</caption>
 <tr bgcolor=#D7EBFF><td width=15%><?=$MSG_Number?><td width=25% align=center><?=$Rank?><td width=70% align=center>Solved Problems List</tr>
 <tr bgcolor=#D7EBFF><td><?=$MSG_SOVLED?><td align=center><a href='status.php?user_id=<?=$user?>&jresult=4'><?=$AC?></a>
 <td rowspan=14 align=center>
