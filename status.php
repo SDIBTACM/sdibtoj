@@ -153,7 +153,7 @@ echo "<input type=submit value='$MSG_SEARCH'></form>";
 </td></tr>
 </table>
 <table align=center>
-<tr  class='toprow'>
+<tr align=center  class='toprow'>
 <td width="8%"><?=$MSG_RUNID?>
 <td width="10%"><?=$MSG_USER?>
 <td width="6%"><?=$MSG_PROBLEM?>
