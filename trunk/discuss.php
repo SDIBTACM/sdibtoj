@@ -48,7 +48,7 @@ if (array_key_exists("pid",$_REQUEST)&&$_REQUEST['pid']!=''){
 else
   $level=" - ( `top_level` = 1 AND `pid` != 0 )";
 $sql.=" GROUP BY `topic_id` ORDER BY `top_level`$level DESC, MAX(`reply`.`time`) DESC";
-$sql.=" LIMIT 30";
+$sql.=" LIMIT 50";
 //echo $sql;
 $result = mysql_query($sql) or die("Error! ".mysql_error());
 $rows_cnt = mysql_num_rows($result);
