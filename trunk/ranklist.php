@@ -41,8 +41,8 @@
                                       $s=date('Y').'-'.date('m').'-'.date('d');
                                         break;
 				case 'w': 
-                                       $monday=mktime(0, 0, 0, date("m"),date("d")-date("w"), date("Y"));
-                                        $s=strftime("%Y-%m-%d",$monday);
+                                        $monday=mktime(0, 0, 0, date("m"),date("d")-(date("w")+7)%8+1, date("Y"));
+                                          $s=strftime("%Y-%m-%d",$monday);
                                            break;
 				case 'm': 
 				    $s=date('Y').'-'.date('m').'-01';break;
