@@ -1,6 +1,6 @@
 <?php
 		ob_start();
-		header ( "content-type:   application/file" );
+		header ( "content-type:   application/excel" );
 		
 ?>
 <?
@@ -8,7 +8,7 @@ require_once("./include/db_info.inc.php");
 global $mark_base,$mark_per_problem,$mark_per_punish;
  $mark_base=60;
  $mark_per_problem=10;
- $mark_per_punish=1;
+ $mark_per_punish=2;
 if(isset($OJ_LANG)){
 		require_once("./lang/$OJ_LANG.php");
 }
@@ -47,9 +47,13 @@ class TM{
 			}else{
 				$this->mark+=$mark_per_problem;
 			}
-			if($this->p_wa_num[$pid]*$mark_per_punish<$mark_per_problem)
-					$this->mark-=$this->p_wa_num[$pid]*$mark_per_punish;
-			
+			$punish=intval($this->p_wa_num[$pid]*$mark_per_punish);
+			if($punish<intval($mark_per_problem*.8))
+				$this->mark-=$punish;
+			else
+				$this->mark-=intval($mark_per_problem*.8);
+//			if($this->mark<$mark_base)
+//				$this->mark=$mark_base;
 //			echo "Time:".$this->time."<br>";
 //			echo "Solved:".$this->solved."<br>";
 		}
@@ -74,7 +78,10 @@ if ($rows_cnt>0){
 	$row=mysql_fetch_array($result);
 	$start_time=strtotime($row[0]);
 	$title=$row[1];
-	header ( "content-disposition:   attachment;   filename=contest".$_GET['cid']."_".$title.".xls" );
+	if(strpos($_SERVER['HTTP_USER_AGENT'],'MSIE')){
+		$title=iconv("utf8","gbk",$title);
+	}
+	header ( "content-disposition:   attachment;   filename=contest".$cid."_".$title.".xls" );
 }
 mysql_free_result($result);
 if ($start_time==0){
@@ -93,8 +100,13 @@ $sql="SELECT count(1) FROM `contest_problem` WHERE `contest_id`='$cid'";
 $result=mysql_query($sql);
 $row=mysql_fetch_array($result);
 $pid_cnt=intval($row[0]);
-
-$mark_per_problem=(100-$mark_base)/$pid_cnt;
+if($pid_cnt==1) {
+	$mark_base=100;
+	$mark_per_problem=0;
+}else{
+	$mark_per_problem=(100-$mark_base)/($pid_cnt-1);
+}
+$mark_per_punish=$mark_per_problem/5;
 mysql_free_result($result);
 
 $sql="SELECT 
@@ -126,8 +138,8 @@ usort($U,"s_cmp");
 $rank=1;
 //echo "<style> td{font-size:14} </style>";
 //echo "<title>Contest RankList -- $title</title>";
-//echo "<center><h3>Contest RankList -- $title</h3></center>";
-echo "<table border=1><tr align=center><td>Rank<td>User<td>Nick<td>Solved<td>Mark";
+echo "<center><h3>Contest RankList -- $title</h3></center>";
+echo "<table border=1><tr><td>Rank<td>User<td>Nick<td>Solved<td>Mark";
 for ($i=0;$i<$pid_cnt;$i++)
 	echo "<td>$PID[$i]";
 echo "</tr>";
@@ -140,14 +152,22 @@ for ($i=0;$i<$user_cnt;$i++){
         
 	$usolved=$U[$i]->solved;
 	echo "<td>$uuid";
-        if(strpos($_SERVER['HTTP_USER_AGENT'],'MSIE')){
-               $U[$i]->nick=iconv("utf8","gbk",$U[$i]->nick);
-         }
-
-
+	if(strpos($_SERVER['HTTP_USER_AGENT'],'MSIE')){
+		$U[$i]->nick=iconv("utf8","gbk",$U[$i]->nick);
+	}
 	echo "<td>".$U[$i]->nick."";
 	echo "<td>$usolved";
-	echo "<td>".($U[$i]->mark);
+	echo "<td>";
+	$rank_punish=intval(pow($rank,log((100-$mark_base)/4,$user_cnt)));
+	if($U[$i]->mark>$mark_base+$rank_punish||$pid_cnt==1)
+		$U[$i]->mark-=$rank_punish;
+        
+	if($U[$i]->mark<($mark_base+100)/2&&$usolved==$pid_cnt&&$pid_cnt>1)
+                $U[$i]->mark=($mark_base+100)/2;
+        
+	if($U[$i]->mark<$mark_base&&$usolved&&$pid_cnt>1)
+		$U[$i]->mark=$mark_base;
+	echo $U[$i]->mark>0?intval($U[$i]->mark):0;
 	for ($j=0;$j<$pid_cnt;$j++){
 		echo "<td>";
 		if(isset($U[$i])){
