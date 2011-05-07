@@ -2,8 +2,8 @@
 	@session_start();
 static 	$DB_HOST="127.0.0.1";
 static 	$DB_NAME="jol";
-static 	$DB_USER="root";
-static 	$DB_PASS="root";
+static 	$DB_USER="jol";
+static 	$DB_PASS="147258";
 	// connect db 
 static 	$OJ_NAME="SDIBT";
 static 	$OJ_HOME="http://acm.sdibt.edu.cn/";
@@ -27,5 +27,5 @@ if (isset($_SESSION['OJ_LANG'])) $OJ_LANG=$_SESSION['OJ_LANG'];
 	
 	if(mysql_select_db($DB_NAME));
 	else die('Can\'t use foo : ' . mysql_error());
-
+        date_default_timezone_set("PRC");
 ?>
