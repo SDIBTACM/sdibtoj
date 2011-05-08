@@ -81,8 +81,8 @@ require_once("oj-header.php");
 $sql="SELECT * FROM `contest` WHERE `defunct`='N' ORDER BY `contest_id` DESC";
 $result=mysql_query($sql);
 $color=false;
-echo "<center><table width=90%><h2>Contest List</h2>ServerTime:<span id=nowdate></span>";
-echo "<tr class=toprow align=center><td width=10%>ID<td width=50%>Name<td width=30%>Status<td width=10%>Private</tr>";
+echo "<center><h2>Contest List</h2>ServerTime:<span id=nowdate></span>";
+echo "<table width=90%><tr class=toprow align=center><td width=10%>ID<td width=50%>Name<td width=30%>Status<td width=10%>Private</tr>";
 while ($row=mysql_fetch_object($result)){
 	if ($color) echo "<tr align=center class=oddrow>";
 	else echo "<tr align=center class=evenrow>";
@@ -119,6 +119,7 @@ function clock()
       var x,h,m,s,n,xingqi,y,mon,d;
       var x = new Date(new Date().getTime()+diff);
       y = x.getYear()+1900;
+       if (y>3000) y-=1900;
       mon = x.getMonth()+1;
       d = x.getDate();
       xingqi = x.getDay();
