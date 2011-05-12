@@ -142,5 +142,26 @@ mysql_free_result($result);
 echo "</tbody>";
 
 echo "</table></center>";
+
 ?>
+
+<?
+$sql="SELECT max(`problem_id`) as upid FROM `problem`";
+$page_cnt=100;
+$result=mysql_query($sql);
+echo mysql_error();
+$row=mysql_fetch_object($result);
+$cnt=intval($row->upid)-1000;
+$cnt=$cnt/$page_cnt;
+echo "<h3 align='center'>";
+for ($i=1;$i<=$cnt+1;$i++){
+	if ($i>1) echo '&nbsp;';
+	if ($i==$page) echo "<span class=red>$i</span>";
+	else echo "<a href='problemset.php?page=".$i."'>".$i."</a>";
+}
+echo "</h3>";
+
+?>
+
+
 <?require_once("oj-footer.php")?>
