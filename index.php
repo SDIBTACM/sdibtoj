@@ -22,7 +22,7 @@ while ($row=mysql_fetch_object($result)){
                         echo "<tr><td><td>".$row->content."</tr>";
 
                 }
-	
+        mysql_free_result($result);
 	echo "<tr></tr>";
 	echo "<tr></tr>";
 	echo "<tr><td><td><font color=red>Problem分类：</font></tr>";
