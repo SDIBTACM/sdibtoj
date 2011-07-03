@@ -25,7 +25,7 @@
                  <?php if($OJ_VCODE){?>
 		<tr><td>Type:
                		<td><input name="vcode" size=4 type=text>
-                        <img src=vcode.php>*
+                        <img src=vcode.php align="absmiddle">*
 		</tr>
 		<?php }?>
 		<tr><td>
