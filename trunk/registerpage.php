@@ -23,8 +23,9 @@
 			<td><input name="email" size=30 type=text>
 		</tr>
                  <?php if($OJ_VCODE){?>
-		<tr><td>Type:<img src=vcode.php>
-			<td><input name="vcode" size=4 type=text>*
+		<tr><td>Type:
+               		<td><input name="vcode" size=4 type=text>
+                        <img src=vcode.php>*
 		</tr>
 		<?php }?>
 		<tr><td>
