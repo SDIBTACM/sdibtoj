@@ -55,9 +55,12 @@
 
                  <th><a href="http://jsj.sdibt.edu.cn/judge/"><font color=red>VIRTUAL JUDGE</font></a></th>
 
-                <?if(isset($OJ_DICT)&&$OJ_DICT&&$OJ_LANG=="cn"){?>
-		<th><span style="color:1a5cc8" id="dict_status"></span></th>
-		<?}?>
+		<?if(isset($OJ_DICT)&&$OJ_DICT&&$OJ_LANG=="cn"){?>
+      <div class=menu_item >
+		      <span style="color:1a5cc8" id="dict_status"></span>
+      </div>
+      <script src="include/underlineTranslation.js" type="text/javascript"></script>
+                <?}?>
 		<th><a href="<?=isset($OJ_FAQ_LINK)?$OJ_FAQ_LINK:"faqs.php"?>"><?=$MSG_FAQ?></a></th>
 		<th><a href="./discuss.php"><?=$MSG_BBS?></a></th>
 		<th><a href="<?=$OJ_HOME?>"><?=$MSG_HOME?></a></th>

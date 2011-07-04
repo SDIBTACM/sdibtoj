@@ -54,7 +54,16 @@ if (isset($_GET['cid'])){
 //	echo "<br>";
 //	echo $sql;
 //	echo "<br>";
+        
+       
 	$result=mysql_query($sql);
+       $end_flag=false;
+        $sql1="SELECT `private` FROM `contest` WHERE `contest_id`='$cid' AND  `end_time`<NOW()";
+        $result1=mysql_query($sql);
+        $rows_cnt1=mysql_num_rows($result1);
+        if ($rows_cnt1!=1){
+          $end_flag=true;
+         }
 	$cnt=0;
 	echo "<table width=60%><tr class=toprow><td width=5><td width=34%><b>Problem ID</b><td width=65%><b>Title</b></tr>";
 	while ($row=mysql_fetch_object($result)){
@@ -62,9 +71,15 @@ if (isset($_GET['cid'])){
 		else echo "<tr class=evenrow>";
 		echo "<td>";
 		if (isset($_SESSION['user_id'])) echo check_ac($cid,$cnt);
-		echo "<td>$row->pid Problem $PID[$cnt]
+	        if(!$end_flag){
+        	echo "<td>$row->pid Problem $PID[$cnt]
 			<td><a href='problem.php?cid=$cid&pid=$cnt'>$row->title</a>
-			</tr>";
+			</tr>";}
+                else
+                {
+               echo "<td>$row->pid Problem $PID[$cnt]
+                        <td><a href='problem.php?id=$row->pid'>$row->title</a>
+                        </tr>";}
 		$cnt++;
 	}
 	echo "</table><br>";
