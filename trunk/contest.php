@@ -97,7 +97,7 @@ $sql="SELECT * FROM `contest` WHERE `defunct`='N' ORDER BY `contest_id` DESC";
 $result=mysql_query($sql);
 $color=false;
 echo "<center><h2>Contest List</h2>ServerTime:<span id=nowdate></span>";
-echo "<table width=90%><tr class=toprow align=center><td width=10%>ID<td width=50%>Name<td width=30%>Status<td width=10%>Private</tr>";
+echo "<table width=90%><tr class=toprow align=center><td width=10%>ID<td width=50%>Contest Name<td width=20%>Start time<td width=10%>Status<td width=10%>Type</tr>";
 while ($row=mysql_fetch_object($result)){
 	if ($color) echo "<tr align=center class=oddrow>";
 	else echo "<tr align=center class=evenrow>";
@@ -106,10 +106,11 @@ while ($row=mysql_fetch_object($result)){
 	$start_time=strtotime($row->start_time);
 	$end_time=strtotime($row->end_time);
 	$now=time();
+        echo "<td>$row->start_time";
 	// past
-	if ($now>$end_time) echo "<td><font color=green>Ended@$row->end_time</font>";
+	if ($now>$end_time) echo "<td><font color=green>Ended</font>";
 	// pending
-	else if ($now<$start_time) echo "<td><font color=blue>Start@$row->start_time</font>";
+	else if ($now<$start_time) echo "<td><font color=blue>Pending</font>";
 	// running
 	else echo "<td><font color=red> Running </font>";
 	$private=intval($row->private);
