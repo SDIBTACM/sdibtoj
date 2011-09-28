@@ -57,11 +57,11 @@ if (isset($_GET['cid'])){
         
        
 	$result=mysql_query($sql);
-       $end_flag=false;
+        $end_flag=false;
         $sql1="SELECT `private` FROM `contest` WHERE `contest_id`='$cid' AND  `end_time`<NOW()";
-        $result1=mysql_query($sql);
+        $result1=mysql_query($sql1);
         $rows_cnt1=mysql_num_rows($result1);
-        if ($rows_cnt1!=1){
+        if ($rows_cnt1==1){
           $end_flag=true;
          }
 	$cnt=0;
@@ -77,8 +77,8 @@ if (isset($_GET['cid'])){
 			</tr>";}
                 else
                 {
-               echo "<td>$row->pid Problem $PID[$cnt]
-                        <td><a href='problem.php?id=$row->pid'>$row->title</a>
+                     echo "<td>$row->pid Problem $PID[$cnt]
+                         <td><a href='problem.php?id=$row->pid'>$row->title</a>
                         </tr>";}
 		$cnt++;
 	}

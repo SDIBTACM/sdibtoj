@@ -12,9 +12,26 @@ $row=mysql_fetch_object($result);
 $cnt=intval($row->upid)-1000;
 $cnt=$cnt/$page_cnt;
 
+//remember page
+  $page="1";
 if (isset($_GET['page'])){
-	$page=intval($_GET['page']);
-}else $page="1";
+    $page=intval($_GET['page']);
+    if(isset($_SESSION['user_id'])){
+         $sql="update users set volume=$page where user_id='".$_SESSION['user_id']."'";
+         mysql_query($sql);
+    }
+}else{
+    if(isset($_SESSION['user_id'])){
+            $sql="select volume from users where user_id='".$_SESSION['user_id']."'";
+            $result=@mysql_query($sql);
+            $row=mysql_fetch_array($result);
+            $page=intval($row[0]);
+    }
+    if(!is_numeric($page))
+        $page='1';
+}
+  //end of remember page
+
 $pstart=1000+$page_cnt*intval($page)-$page_cnt;
 $pend=$pstart+$page_cnt;
 
@@ -22,8 +39,8 @@ $sub_arr=Array();
 // submit
 if (isset($_SESSION['user_id'])){
 $sql="SELECT `problem_id` FROM `solution` WHERE `user_id`='".$_SESSION['user_id']."'".
-	" AND `problem_id`>='$pstart'".
-	" AND `problem_id`<'$pend'".
+//	" AND `problem_id`>='$pstart'".
+//	" AND `problem_id`<'$pend'".
 	" group by `problem_id`";
 $result=@mysql_query($sql) or die(mysql_error());
 while ($row=mysql_fetch_array($result))
@@ -33,8 +50,8 @@ $acc_arr=Array();
 // ac
 if (isset($_SESSION['user_id'])){
 $sql="SELECT `problem_id` FROM `solution` WHERE `user_id`='".$_SESSION['user_id']."'".
-	" AND `problem_id`>='$pstart'".
-	" AND `problem_id`<'$pend'".
+//	" AND `problem_id`>='$pstart'".
+//	" AND `problem_id`<'$pend'".
 	" AND `result`=4".
 	" group by `problem_id`";
 $result=@mysql_query($sql) or die(mysql_error());
