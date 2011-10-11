@@ -46,10 +46,21 @@ if (isset($_GET['cid'])){
 		require_once("oj-footer.php");
 		exit(1);
 	}
+         if (isset($_SESSION['administrator'])){
+
+           $sql="SELECT `problem`.`title` as `title`,`problem`.`problem_id` as `pid`
+                FROM `contest_problem`,`problem`
+                WHERE `contest_problem`.`problem_id`=`problem`.`problem_id`
+                AND `contest_problem`.`contest_id`='$cid' ORDER BY `contest_problem`.`num`";
+
+         }
+        else
+        {
 	$sql="SELECT `problem`.`title` as `title`,`problem`.`problem_id` as `pid`
 		FROM `contest_problem`,`problem`
 		WHERE `contest_problem`.`problem_id`=`problem`.`problem_id` AND `problem`.`defunct`='N'
 		AND `contest_problem`.`contest_id`='$cid' ORDER BY `contest_problem`.`num`";
+        }
 //	echo $cid;
 //	echo "<br>";
 //	echo $sql;
