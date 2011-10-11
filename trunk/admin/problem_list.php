@@ -28,7 +28,13 @@ for ($i=1;$i<=$cnt+1;$i++){
 	else echo "<a href='problem_list.php?page=".$i."'>".$i."</a>";
 }
 echo "</center>";
-$sql="select `problem_id`,`title`,`in_date`,`defunct` FROM `problem` where problem_id>=$pstart and problem_id<=$pend order by `problem_id` desc";
+if(isset($_GET['search'])){
+  $sql="select  `problem_id`,`title`,`in_date`,`defunct` FROM `problem` where `defunct`='Y'  order by `problem_id` desc  ";
+}
+else
+{
+  $sql="select `problem_id`,`title`,`in_date`,`defunct` FROM `problem` where problem_id>=$pstart and problem_id<=$pend order by `problem_id` desc";
+ }
 //echo $sql;
 $result=mysql_query($sql) or die(mysql_error());
 echo "<center><table width=90% border=1>";
@@ -51,8 +57,8 @@ for (;$row=mysql_fetch_object($result);){
 	}
 	echo "</tr>";
 }
-echo "<tr><td colspan=5><input type=submit name='problem2contest' value='CheckToNewContest'>";
-echo "</tr></form>";
+echo "<tr><td colspan=5><input type=submit name='problem2contest' value='CheckToNewContest'></tr></form>";
+echo "<tr><td width='90%' colspan='4'><form>$MSG_SEARCH<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td></tr>";
 echo "</table></center>";
 require("../oj-footer.php");
 ?>
