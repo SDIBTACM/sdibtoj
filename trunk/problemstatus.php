@@ -134,11 +134,12 @@ ORDER BY score, in_date
 
 )c
 on b.score=c.score and b.user_id=c.user_id 
+GROUP by c.user_id
 order by c.score,in_date
 LIMIT  $start, $sz";
 
 $result=mysql_query($sql);
-
+//echo $sql;
 echo "<td>";
 echo "<table>";
 echo "<tr class=toprow><td>$MSG_Number<td>RunID<td>$MSG_USER<td>$MSG_MEMORY<td>$MSG_TIME<td>$MSG_LANG<td>$MSG_CODE_LENGTH<td>$MSG_SUBMIT_TIME</tr>";
