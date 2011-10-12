@@ -29,7 +29,13 @@ for ($i=1;$i<=$cnt+1;$i++){
 }
 echo "</center>";
 if(isset($_GET['search'])){
-  $sql="select  `problem_id`,`title`,`in_date`,`defunct` FROM `problem` where `defunct`='Y'  order by `problem_id` desc  ";
+   if(trim($_GET['search'])=="")
+      $sql="select  `problem_id`,`title`,`in_date`,`defunct` FROM `problem` where `defunct`='Y'  order by `problem_id` desc  ";
+   else
+     {
+      $search=mysql_real_escape_string($_GET['search']); 
+      $sql="select  `problem_id`,`title`,`in_date`,`defunct` FROM `problem` where (title like '%$search%' or source like '%$search%') order by `problem_id` desc  ";
+      }
 }
 else
 {
