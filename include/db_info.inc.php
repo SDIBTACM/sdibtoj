@@ -19,6 +19,7 @@ static  $OJ_EDITE_AREA=true;//true: syntax highlighting is active
 static  $OJ_MAIL=true;     //true: mail function is available
 static  $OJ_AUTO_SHARE=true;//true: One can view all AC submit if he/she has ACed it onece.
 static  $OJ_VCODE=true;
+static  $OJ_APPENDCODE=true; 
 if (isset($_SESSION['OJ_LANG'])) $OJ_LANG=$_SESSION['OJ_LANG'];
 	if(mysql_pconnect($DB_HOST,$DB_USER,$DB_PASS));
 	else die('Could not connect: ' . mysql_error());
