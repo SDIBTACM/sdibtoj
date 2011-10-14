@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id'])){
 	exit(0);
 }
 require_once("include/db_info.inc.php");
+require_once("include/const.inc.php");
 $user_id=$_SESSION['user_id'];
 
 if (isset($_POST['cid'])){
@@ -88,6 +89,14 @@ if (isset($_POST['id'])) {
 	echo "<h2>No Such Problem!</h2>";
 	exit(0);
 }
+
+
+$language=intval($_POST['language']);
+if ($language>9 || $language<0) $language=0;
+$language=strval($language);
+
+
+
 $source=$_POST['source'];
 if(get_magic_quotes_gpc())
 	$source=stripslashes($source);
@@ -95,10 +104,13 @@ $source=mysql_real_escape_string($source);
 //$source=trim($source);
 $len=strlen($source);
 //echo $source;
+//use append Main code
+$append_file="$OJ_DATA/$id/append.$language_ext[$language]";
+if(isset($OJ_APPENDCODE)&&$OJ_APPENDCODE&&file_exists($append_file)){
+     $source.=mysql_real_escape_string("\n".file_get_contents($append_file));
+}
+//end of append 
 
-$language=intval($_POST['language']);
-if ($language>6 || $language<0) $language=0;
-$language=strval($language);
 
 setcookie('lastlang',$language,time()+360000);
 
