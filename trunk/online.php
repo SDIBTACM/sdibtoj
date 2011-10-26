@@ -3,9 +3,13 @@
 	require_once('./oj-header.php');
 	require_once('./include/db_info.inc.php');
 	require_once('./include/iplocation.php');
-	$users = $on->getAll();
-	$ip = new IpLocation();
+      if($OJ_ONLINE){
+        	$users = $on->getAll();
+         	$ip = new IpLocation();
+      }     
 ?>
+
+<?php if($OJ_ONLINE) {?>
 <h3>current online user: <?=$on->get_num()?></h3>
 <table style="margin:auto;width:98%">
 <thead>
@@ -30,8 +34,8 @@
 endforeach;?>
 </tbody>
 </table>
-
-
+<?php }
+?>
 <?
 if (isset($_SESSION['administrator'])){
 
