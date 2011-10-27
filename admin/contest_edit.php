@@ -23,8 +23,8 @@ if (isset($_POST['syear']))
 	//echo $langmask;	
 
          $cid=intval($_POST['cid']);
-	
-         $sql="UPDATE `contest` set `title`='$title',`start_time`='$starttime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask WHERE `contest_id`=$cid";
+           if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator']))) exit();	
+          $sql="UPDATE `contest` set `title`='$title',`start_time`='$starttime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask WHERE `contest_id`=$cid";
 	echo $sql;
 	mysql_query($sql) or die(mysql_error());
 	$sql="DELETE FROM `contest_problem` WHERE `contest_id`=$cid";

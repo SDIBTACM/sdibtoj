@@ -53,6 +53,10 @@ if (isset($_POST['syear']))
 	}
 	$sql="DELETE FROM `privilege` WHERE `rightstr`='c$cid'";
 	mysql_query($sql);
+       $sql="insert into `privilege` (`user_id`,`rightstr`)  values('".$_SESSION['user_id']."','m$cid')";
+       mysql_query($sql);
+      $_SESSION["m$cid"]=true;
+ 
 	$pieces = explode("\n", trim($_POST['ulist']));
 	if (count($pieces)>0 && strlen($pieces[0])>0){
 		$sql_1="INSERT INTO `privilege`(`user_id`,`rightstr`) 
