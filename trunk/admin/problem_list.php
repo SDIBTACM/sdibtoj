@@ -45,10 +45,10 @@ else
 $result=mysql_query($sql) or die(mysql_error());
 echo "<center><table width=90% border=1>";
 echo "<form method=post action=contest_add.php>";
-echo "<tr><td colspan=5><input type=submit name='problem2contest' value='CheckToNewContest'>";
+echo "<tr><td colspan=6><input type=submit name='problem2contest' value='CheckToNewContest'>";
 echo "<tr><td>PID<td>Title<td>Date";
 if(isset($_SESSION['administrator'])){
-    echo "<td>Defunct<td>Edit</tr>";
+    echo "<td>Defunct<td>Edit<td>TestData</tr>";
 }
 for (;$row=mysql_fetch_object($result);){
 	echo "<tr>";
@@ -59,11 +59,12 @@ for (;$row=mysql_fetch_object($result);){
 	if(isset($_SESSION['administrator'])){
 		echo "<td><a href=problem_df_change.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">".($row->defunct=="N"?"Delete":"Resume")."</a>";
 		echo "<td><a href=problem_edit.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">Edit</a>";
-		//echo "<td><input type=submit name='problem2contest' value='ToNewContest'>";
-	}
+	echo "<td><a href=quixplorer/index.php?action=list&dir=$row->problem_id&order=name&srt=yes>TestData</a>";
+
+        }
 	echo "</tr>";
 }
-echo "<tr><td colspan=5><input type=submit name='problem2contest' value='CheckToNewContest'></tr></form>";
+echo "<tr><td colspan=6><input type=submit name='problem2contest' value='CheckToNewContest'></tr></form>";
 echo "<tr><td width='90%' colspan='4'><form>$MSG_SEARCH<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td></tr>";
 echo "</table></center>";
 require("../oj-footer.php");
