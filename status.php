@@ -64,7 +64,7 @@ $user_id="";
 if (isset($_GET['user_id'])){
 	$user_id=trim($_GET['user_id']);
 	if (is_valid_user_name($user_id) && $user_id!=""){
-           if(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))
+           if(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])||isset($_SESSION['source_browser']))
                    $sql=$sql."AND user_id like '%$user_id%' ";
                else
 		   $sql=$sql."AND `user_id`='".$user_id."' ";
@@ -148,7 +148,9 @@ if(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])){
 	
 	
 }
-echo "<input type=submit value='$MSG_SEARCH'></form>";
+echo "<input type=submit value='$MSG_SEARCH'>";
+echo "</form>";
+
 ?>
 </td></tr>
 </table>
