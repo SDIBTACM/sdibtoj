@@ -55,7 +55,7 @@ if (isset($_GET['vid'])){
 ?>
 <?
 
-if($OJ_MAIL)
+if($OJ_MAIL||isset($_SESSION['administrator']))
 {
  ?>
  
@@ -127,7 +127,7 @@ if(isset($_POST['to_user'])){
 	}
 }
 //list mail
-if($OJ_MAIL)
+//if($OJ_MAIL||isset($_SESSION['administrator']))
 {
 	$sql="SELECT * FROM `mail` WHERE to_user='".$_SESSION['user_id']."' order by mail_id desc limit 0,50";
 	$result=mysql_query($sql) or die(mysql_error());
