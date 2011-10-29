@@ -226,7 +226,7 @@ while(	$row=mysql_fetch_object($result)){
 					echo $row->sim_s_id;
 			}
 			if(isset($_GET['showsim'])&&isset($row->old_user_id)){
-					echo "$row->old_user_id";
+					echo "<a href=userinfo.php?user=".$row->old_user_id."><font color=red>".$row->old_user_id."</font></a>";
 				
 			}
 			echo	 "</font>";
