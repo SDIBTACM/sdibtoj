@@ -67,16 +67,16 @@ if (mysql_num_rows($result)!=1){
    if(isset($_GET['id'])){
       $id=intval($_GET['id']);
 	   mysql_free_result($result);
-	   $sql="SELECT  contest.`contest_id` , contest.`title`,contest_problem.num FROM `contest_problem`,`contest` WHERE contest.contest_id=contest_problem.contest_id and `problem_id`=$id and defunct='N'  ORDER BY `num`";
+	   $sql="SELECT  contest.`contest_id` , contest.`title`,contest_problem.num FROM `contest_problem`,`contest` WHERE contest.contest_id=contest_problem.contest_id and `problem_id`=$id and defunct='N' and NOW()< contest.end_time ORDER BY `num`";
 	   //echo $sql;
            $result=mysql_query($sql);
 	   if($i=mysql_num_rows($result)){
-	     // echo "This problem is in Contest(s) below:<br>";
+	      echo "This problem is in Contest(s) below:<br>";
 		   for (;$i>0;$i--){
 				$row=mysql_fetch_row($result);
-			//	echo "<a href=problem.php?cid=$row[0]&pid=$row[2]>Contest $row[0]:$row[1]</a><br>";
-			echo "<title>$MSG_NO_SUCH_PROBLEM!</title>";
-                        echo "<h2>$MSG_NO_SUCH_PROBLEM!</h2>";
+				echo "<a href=problem.php?cid=$row[0]&pid=$row[2]>Contest $row[0]:$row[1]</a><br>";
+		//	echo "<title>$MSG_NO_SUCH_PROBLEM!</title>";
+                  //      echo "<h2>$MSG_NO_SUCH_PROBLEM!</h2>";
 	
 			}
 		}else{
@@ -99,7 +99,7 @@ if (mysql_num_rows($result)!=1){
 	}
 	echo "<span class=green>$MSG_Time_Limit: </span>$row->time_limit Sec&nbsp;&nbsp;";
 	echo "<span class=green>$MSG_Memory_Limit: </span>".$row->memory_limit." MB";
-	if ($row->spj) echo "Sec&nbsp;&nbsp;<span class=red>Special Judge</span>";
+	if ($row->spj) echo "&nbsp;&nbsp;<span class=red>Special Judge</span>";
 	echo "<br><span class=green>$MSG_SUBMIT: </span>".$row->submit."&nbsp;&nbsp;";
 	echo "<span class=green>$MSG_SOVLED: </span>".$row->accepted."<br>"; 
 	
