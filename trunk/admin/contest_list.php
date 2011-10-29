@@ -1,5 +1,5 @@
 <?php require("admin-header.php");
-echo "<title>Problem List</title>";
+echo "<title>Contest List</title>";
 echo "<center><h2>Contest List</h2></center>";
 require_once("../include/set_get_key.php");
 $sql="select `contest_id`,`title`,`start_time`,`end_time`,`private`,`defunct` FROM `contest` order by `contest_id` desc";
@@ -26,7 +26,7 @@ for (;$row=mysql_fetch_object($result);){
 		}
 	 
 	}else{
-		echo "<td colspan=4 align=right><a href=contest_add.php?cid=$row->contest_id>Copy</a><td>";
+	//	echo "<td colspan=4 align=right><a href=contest_add.php?cid=$row->contest_id>Copy</a><td>";
 		
 	}
 		
