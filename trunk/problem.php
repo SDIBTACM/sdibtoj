@@ -51,7 +51,7 @@ if (isset($_GET['id'])){
 	// public
 	require_once("contest-header.php");
 	if (!$contest_ok){
-		echo "Not Invited!";
+		echo "<center><h1>Not Invited!</h1></center>";
 		require_once("oj-footer.php");
 		exit(1);
 	}
