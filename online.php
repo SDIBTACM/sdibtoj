@@ -109,8 +109,8 @@ for (;$row=mysql_fetch_row($result);){
         echo "<tr align=center>";
         echo "<td><a href='userinfo.php?user=".$rowa[0]."'>".$rowa[0]."</a>";
         echo "<td>".$rowa[1];
-        echo "<td>".$a;
-        echo "<td>".$temp;
+        echo "<td>".$rowa[2];
+        echo "<td>".$rowa[3];
         echo "</tr>";
     }
 }
