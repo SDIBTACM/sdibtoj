@@ -41,6 +41,9 @@ if (isset($_SESSION['administrator'])){
 
 echo "<center>";
 echo "<td width='100%' colspan='5'><form>IP(支持模糊查找)<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td></tr>";
+echo "<center>";
+echo "<td width='100%' colspan='5'><form>UserName(支持模糊查找)<input type='text' name='diffip'><input type='submit' value='DiffIp' ></form></td></tr>";
+
 if(isset($_GET['search'])){
 
     $sql="SELECT * FROM `loginlog`";
@@ -73,15 +76,15 @@ mysql_free_result($result);
 <?
 if (isset($_SESSION['administrator'])){
 
-echo "<center>";
-echo "<td width='100%' colspan='5'><form>UserName(支持模糊查找)<input type='text' name='diffip'><input type='submit' value='DiffIp' ></form></td></tr>";
+//echo "<center>";
+//echo "<td width='100%' colspan='5'><form>UserName(支持模糊查找)<input type='text' name='diffip'><input type='submit' value='DiffIp' ></form></td></tr>";
 if(isset($_GET['diffip'])){
 
     $sql="SELECT DISTINCT(user_id) FROM `loginlog`";
     $search1=trim(mysql_real_escape_string($_GET['diffip']));
     if ($search1!='')
     	$sql=$sql." WHERE user_id like '%$search1%' ";
-    $sql=$sql."  order by `time` desc LIMIT 0,50";
+    $sql=$sql."  order by `time` desc LIMIT 0,70";
 
 $result=mysql_query($sql) or die(mysql_error());
 echo "<table border=1>";
