@@ -1,31 +1,36 @@
-<?session_start();?>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Add a contest</title>
-
-<?
-require_once("../include/db_info.inc.php");
+<?php require("admin-header.php");
+include_once("../fckeditor/fckeditor.php") ;
+ $cid=intval($_GET['cid']);
+if(!(isset($_SESSION['administrator'])||isset($_SESSION["m$cid"])))
+{
+   echo "You don't have the privilage";
+   exit(0);
+}
 if (isset($_POST['syear']))
 {
-       require_once("../include/check_post_key.php");
-        $starttime=intval($_POST['syear'])."-".intval($_POST['smonth'])."-".intval($_POST['sday'])." ".intval($_POST['shour']).":".intval($_POST['sminute']).":00";
-         $endtime=intval($_POST['eyear'])."-".intval($_POST['emonth'])."-".intval($_POST['eday'])." ".intval($_POST['ehour']).":".intval($_POST['eminute']).":00";
+	require_once("../include/check_post_key.php");
+	
+	$starttime=intval($_POST['syear'])."-".intval($_POST['smonth'])."-".intval($_POST['sday'])." ".intval($_POST['shour']).":".intval($_POST['sminute']).":00";
+	$endtime=intval($_POST['eyear'])."-".intval($_POST['emonth'])."-".intval($_POST['eday'])." ".intval($_POST['ehour']).":".intval($_POST['eminute']).":00";
 //	echo $starttime;
 //	echo $endtime;
+	 
+	$title=mysql_real_escape_string($_POST['title']);
+	$description=mysql_real_escape_string($_POST['description']);
+	$private=mysql_real_escape_string($_POST['private']);
 	
-         $title=mysql_real_escape_string($_POST['title']);
-          $private=mysql_real_escape_string($_POST['private']);	
    $lang=$_POST['lang'];
    $langmask=0;
    foreach($lang as $t){
 			$langmask+=1<<$t;
 	} 
 	$langmask=15&(~$langmask);
-	//echo $langmask;	
+	echo $langmask;	
 
-         $cid=intval($_POST['cid']);
-           if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator']))) exit();	
-          $sql="UPDATE `contest` set `title`='$title',`start_time`='$starttime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask WHERE `contest_id`=$cid";
-	echo $sql;
+	$cid=intval($_POST['cid']);
+	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator']))) exit();
+	$sql="UPDATE `contest` set `title`='$title',description='$description',`start_time`='$starttime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask WHERE `contest_id`=$cid";
+	//echo $sql;
 	mysql_query($sql) or die(mysql_error());
 	$sql="DELETE FROM `contest_problem` WHERE `contest_id`=$cid";
 	mysql_query($sql);
@@ -36,7 +41,13 @@ if (isset($_POST['syear']))
 			VALUES ('$cid','$pieces[0]',0)";
 		for ($i=1;$i<count($pieces);$i++)
 			$sql_1=$sql_1.",('$cid','$pieces[$i]',$i)";
+		mysql_query("update solution set num=-1 where contest_id=$cid");
+		for ($i=0;$i<count($pieces);$i++){
+			$sql_2="update solution set num='$i' where contest_id='$cid' and problem_id='$pieces[$i]';";
+			mysql_query($sql_2);
+		}
 		//echo $sql_1;
+		
 		mysql_query($sql_1) or die(mysql_error());
 		$sql="update `problem` set defunct='N' where `problem_id` in ($plist)";
 		mysql_query($sql) or die(mysql_error());
@@ -55,8 +66,7 @@ if (isset($_POST['syear']))
 		mysql_query($sql_1) or die(mysql_error());
 	}
 	
-	
-	require_once("../oj-footer.php");
+         echo "<script>window.location.href=\"contest_list.php\";</script>";	
 	exit();
 }else{
 	$cid=intval($_GET['cid']);
@@ -72,6 +82,7 @@ if (isset($_POST['syear']))
 	$endtime=$row['end_time'];
 	$private=$row['private'];
 	$langmask=$row['langmask'];
+	$description=$row['description'];
 	$title=htmlspecialchars($row['title']);
 	mysql_free_result($result);
 	$plist="";
@@ -95,32 +106,31 @@ if (isset($_POST['syear']))
 }
 ?>
 
-<form method=POST action='<?=$_SERVER['PHP_SELF']?>'>
-<?require_once("../include/set_post_key.php");?>
+<form method=POST action='<?php echo $_SERVER['PHP_SELF']?>'>
+<?php require_once("../include/set_post_key.php");?>
 <p align=center><font size=4 color=#333399>Edit a Contest</font></p>
-<input type=hidden name='cid' value=<?=$cid?>>
-<p align=left>Title:<input type=text name=title size=71 value='<?=$title?>'></p>
+<input type=hidden name='cid' value=<?php echo $cid?>>
+<p align=left>Title:<input type=text name=title size=71 value='<?php echo $title?>'></p>
 <p align=left>Start Time:<br>&nbsp;&nbsp;&nbsp;
-Year:<input type=text name=syear value=<?=substr($starttime,0,4)?> size=7 >
-Month:<input type=text name=smonth value='<?=substr($starttime,5,2)?>' size=7 >
-Day:<input type=text name=sday size=7 value='<?=substr($starttime,8,2)?>'>
-Hour:<input type=text name=shour size=7 value='<?=substr($starttime,11,2)?>'>;
-Minute:<input type=text name=sminute size=7 value=<?=substr($starttime,14,2)?>></p>
+Year:<input type=text name=syear value=<?php echo substr($starttime,0,4)?> size=7 >
+Month:<input type=text name=smonth value='<?php echo substr($starttime,5,2)?>' size=7 >
+Day:<input type=text name=sday size=7 value='<?php echo substr($starttime,8,2)?>'>
+Hour:<input type=text name=shour size=7 value='<?php echo substr($starttime,11,2)?>'>
+Minute:<input type=text name=sminute size=7 value=<?php echo substr($starttime,14,2)?>></p>
 <p align=left>End Time:<br>&nbsp;&nbsp;&nbsp;
 
-Year:<input type=text name=eyear value=<?=substr($endtime,0,4)?> size=7 >
-Month:<input type=text name=emonth value=<?=substr($endtime,5,2)?> size=7 >
-Day:<input type=text name=eday size=7 value=<?=substr($endtime,8,2)?>>&nbsp;
-Hour:<input type=text name=ehour size=7 value=<?=substr($endtime,11,2)?>> &nbsp;
-Minute:<input type=text name=eminute size=7 value=<?=substr($endtime,14,2)?>></p>
+Year:<input type=text name=eyear value=<?php echo substr($endtime,0,4)?> size=7 >
+Month:<input type=text name=emonth value=<?php echo substr($endtime,5,2)?> size=7 >
+Day:<input type=text name=eday size=7 value=<?php echo substr($endtime,8,2)?>>&nbsp;
+Hour:<input type=text name=ehour size=7 value=<?php echo substr($endtime,11,2)?>> &nbsp;
+Minute:<input type=text name=eminute size=7 value=<?php echo substr($endtime,14,2)?>></p>
 
 Public/Private:<select name=private>
-	<option value=0 <?=$private=='0'?'selected=selected':''?>>Public</option>
-	<option value=1 <?=$private=='1'?'selected=selected':''?>>Private</option>
+	<option value=0 <?php echo $private=='0'?'selected=selected':''?>>Public</option>
+	<option value=1 <?php echo $private=='1'?'selected=selected':''?>>Private</option>
 </select>
-<br>Problems:<input type=text size=60 name=cproblem value='<?=$plist?>'>
-<?
- $lang=(~((int)$langmask))&15;
+<br>Problems:<input type=text size=60 name=cproblem value='<?php echo $plist?>'>
+<?php $lang=(~((int)$langmask))&1023;
  $C_select=($lang&1)>0?"selected":"";
  $CPP_select=($lang&2)>0?"selected":"";
  $P_select=($lang&4)>0?"selected":"";
@@ -129,17 +139,30 @@ Public/Private:<select name=private>
 ?>
 
  Language:<select name="lang[]" multiple>
-		<option value=0 <?=$C_select?>>C</option>
-		<option value=1 <?=$CPP_select?>>C++</option>
-		<option value=2 <?=$P_select?>>Pascal</option>
-		<option value=3 <?=$J_select?>>Java</option>	
+		<option value=0 <?php echo $C_select?>>C</option>
+		<option value=1 <?php echo $CPP_select?>>C++</option>
+		<option value=2 <?php echo $P_select?>>Pascal</option>
+		<option value=3 <?php echo $J_select?>>Java</option>	
 	</select>
 	
 
-<br>
-Users:<textarea name="ulist" rows="10" cols="20"><?php if (isset($ulist)) { echo $ulist; } ?></textarea>
+<p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
+
+<?php
+$fck_description = new FCKeditor('description') ;
+$fck_description->BasePath = '../fckeditor/' ;
+$fck_description->Height = 300 ;
+$fck_description->Width=600;
+
+$fck_description->Value = $description ;
+$fck_description->Create() ;
+
+?>
+<br><br>
+Users:<textarea name="ulist" rows="20" cols="20"><?php if (isset($ulist)) { echo $ulist; } ?></textarea>
 <p><input type=submit value=Submit name=submit><input type=reset value=Reset name=reset></p>
 
 </form>
-<?require_once("../oj-footer.php");?>
+<?php require_once("../oj-footer.php");?>
+
 
