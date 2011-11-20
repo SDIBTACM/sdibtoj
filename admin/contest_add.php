@@ -22,7 +22,7 @@ if (isset($_POST['syear']))
 	}
 	$title=mysql_real_escape_string($title);
 	$private=mysql_real_escape_string($private);
-	
+       $description=mysql_real_escape_string($_POST['description']);	
     $lang=$_POST['lang'];
     $langmask=$OJ_LANGMASK;
     foreach($lang as $t){
@@ -30,9 +30,8 @@ if (isset($_POST['syear']))
 	} 
 	$langmask=15&(~$langmask);
 	//echo $langmask;	
-	
-	$sql="INSERT INTO `contest`(`title`,`start_time`,`end_time`,`private`,`langmask`)
-		VALUES('$title','$starttime','$endtime','$private',$langmask)";
+         $sql="INSERT INTO `contest`(`title`,`start_time`,`end_time`,`private`,`langmask`,`description`)	
+       VALUES('$title','$starttime','$endtime','$private',$langmask,'$description')";
 //	echo $sql;
 	mysql_query($sql) or die(mysql_error());
 	$cid=mysql_insert_id();
@@ -46,7 +45,7 @@ if (isset($_POST['syear']))
 		for ($i=1;$i<count($pieces);$i++){
 			$sql_1=$sql_1.",('$cid','$pieces[$i]',$i)";
 		}
-		echo $sql_1;
+		//echo $sql_1;
 		mysql_query($sql_1) or die(mysql_error());
 		$sql="update `problem` set defunct='N' where `problem_id` in ($plist)";
 		mysql_query($sql) or die(mysql_error());
@@ -66,6 +65,7 @@ if (isset($_POST['syear']))
 		//echo $sql_1;
 		mysql_query($sql_1) or die(mysql_error());
 	}
+   echo "<script>window.location.href=\"contest_list.php\";</script>";
 }
 else{
    if(isset($_GET['cid'])){
@@ -95,7 +95,7 @@ else if(isset($_POST['problem2contest'])){
 				$plist=$i;
 	   }
 }  
-  
+  include_once("../fckeditor/fckeditor.php") ;
 ?>
 	
 	<form method=POST action='<?=$_SERVER['PHP_SELF']?>'>
@@ -123,7 +123,21 @@ else if(isset($_POST['problem2contest'])){
 	</select>
         <?require_once("../include/set_post_key.php");?>
 	<br>Problems:<input type=text size=60 name=cproblem value="<?=isset($plist)?$plist:""?>">
-	<br>
+	<br>*题号与题号之间用英文逗号分开。例:1500,1501,1502
+        <br>
+        <p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
+
+<?php
+$fck_description = new FCKeditor('description') ;
+$fck_description->BasePath = '../fckeditor/' ;
+$fck_description->Height = 300 ;
+$fck_description->Width=600;
+
+$fck_description->Value = $description ;
+$fck_description->Create() ;
+
+?>
+<br><br>
 	Users:<textarea name="ulist" rows="10" cols="20"></textarea>
 	<br />
 	*可以将学生学号从Excel整列复制过来，然后要求他们用学号做UserID注册,就能进入Private的比赛作为作业和测验。

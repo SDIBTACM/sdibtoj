@@ -28,7 +28,7 @@ $content=mysql_real_escape_string($content);
 $user_id=mysql_real_escape_string($user_id);
 $sql="insert into news(`user_id`,`title`,`content`,`time`) values('$user_id','$title','$content',now())";
 mysql_query ( $sql );
-
+echo "<script>window.location.href=\"contest_list.php\";</script>";
 ?>
 <?
 

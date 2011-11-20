@@ -26,8 +26,11 @@ if (isset($_GET['cid'])){
 		$now=time();
 		$start_time=strtotime($row->start_time);
 		$end_time=strtotime($row->end_time);
+                $description=$row->description;
 		echo "<title>Contest - $row->title</title>";
-		echo "<h3>Contest - $row->title</h3>Start Time: <font color=#993399>$row->start_time</font> ";
+		echo "<h3>Contest - $row->title</h3>
+               <p>$description</p>
+               Start Time: <font color=#993399>$row->start_time</font> ";
 		echo "End Time: <font color=#993399>$row->end_time</font><br>";
 		echo "Current Time: <font color=#993399><span id=nowdate >".date("Y-m-d H:i:s")."</span></font> Status:";
 		if ($now>$end_time) echo "<font color=red>Ended</font>";
