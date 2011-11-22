@@ -6,6 +6,13 @@
 	$rows_cnt = mysql_num_rows($result) or die("Error! ".mysql_error());
 	$row= mysql_fetch_object($result);
 	$isadmin = isset($_SESSION['administrator']);
+        $sz=20;
+        $tid=strval(intval($_GET['tid']));
+       if (isset($_GET['page']))
+             $page=strval(intval($_GET['page']));
+        else $page=0;
+            $start=$page*$sz;
+
 ?>
 
 <center>
@@ -32,7 +39,7 @@ if ($isadmin){
 </tr>
 
 <?php
-	$sql="SELECT `rid`, `author_id`, `time`, `content`, `status` FROM `reply` WHERE `topic_id` = '".mysql_escape_string($_REQUEST['tid'])."' AND `status` <=1 ORDER BY `rid` LIMIT 30";
+	$sql="SELECT `rid`, `author_id`, `time`, `content`, `status` FROM `reply` WHERE `topic_id` = '".mysql_escape_string($_REQUEST['tid'])."' AND `status` <=1 ORDER BY `rid` LIMIT $start,$sz";
 	$result=mysql_query($sql) or die("Error! ".mysql_error());
 	$rows_cnt = mysql_num_rows($result);
 	$cnt=0;
@@ -65,7 +72,7 @@ if ($isadmin){
 			?>
 			>Delete</a> ]</span>
 			<span style="width:5em;text-align:right;display:inline-block;font-weight:bold;margin:0 10px">
-			<?php echo $i+1;?>#</span>
+			<?php echo $start+$i+1;?>#</span>
 		</div>
 		<div style="text-align:left; clear:both; margin:10px 30px;white-space:normal;">
 			<?php	if ($row->status == 0) echo nl2br(htmlspecialchars($row->content));
@@ -82,7 +89,26 @@ if ($isadmin){
 	}
 ?>
 </table>
-<div style="font-size:90%; width:100%; text-align:center">[<a href="#">Top</a>]  [<a href="#">Previous Page</a>]  [<a href="#">Next Page</a>] </div>
+<div style="font-size:90%; width:100%; text-align:center">
+<?
+echo  "<a href='thread.php?tid=$tid'>[Top]</a>";
+if($page>0){
+    $page--;
+    echo "&nbsp;&nbsp;<a href='thread.php?tid=$tid&page=$page'>[Previous]</a>";
+    $page++;
+}
+if($rows_cnt==$sz){
+     $page++;
+    echo "&nbsp;&nbsp;<a href='thread.php?tid=$tid&page=$page'>[Next]</a>";
+    $page--;
+
+
+}
+
+//echo [<a href="thread.php?">Previous Page</a>]  [<a href="#">Next Page</a>] </div>
+echo "</div>"
+?>
+
 <?
 if (isset($_SESSION['user_id'])){?>
 <div style="font-size:80%;"><div style="margin:0 10px">New Reply:</div></div>
