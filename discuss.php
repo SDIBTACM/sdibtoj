@@ -3,7 +3,16 @@
 	if(isset($_REQUEST['pid']))
 		$pid=addslashes($_REQUEST['pid']); 
 	else
-		$pid=0;
+  		$pid=0;
+       
+        $sz=20;
+ 
+       if (isset($_GET['page']))
+             $page=strval(intval($_GET['page']));
+        else $page=0;
+            $start=$page*$sz;
+
+
 	if(isset($_REQUEST['cid']))
 		$cid=addslashes($_REQUEST['cid']);
 	else
@@ -48,7 +57,7 @@ if (array_key_exists("pid",$_REQUEST)&&$_REQUEST['pid']!=''){
 else
   $level=" - ( `top_level` = 1 AND `pid` != 0 )";
 $sql.=" GROUP BY `topic_id` ORDER BY `top_level`$level DESC, MAX(`reply`.`time`) DESC";
-$sql.=" LIMIT 50";
+$sql.=" LIMIT $start, $sz";
 //echo $sql;
 $result = mysql_query($sql) or die("Error! ".mysql_error());
 $rows_cnt = mysql_num_rows($result);
@@ -99,12 +108,26 @@ mysql_free_result($result);
 ?>
 
 </table> 
-<span style = "font-size:75%; margin:0 10">[<b class="top3">Top</b>] 总置顶</span>
-<span style = "font-size:75%; margin:0 10">[<b class="top2">Top</b>] 分区置顶</span>
-<span style = "font-size:75%; margin:0 10">[<b class="top1">Top</b>] 题目置顶</span>
-<span style = "font-size:75%; margin:0 10">[<b class="hot">Hot</b>] 热帖</span>
-<span style = "font-size:75%; margin:0 10">[<b class="lock">Lock</b>] 锁帖</span>
 </div>
 </center>
+<?php
+echo "<center><a href='discuss.php'>[Top]</a>";
+if($page>0){
+        $page--;
+        echo "&nbsp;&nbsp;<a href='discuss.php?page=$page'>[Previous]</a>";
+        $page++;
+}
+else
+{
+echo "&nbsp;&nbsp;<a href='discuss.php'>[Previous]</a>";
 
+}
+if($rows_cnt==$sz){
+        $page++;
+        echo "&nbsp;&nbsp;<a href='discuss.php?page=$page'>[Next]</a>";
+        $page--;
+}
+echo "</center>";
+
+?>
 <?require_once("./oj-footer.php")?>
