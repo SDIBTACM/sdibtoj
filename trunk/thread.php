@@ -97,14 +97,16 @@ if($page>0){
     echo "&nbsp;&nbsp;<a href='thread.php?tid=$tid&page=$page'>[Previous]</a>";
     $page++;
 }
+else
+     echo "&nbsp;&nbsp;<a href='thread.php?tid=$tid&page=$page'>[Previous]</a>";
+
 if($rows_cnt==$sz){
      $page++;
     echo "&nbsp;&nbsp;<a href='thread.php?tid=$tid&page=$page'>[Next]</a>";
     $page--;
-
-
 }
-
+else
+    echo "&nbsp;&nbsp;<a href='thread.php?tid=$tid&page=$page'>[Next]</a>";
 //echo [<a href="thread.php?">Previous Page</a>]  [<a href="#">Next Page</a>] </div>
 echo "</div>"
 ?>

@@ -127,6 +127,8 @@ if($rows_cnt==$sz){
         echo "&nbsp;&nbsp;<a href='discuss.php?page=$page'>[Next]</a>";
         $page--;
 }
+else
+    echo "&nbsp;&nbsp;<a href='discuss.php?page=$page'>[Next]</a>";
 echo "</center>";
 
 ?>
