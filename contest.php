@@ -107,8 +107,16 @@ require_once("oj-header.php");
 ?>
 <title>Contest List</title>
 <?
-$sql="SELECT * FROM `contest` WHERE `defunct`='N' ORDER BY `contest_id` DESC";
+ $sz=30;
+ 
+       if (isset($_GET['page']))
+             $page=strval(intval($_GET['page']));
+        else $page=0;
+            $start=$page*$sz;
+
+$sql="SELECT * FROM `contest` WHERE `defunct`='N' ORDER BY `contest_id` DESC limit $start,$sz";
 $result=mysql_query($sql);
+$rows_cnt = mysql_num_rows($result);
 $color=false;
 echo "<center><h2>Contest List</h2>ServerTime:<span id=nowdate></span>";
 echo "<table width=90%><tr class=toprow align=center><td width=10%>ID<td width=50%>Contest Name<td width=20%>Start time<td width=10%>Status<td width=10%>Type</tr>";
@@ -135,6 +143,28 @@ while ($row=mysql_fetch_object($result)){
 }
 echo "</table></center>";
 mysql_free_result($result);
+
+echo "<center><a href='contest.php'>[Top]</a>";
+if($page>0){
+        $page--;
+        echo "&nbsp;&nbsp;<a href='contest.php?page=$page'>[Previous]</a>";
+        $page++;
+}
+else
+{
+echo "&nbsp;&nbsp;<a href='contest.php'>[Previous]</a>";
+
+}
+if($rows_cnt==$sz){
+        $page++;
+        echo "&nbsp;&nbsp;<a href='contest.php?page=$page'>[Next]</a>";
+        $page--;
+}
+else
+       echo "&nbsp;&nbsp;<a href='contest.php?page=$page'>[Next]</a>";
+echo "</center>";
+
+
 ?>
 
 <?
