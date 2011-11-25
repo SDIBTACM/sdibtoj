@@ -21,11 +21,16 @@ if ($ok==true){
 	$sql="SELECT `error` FROM `compileinfo` WHERE `solution_id`='".$id."'";
 	$result=mysql_query($sql);
 	$row=mysql_fetch_object($result);
-	echo htmlspecialchars(str_replace("\n\r","\n",$row->error))."</pre>";
-	mysql_free_result($result);
+         $ce=str_replace("\n\r","\n",$row->error);
+        $ce=htmlspecialchars($ce);
+        $ce=str_replace("Main.","<a href=showsource.php?id=$id>Main.</a>",$ce);
+        echo $ce."</pre>";	 
+       
+        mysql_free_result($result);
 }else{
 	mysql_free_result($result);
 	echo "I am sorry, You could not view this message!";
 }
 ?>
+<script></script>
 <?require_once("oj-footer.php")?>
