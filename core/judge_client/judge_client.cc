@@ -435,6 +435,41 @@ void addceinfo(int solution_id) {
 		printf("%s\n", mysql_error(conn));
 	fclose(fp);
 }
+void _addreinfo_mysql(int solution_id) {
+	char sql[(1 << 16)], *end;
+	char reinfo[(1 << 16)], *rend;
+	FILE *fp = fopen("error.out", "r");
+	snprintf(sql, (1 << 16) - 1,
+			"DELETE FROM runtimeinfo WHERE solution_id=%d", solution_id);
+	mysql_real_query(conn, sql, strlen(sql));
+	rend = reinfo;
+	while (fgets(rend, 1024, fp)) {
+		rend += strlen(rend);
+		if (rend - reinfo > 40000)
+			break;
+	}
+	rend = 0;
+	end = sql;
+	strcpy(end, "INSERT INTO runtimeinfo VALUES(");
+	end += strlen(sql);
+	*end++ = '\'';
+	end += sprintf(end, "%d", solution_id);
+	*end++ = '\'';
+	*end++ = ',';
+	*end++ = '\'';
+	end += mysql_real_escape_string(conn, end, reinfo, strlen(reinfo));
+	*end++ = '\'';
+	*end++ = ')';
+	*end = 0;
+	//	printf("%s\n",ceinfo);
+	if (mysql_real_query(conn, sql, end - sql))
+		printf("%s\n", mysql_error(conn));
+	fclose(fp);
+}
+void addreinfo(int solution_id) {
+		_addreinfo_mysql(solution_id);
+}
+
 
 void update_user(char user_id[]) {
 	char sql[BUFFER_SIZE];
@@ -873,6 +908,12 @@ int get_page_fault_mem(struct rusage & ruse, pid_t & pidApp) {
 	}
 	return m_minflt;
 }
+void print_runtimeerror(char * err){
+        FILE *ferr=fopen("error.out","a+");
+        fprintf(ferr,"Runtime Error:%s\n",err);
+        fclose(ferr);
+}
+
 
 void watch_solution(pid_t pidApp, char * infile, int & ACflg, int isspj,
 		char * userfile, char * outfile, int solution_id, int lang,
@@ -919,7 +960,7 @@ void watch_solution(pid_t pidApp, char * infile, int & ACflg, int isspj,
 				printf("status>>8=%d\n", exitcode);
 				psignal(exitcode, NULL);
 			}
-			if (ACflg == OJ_AC)
+			if (ACflg == OJ_AC){
 				switch (exitcode) {
 				case SIGXCPU:
 					ACflg = OJ_TL;
@@ -931,6 +972,9 @@ void watch_solution(pid_t pidApp, char * infile, int & ACflg, int isspj,
 				default:
 					ACflg = OJ_RE;
 				}
+                            print_runtimeerror(strsignal(exitcode));
+
+                       }
 			ptrace(PTRACE_KILL, pidApp, NULL, NULL);
 
 			break;
@@ -950,7 +994,7 @@ void watch_solution(pid_t pidApp, char * infile, int & ACflg, int isspj,
 				printf("WTERMSIG=%d\n", sig);
 				psignal(sig, NULL);
 			}
-			if (ACflg == OJ_AC)
+			if (ACflg == OJ_AC){
 				switch (sig) {
 				case SIGCHLD:
 				case SIGALRM:
@@ -964,7 +1008,10 @@ void watch_solution(pid_t pidApp, char * infile, int & ACflg, int isspj,
 
 				default:
 					ACflg = OJ_RE;
-				}
+	           		}
+                               print_runtimeerror(strsignal(sig));
+
+                       }
 			break;
 		}
 		/*     commited from http://www.felix021.com/blog/index.php?go=category_13
@@ -982,10 +1029,12 @@ void watch_solution(pid_t pidApp, char * infile, int & ACflg, int isspj,
 		 }*/
 		if (call_counter[reg.REG_SYSCALL] == 0) { //do not limit JVM syscall for using different JVM
 			ACflg = OJ_RE;
-			write_log(
-					"[ERROR] A Not allowed system call: runid:%d callid:%d\n",
-					solution_id, reg.REG_SYSCALL);
-			ptrace(PTRACE_KILL, pidApp, NULL, NULL);
+			char error[BUFFER_SIZE];
+                        sprintf(error,"[ERROR] A Not allowed system call: runid:%d callid:%ld\n",
+                                        solution_id, reg.REG_SYSCALL);
+                        write_log(error); 
+                         print_runtimeerror(error);
+                         ptrace(PTRACE_KILL, pidApp, NULL, NULL);
 		} else {
 			if (sub == 1)
 				call_counter[reg.REG_SYSCALL]--;
@@ -1187,6 +1236,7 @@ int main(int argc, char** argv) {
 	}else{
 	    sim = 0;
     }
+      if(ACflg == OJ_RE)addreinfo(solution_id);
 	clean_workdir(work_dir);
 
 	update_solution(solution_id, ACflg, usedtime, topmemory >> 10, sim,

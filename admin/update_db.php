@@ -52,7 +52,13 @@ CREATE TABLE `sim` (
   PRIMARY KEY  (`s_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 
-
+$tsql[4]="select 1 from runtimeinfo limit 1";
+$csql[4]="CREATE TABLE  `runtimeinfo` (
+  `solution_id` int(11) NOT NULL DEFAULT '0',
+  `error` text,
+  PRIMARY KEY (`solution_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+";
 if(isset($_POST['do'])){
 	require_once("../include/check_post_key.php");
         echo "Executing...<br>";
