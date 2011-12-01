@@ -16,8 +16,9 @@
 		$result=mysql_query($sql);
 		$row=mysql_fetch_row($result);
 		if (intval($row[0])==0) $retmsg=$MSG_CONTEST;
-		else $retmsg=$row[0]."<font color=red>&nbsp;$MSG_CONTEST</font>";
-		mysql_free_result($result);
+		else
+                   $retmsg=$row[0]."<font color=red>&nbsp;$MSG_CONTEST</font>";
+         	mysql_free_result($result);
 		return $retmsg;
 	}
 	function checkmail(){
@@ -27,11 +28,17 @@
 		$result=mysql_query($sql);
 		if(!$result) return false;
 		$row=mysql_fetch_row($result);
-		$retmsg="<font color=red>(".$row[0].")</font>";
-		mysql_free_result($result);
+     
+                  $sql1="SELECT count(1) FROM `mail` WHERE
+                               `to_user`='".$_SESSION['user_id']."'";
+                $result1=mysql_query($sql1);
+                if(!$result1) return false;
+                $row1=mysql_fetch_row($result1);
+	       	$retmsg="<font color=red>(".$row[0]."/".$row1[0].")</font>";
+		mysql_free_result($result);mysql_free_result($result1);
+
 		return $retmsg;
 	}
-	
 	if(isset($OJ_LANG)){
 		require_once("./lang/$OJ_LANG.php");
 		if(file_exists("./faqs.$OJ_LANG.php")){
@@ -48,12 +55,12 @@
 </head>
 <body>
 <center>
-<h2><font color="red">Welcome To <?=$OJ_NAME?> ACM-ICPC Online Judge</font></h2>
+<h2><img id=logo src=./image/logo.png><font color="red">Welcome To <?=$OJ_NAME?> ACM-ICPC Online Judge</font></h2>
 <table width=96%> 
 	<tr align="center" class='hd' valign="top">
 		
 
-                 <th><a href="http://jsj.sdibt.edu.cn/judge/"><font color=red>VIRTUAL JUDGE</font></a></th>
+                 <th><a href="http://acm.sdibt.edu.cn:8080/judge/"><font color=red>VIRTUAL JUDGE</font></a></th>
 
 		<?if(isset($OJ_DICT)&&$OJ_DICT&&$OJ_LANG=="cn"){?>
       <div class=menu_item >
