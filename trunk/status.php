@@ -217,7 +217,16 @@ while(	$row=mysql_fetch_object($result)){
 		echo "<td><a href='problem.php?id=".$row->problem_id."'>".$row->problem_id."</a>";
 	if (intval($row->result)==11 && ((isset($_SESSION['user_id'])&&$row->user_id==$_SESSION['user_id']) || isset($_SESSION['source_browser']))){
 		echo "<td><a href='ceinfo.php?sid=$row->solution_id'><font color=".$judge_color[$row->result].">".$judge_result[$row->result]."</font></a>";
-	}else{
+	}
+        else if (intval($row->result)==10 && ((isset($_SESSION['user_id'])&&$row->user_id==$_SESSION['user_id']) || isset($_SESSION['source_browser']))){
+  
+         //  echo "<td><a href='reinfo.php?sid=$row->solution_id' class=".$judge_color[$row->result].">".$judge_result[$row->result]."</a>";
+             echo "<td><a href='reinfo.php?sid=$row->solution_id'><font color=".$judge_color[$row->result].">".$judge_result[$row->result]."</font></a>";
+
+
+        }
+
+        else{
 		if($OJ_SIM&&$row->sim&&$row->sim_s_id!=$row->s_id) {
 			echo "<td>*<font color=".$judge_color[$row->result].">".$judge_result[$row->result]."</font>-<font color=red>";
 			if( isset($_SESSION['source_browser'])){
