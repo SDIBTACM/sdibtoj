@@ -13,7 +13,7 @@ if (isset($_GET['id'])){
 	// practice
 	$id=intval($_GET['id']);
 	require_once("oj-header.php");
-	if (!isset($_SESSION['administrator']) && $id!=1000)
+	if (!isset($_SESSION['administrator']))
 		$sql="SELECT * FROM `problem` WHERE `problem_id`=$id AND `defunct`='N' AND `problem_id` NOT IN (
 				SELECT `problem_id` FROM `contest_problem` WHERE `contest_id` IN(
 						SELECT `contest_id` FROM `contest` WHERE `end_time`>NOW() or `private`='1'))
@@ -33,13 +33,13 @@ if (isset($_GET['id'])){
 		$sql="SELECT langmask FROM `contest` WHERE `defunct`='N' AND `contest_id`=$cid";
 	$result=mysql_query($sql);
 	$rows_cnt=mysql_num_rows($result);
-   $ok_cnt=$rows_cnt==1;		
+        $ok_cnt=$rows_cnt==1;		
 	$row=mysql_fetch_row($result);
 	$langmask=$row[0];
 	mysql_free_result($result);
 	if ($ok_cnt!=1){
 		// not started
-		echo "No such Contest!";
+		echo "No such Contest or Contest not Start!";
 		require_once("oj-footer.php");
 		exit(0);
 	}else{
