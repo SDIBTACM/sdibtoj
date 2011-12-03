@@ -51,10 +51,12 @@ if(isset($_SESSION['administrator'])){
     echo "<td>Defunct<td>Edit<td>TestData</tr>";
 }
 for (;$row=mysql_fetch_object($result);){
+     if($row->defunct=="N"||isset($_SESSION['administrator']))
+     {
 	echo "<tr>";
 	echo "<td>".$row->problem_id;
 	echo "<input type=checkbox name='pid[]' value='$row->problem_id'>";
-	echo "<td><a href='../problem.php?id=$row->problem_id'>".$row->title."</a>";
+        echo "<td><a href='../problem.php?id=$row->problem_id'>".$row->title."</a>";
 	echo "<td>".$row->in_date;
 	if(isset($_SESSION['administrator'])){
 		echo "<td><a href=problem_df_change.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">".($row->defunct=="N"?"Delete":"Resume")."</a>";
@@ -63,7 +65,8 @@ for (;$row=mysql_fetch_object($result);){
 
         }
 	echo "</tr>";
-}
+    }
+ }
 echo "<tr><td colspan=6><input type=submit name='problem2contest' value='CheckToNewContest'></tr></form>";
 echo "<tr><td width='90%' colspan='4'><form>$MSG_SEARCH<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td></tr>";
 echo "</table></center>";
