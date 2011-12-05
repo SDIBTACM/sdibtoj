@@ -1,9 +1,20 @@
 <?php require("admin-header.php");
+//page
+       $sz=50;
+       if (isset($_GET['page']))
+             $page=strval(intval($_GET['page']));
+        else $page=0;
+             $start=$page*$sz;
+
+
+
+
 echo "<title>Contest List</title>";
 echo "<center><h2>Contest List</h2></center>";
 require_once("../include/set_get_key.php");
-$sql="select `contest_id`,`title`,`start_time`,`end_time`,`private`,`defunct` FROM `contest` order by `contest_id` desc";
+$sql="select `contest_id`,`title`,`start_time`,`end_time`,`private`,`defunct` FROM `contest` order by `contest_id` desc limit $start,$sz";
 $result=mysql_query($sql) or die(mysql_error());
+$rows_cnt = mysql_num_rows($result);
 echo "<center><table width=90% border=1>";
 echo "<tr><td>ContestID<td>Title<td>StartTime<td>EndTime<td>Private<td>Status<td>Edit<td>Copy<td>Export"; 
 echo "</tr>";
@@ -33,6 +44,32 @@ for (;$row=mysql_fetch_object($result);){
 	echo "</tr>";
 }
 echo "</table></center>";
+
+//top,next,previous
+echo "<center><a href='contest_list.php'>[Top]</a>";
+if($page>0){
+        $page--;
+        echo "&nbsp;&nbsp;<a href='contest_list.php?page=$page'>[Previous]</a>";
+        $page++;
+}
+else
+{
+echo "&nbsp;&nbsp;<a href='contest_list.php'>[Previous]</a>";
+
+}
+if($rows_cnt==$sz){
+        $page++;
+        echo "&nbsp;&nbsp;<a href='contest_list.php?page=$page'>[Next]</a>";
+        $page--;
+}
+else
+    echo "&nbsp;&nbsp;<a href='contest_list.php?page=$page'>[Next]</a>";
+echo "</center>";
+
+
+
+
+
 require("../oj-footer.php");
 ?>
 
