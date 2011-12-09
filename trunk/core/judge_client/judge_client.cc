@@ -159,15 +159,6 @@ void init_syscalls_limits(int lang) {
 	} else if (lang == 3) { // Java
 		for (i = 0; LANG_JC[i]; i++)
 			call_counter[LANG_JV[i]] = LANG_JC[i];
-	} else if (lang == 4) { // Ruby
-		for (i = 0; LANG_RC[i]; i++)
-			call_counter[LANG_RV[i]] = LANG_RC[i];
-	} else if (lang == 5) { // Bash
-		for (i = 0; LANG_BC[i]; i++)
-			call_counter[LANG_BV[i]] = LANG_BC[i];
-	}else if (lang == 6) { // Python
-		for (i = 0; LANG_YC[i]; i++)
-			call_counter[LANG_YV[i]] = LANG_YC[i];
 	}
 
 }
@@ -916,6 +907,19 @@ void print_runtimeerror(char * err){
         fprintf(ferr,"Runtime Error:%s\n",err);
         fclose(ferr);
 }
+void clean_session(pid_t p){
+	char cmd[BUFFER_SIZE];
+	sprintf(cmd,"ps -o sid -p %d",p);
+	FILE * pf=popen(cmd,"r");
+	pid_t sid=p;
+	fscanf(pf,"%s",cmd);
+	fscanf(pf,"%d",&sid);
+	pclose(pf);
+	if (DEBUG) printf("pkill -9 -s %d\n",sid);
+	execute_cmd("pkill -9 -s %d",sid);
+}
+
+
 
 
 void watch_solution(pid_t pidApp, char * infile, int & ACflg, int isspj,
@@ -1064,7 +1068,7 @@ void watch_solution(pid_t pidApp, char * infile, int & ACflg, int isspj,
 	}
 	usedtime += (ruse.ru_utime.tv_sec * 1000 + ruse.ru_utime.tv_usec / 1000);
 	usedtime += (ruse.ru_stime.tv_sec * 1000 + ruse.ru_stime.tv_usec / 1000);
-
+         clean_session(pidApp);
 }
 void clean_workdir(char work_dir[BUFFER_SIZE]) {
 	if (DEBUG) {
@@ -1222,6 +1226,7 @@ int main(int argc, char** argv) {
 		init_syscalls_limits(lang);
 		pid_t pidApp = fork();
 		if (pidApp == 0) {
+                        setsid();
 			run_solution(lang, work_dir, time_lmt, usedtime, mem_lmt);
 		} else {
 			watch_solution(pidApp, infile, ACflg, isspj, userfile, outfile,
