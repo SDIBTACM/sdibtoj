@@ -209,6 +209,7 @@ void init_mysql_conf() {
 			printf("sim=%d\n", sim_enable);
 		}
 	}
+       fclose(fp);
 }
 
 int isInFile(const char fname[]) {
@@ -235,6 +236,8 @@ void find_next_nonspace(int & c1, int & c2, FILE *& f1, FILE *& f2, int & ret) {
 				continue;
 			} else if ((c1 == '\r' && c2 == '\n')) {
 				c1 = fgetc(f1);
+                        } else if ((c2 == '\r' && c1 == '\n')) {
+                               c2 = fgetc(f2);
 			} else {
 				if (DEBUG)
 					printf("%d=%c\t%d=%c", c1, c1, c2, c2);
@@ -774,11 +777,11 @@ void run_solution(int & lang, char * work_dir, int & time_lmt, int & usedtime,
 	setrlimit(RLIMIT_FSIZE, &LIM);
 	// proc limit
 	if (lang < 3) { //java ruby bash python need more threads/processes
-		LIM.rlim_cur = 10;
-		LIM.rlim_max = 10;
-	} else {
-		LIM.rlim_cur = 100;
-		LIM.rlim_max = 100;
+		LIM.rlim_cur = 1;
+		LIM.rlim_max = 1;
+	} else if(lang == 3){
+		LIM.rlim_cur = 50;
+		LIM.rlim_max = 50;
 	}
 	setrlimit(RLIMIT_NPROC, &LIM);
 	// set the stack
