@@ -753,7 +753,9 @@ void copy_python_runtime(char * work_dir) {
 void run_solution(int & lang, char * work_dir, int & time_lmt, int & usedtime,
 		int & mem_lmt) {
 	char java_p1[BUFFER_SIZE], java_p2[BUFFER_SIZE];
-	// child
+	// set children new session to killall them later
+        setsid();
+      
 	// set the limit
 	struct rlimit LIM; // time limit, file limit& memory limit
 	// time limit
@@ -1137,6 +1139,8 @@ int main(int argc, char** argv) {
 	int solution_id = 1000;
 	int runner_id = 0;
 	int p_id, time_lmt, mem_lmt, lang, isspj, sim, sim_s_id;
+          
+        nice(19);
 
 	init_parameters(argc, argv, solution_id, runner_id);
 
@@ -1226,7 +1230,7 @@ int main(int argc, char** argv) {
 		init_syscalls_limits(lang);
 		pid_t pidApp = fork();
 		if (pidApp == 0) {
-                        setsid();
+                        //setsid();
 			run_solution(lang, work_dir, time_lmt, usedtime, mem_lmt);
 		} else {
 			watch_solution(pidApp, infile, ACflg, isspj, userfile, outfile,
