@@ -153,18 +153,20 @@ bool updatedb(int solution_id,int result){
 void run_client(int runid,int clientid){
     char buf[2],runidstr[1024];
         struct rlimit LIM;
-		LIM.rlim_max=300;
-		LIM.rlim_cur=300;
+		LIM.rlim_max=30;
+		LIM.rlim_cur=30;
 		setrlimit(RLIMIT_CPU,&LIM);
 
 		LIM.rlim_max=80*STD_MB;
 		LIM.rlim_cur=80*STD_MB;
 		setrlimit(RLIMIT_FSIZE,&LIM);
 
-		LIM.rlim_max=STD_MB<<11;
-		LIM.rlim_cur=STD_MB<<11;
+		LIM.rlim_max=STD_MB<<10;
+		LIM.rlim_cur=STD_MB<<10;
 		setrlimit(RLIMIT_AS,&LIM);
-
+ 
+                LIM.rlim_max=LIM.rlim_cur=100;
+                setrlimit(RLIMIT_NPROC,&LIM);
 	//buf[0]=clientid+'0'; buf[1]=0;
 	sprintf(buf,"%d",clientid);
 	sprintf(runidstr,"%d",runid);
