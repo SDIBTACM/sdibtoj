@@ -200,7 +200,7 @@ void init_mysql_conf() {
 			printf("sim=%d\n", sim_enable);
 		}
 	}
-       fclose(fp);
+       //fclose(fp);
 }
 
 int isInFile(const char fname[]) {
@@ -522,8 +522,8 @@ int compile(int lang) {
 		LIM.rlim_cur = 60 * STD_MB;
 		setrlimit(RLIMIT_FSIZE, &LIM);
 
-		LIM.rlim_max = 1000 * STD_MB;
-		LIM.rlim_cur = 1000 * STD_MB;
+		LIM.rlim_max = 1024 * STD_MB;
+		LIM.rlim_cur = 1024 * STD_MB;
 		setrlimit(RLIMIT_AS, &LIM);
 		if (lang != 2) {
 			freopen("ce.txt", "w", stderr);
@@ -752,7 +752,8 @@ void copy_python_runtime(char * work_dir) {
 
 void run_solution(int & lang, char * work_dir, int & time_lmt, int & usedtime,
 		int & mem_lmt) {
-	char java_p1[BUFFER_SIZE], java_p2[BUFFER_SIZE];
+	nice(19);
+        char java_p1[BUFFER_SIZE], java_p2[BUFFER_SIZE];
 	// set children new session to killall them later
         setsid();
       
@@ -778,9 +779,17 @@ void run_solution(int & lang, char * work_dir, int & time_lmt, int & usedtime,
 	}
 	setrlimit(RLIMIT_NPROC, &LIM);
 	// set the stack
-	LIM.rlim_cur = STD_MB << 3;
-	LIM.rlim_max = STD_MB << 3;
+	LIM.rlim_cur = STD_MB << 6;
+	LIM.rlim_max = STD_MB << 6;
 	setrlimit(RLIMIT_STACK, &LIM);
+        // set the memory
+       LIM.rlim_cur = STD_MB *mem_lmt*1.5;
+       LIM.rlim_max = STD_MB *mem_lmt*2;
+       if(lang<3)
+             setrlimit(RLIMIT_AS, &LIM);
+
+
+
 	chdir(work_dir);
 	// open the files
 	freopen("data.in", "r", stdin);
@@ -1140,7 +1149,7 @@ int main(int argc, char** argv) {
 	int runner_id = 0;
 	int p_id, time_lmt, mem_lmt, lang, isspj, sim, sim_s_id;
           
-        nice(19);
+        //nice(19);
 
 	init_parameters(argc, argv, solution_id, runner_id);
 
@@ -1239,6 +1248,7 @@ int main(int argc, char** argv) {
 			judge_solution(ACflg, usedtime, time_lmt, isspj, p_id, infile,
 					outfile, userfile, PEflg, lang, work_dir, topmemory,
 					mem_lmt);
+                        clean_session(pidApp);
 		}
 	}
 	if (ACflg == OJ_AC && PEflg == OJ_PE)
