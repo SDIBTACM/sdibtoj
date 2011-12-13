@@ -1079,7 +1079,7 @@ void watch_solution(pid_t pidApp, char * infile, int & ACflg, int isspj,
 	}
 	usedtime += (ruse.ru_utime.tv_sec * 1000 + ruse.ru_utime.tv_usec / 1000);
 	usedtime += (ruse.ru_stime.tv_sec * 1000 + ruse.ru_stime.tv_usec / 1000);
-         clean_session(pidApp);
+         //clean_session(pidApp);
 }
 void clean_workdir(char work_dir[BUFFER_SIZE]) {
 	if (DEBUG) {
@@ -1248,7 +1248,7 @@ int main(int argc, char** argv) {
 			judge_solution(ACflg, usedtime, time_lmt, isspj, p_id, infile,
 					outfile, userfile, PEflg, lang, work_dir, topmemory,
 					mem_lmt);
-                        clean_session(pidApp);
+                        //clean_session(pidApp);
 		}
 	}
 	if (ACflg == OJ_AC && PEflg == OJ_PE)
