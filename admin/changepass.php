@@ -1,4 +1,6 @@
-<?require_once("admin-header.php");?>
+<?
+require_once("admin-header.php")
+?>
 <?
 if (!(isset($_SESSION['administrator']))){
 	echo "<a href='../loginpage.php'>Please Login First!</a>";
@@ -6,8 +8,9 @@ if (!(isset($_SESSION['administrator']))){
 }
 if(isset($_POST['do'])){
         require_once("../include/check_post_key.php");
-	$user_id=mysql_real_escape_string($_POST['user_id']);
-	$passwd =MD5($_POST['passwd']);
+	require_once("../include/my_func.inc.php");
+        $user_id=mysql_real_escape_string($_POST['user_id']);
+	$passwd =pwGen($_POST['passwd']);
 	$sql="update `users` set `password`='$passwd' where `user_id`='$user_id'";
 	mysql_query($sql);
 	if (mysql_affected_rows()==1) echo "Password Changed!";
