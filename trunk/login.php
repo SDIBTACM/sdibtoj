@@ -1,7 +1,8 @@
 <?
 	require_once("./include/db_info.inc.php");
+       require_once("./include/my_func.inc.php");
 	$user_id=mysql_escape_string($_POST['user_id']);
-	$password=MD5($_POST['password']);
+	$password=$_POST['password'];
 	session_destroy();
 	session_start();
         $sql="SELECT `school`,`email`,`nick` FROM `users` WHERE `user_id`='$user_id'";
@@ -17,14 +18,14 @@
 	}
 
 
-	$sql="SELECT `user_id` FROM `users` WHERE `user_id`='".$user_id."' AND `password`='".$password."'";
+	$sql="SELECT `user_id`,`password` FROM `users` WHERE `user_id`='".$user_id."'";
 	$result=mysql_query($sql);
-	$cnt_row=mysql_num_rows($result);
-	if ($cnt_row==1){
-		$row=mysql_fetch_object($result);
-		$_SESSION['user_id']=$row->user_id;
+	$row = mysql_fetch_array($result);
+         if ($row && pwCheck($password,$row['password']))	{	
+		$_SESSION['user_id']=$row['user_id'];
 		mysql_free_result($result);
-	         $sql="INSERT INTO `loginlog` VALUES('$user_id','$password','".$_SERVER['REMOTE_ADDR']."',NOW())";
+                 $password1=pwGen($password);
+	         $sql="INSERT INTO `loginlog` VALUES('$user_id','$password1','".$_SERVER['REMOTE_ADDR']."',NOW())";
 	@mysql_query($sql) or die(mysql_error());
         	$sql="SELECT `rightstr` FROM `privilege` WHERE `user_id`='".$_SESSION['user_id']."'";
 		$result=mysql_query($sql);
