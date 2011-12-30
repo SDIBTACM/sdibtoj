@@ -24,7 +24,7 @@ if ($row && pwCheck($password,$row['password'])) $rows_cnt = 1;
 else $rows_cnt = 0;
 mysql_free_result($result);
 if ($rows_cnt==0){
-        $err_str=$err_str."Old Password Wrong";
+        $err_str=$err_str."Old Password Wrong<br>";
         $err_cnt++;
 }
 $len=strlen($_POST['npassword']);
@@ -37,12 +37,12 @@ if ($len<6 && $len>0){
 }
 $len=strlen($_POST['school']);
 if ($len>100){
-        $err_str=$err_str."School Name Too Long!\n";
+        $err_str=$err_str."School Name Too Long!<br>";
         $err_cnt++;
 }
 $len=strlen($_POST['email']);
 if ($len>100){
-        $err_str=$err_str."Email Too Long!\n";
+        $err_str=$err_str."Email Too Long!<br>";
         $err_cnt++;
 }
 if ($err_cnt>0){
