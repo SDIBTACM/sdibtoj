@@ -2,7 +2,7 @@
 
 $cache_time=1;
  require_once("oj-header.php")?>
-<title>Compile Error Info</title>
+<title>Running Error Info</title>
 <?php 
 require_once("./include/db_info.inc.php");
 require_once("./include/const.inc.php");

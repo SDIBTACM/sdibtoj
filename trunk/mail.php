@@ -171,6 +171,7 @@ for (;$row=mysql_fetch_row($result);){
         echo "<td>".$row[0];
         //echo "<td>".$row[1];
         //echo "<td>".$row[2];
+         if ($row[5]) echo "<font color=red>New</font>";
         echo "<td><a href='userinfo.php?user=$row[2]'>".$row[2]."</a>";
         echo "<td><a href='userinfo.php?user=$row[1]'>".$row[1]."</a>";
 
