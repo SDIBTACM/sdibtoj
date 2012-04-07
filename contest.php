@@ -49,6 +49,75 @@ if (isset($_GET['cid'])){
 		require_once("oj-footer.php");
 		exit(1);
 	}
+
+             
+
+     $sql="SELECT count(`num`) FROM `contest_problem` WHERE `contest_id`='$cid'";
+$result=mysql_query($sql);
+$row=mysql_fetch_array($result);
+$sql="SELECT count(`num`) FROM `contest_problem` WHERE `contest_id`='$cid'";
+$result=mysql_query($sql);
+$row=mysql_fetch_array($result);
+$pid_cnt=intval($row[0]);
+mysql_free_result($result);
+
+$sql="SELECT `result`,`num`,`language` FROM `solution` WHERE `contest_id`='$cid' and num>=0"; 
+$result=mysql_query($sql);
+$R=array();
+while ($row=mysql_fetch_object($result)){
+        $res=intval($row->result)-4;
+        if ($res<0) $res=8;
+        $num=intval($row->num);
+   $lag=intval($row->language);
+        if(!isset($R[$num][$res]))
+                $R[$num][$res]=1;
+        else
+                $R[$num][$res]++;
+        if(!isset($R[$num][$lag+10]))
+                $R[$num][$lag+10]=1;
+        else
+                $R[$num][$lag+10]++;
+        if(!isset($R[$pid_cnt][$res]))
+                $R[$pid_cnt][$res]=1;
+        else
+                $R[$pid_cnt][$res]++;
+        if(!isset($R[$pid_cnt][$lag+10]))
+                $R[$pid_cnt][$lag+10]=1;
+        else
+                $R[$pid_cnt][$lag+10]++;
+        if(!isset($R[$num][8]))
+                $R[$num][8]=1;
+        else
+                $R[$num][8]++;
+        if(!isset($R[$pid_cnt][8]))
+                $R[$pid_cnt][8]=1;
+        else
+                $R[$pid_cnt][8]++;
+}
+mysql_free_result($result);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
          if (isset($_SESSION['administrator'])){
 
            $sql="SELECT `problem`.`title` as `title`,`problem`.`problem_id` as `pid`
@@ -79,7 +148,8 @@ if (isset($_GET['cid'])){
           $end_flag=true;
          }
 	$cnt=0;
-	echo "<table width=60%><tr class=toprow><td width=5><td width=34%><b>Problem ID</b><td width=65%><b>Title</b></tr>";
+
+	echo "<table width=60% ><tr class=toprow><td width=5><td width=30%><b>Problem ID</b><td width=35%><b>Title</b><td width=30%><center><b>AC/Submit</b></center></tr>";
 	while ($row=mysql_fetch_object($result)){
 		if ($cnt&1) echo "<tr class=oddrow>";
 		else echo "<tr class=evenrow>";
@@ -88,15 +158,28 @@ if (isset($_GET['cid'])){
 	        if(!$end_flag){
         	echo "<td>$row->pid Problem $PID[$cnt]
 			<td><a href='problem.php?cid=$cid&pid=$cnt'>$row->title</a>
-			</tr>";}
+			";}
                 else
                 {
                      echo "<td>$row->pid Problem $PID[$cnt]
                          <td><a href='problem.php?id=$row->pid'>$row->title</a>
-                        </tr>";}
-		$cnt++;
+                        ";}
+	        echo "<td><center>";
+                if($R[$cnt][0]=="")
+                    echo "0";
+                else
+                    echo $R[$cnt][0];
+                echo "/";
+               
+                 if($R[$cnt][8]=="")
+                    echo "0";
+                else
+                    echo $R[$cnt][8];
+
+               $cnt++;
+                
 	}
-	echo "</table><br>";
+	echo "</tr></table><br>";
 	mysql_free_result($result);
 	echo "[<a href='status.php?cid=$cid'>Status</a>]";
 	echo "[<a href='contestrank.php?cid=$cid'>Standing</a>]";
@@ -124,7 +207,7 @@ while ($row=mysql_fetch_object($result)){
 	if ($color) echo "<tr align=center class=oddrow>";
 	else echo "<tr align=center class=evenrow>";
 	echo "<td>$row->contest_id";
-	echo "<td><a href='contest.php?cid=$row->contest_id'>$row->title</a>";
+	echo "<td align=left><a href='contest.php?cid=$row->contest_id'>$row->title</a>";
 	$start_time=strtotime($row->start_time);
 	$end_time=strtotime($row->end_time);
 	$now=time();
