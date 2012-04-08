@@ -149,7 +149,7 @@ mysql_free_result($result);
          }
 	$cnt=0;
 
-	echo "<table width=60% ><tr class=toprow><td width=5><td width=30%><b>Problem ID</b><td width=35%><b>Title</b><td width=30%><center><b>AC/Submit</b></center></tr>";
+	echo "<table width=60% ><tr class=toprow><td width=5><td width=30%><b>Problem ID</b><td width=35%><b>Title</b><td width=30%><center><b>Ratio(AC/Submit)</b></center></tr>";
 	while ($row=mysql_fetch_object($result)){
 		if ($cnt&1) echo "<tr class=oddrow>";
 		else echo "<tr class=evenrow>";
@@ -165,6 +165,11 @@ mysql_free_result($result);
                          <td><a href='problem.php?id=$row->pid'>$row->title</a>
                         ";}
 	        echo "<td><center>";
+                 if($R[$cnt][8]=="")
+                      echo "0.00%";
+                 else
+                      echo sprintf( "%.02lf%%",100*$R[$cnt][0]/$R[$cnt][8]);
+                 echo "(";
                 if($R[$cnt][0]=="")
                     echo "0";
                 else
@@ -175,7 +180,7 @@ mysql_free_result($result);
                     echo "0";
                 else
                     echo $R[$cnt][8];
-
+                 echo ")";
                $cnt++;
                 
 	}
