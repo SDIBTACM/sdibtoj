@@ -1,6 +1,11 @@
 <?php require("admin-header.php");
+if (!(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))){
+        echo "<a href='../loginpage.php'>Please Login First!</a>";
+        exit(1);
+}
+
 //page
-       $sz=50;
+       $sz=30;
        if (isset($_GET['page']))
              $page=strval(intval($_GET['page']));
         else $page=0;
