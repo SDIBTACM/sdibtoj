@@ -32,6 +32,7 @@ $test_output = $_POST ['test_output'];
 $hint = $_POST ['hint'];
 $source = $_POST ['source'];
 $spj = $_POST ['spj'];
+$author = $_SESSION['user_id'];
 if (get_magic_quotes_gpc ()) {
 	$title = stripslashes ( $title);
 	$time_limit = stripslashes ( $time_limit);
@@ -49,7 +50,7 @@ if (get_magic_quotes_gpc ()) {
 	$source = stripslashes ( $source );
 }
 //echo "->".$OJ_DATA."<-"; 
-$pid=addproblem ( $title, $time_limit, $memory_limit, $description, $input, $output, $sample_input, $sample_output, $hint, $source, $spj, $OJ_DATA );
+$pid=addproblem ( $title, $time_limit, $memory_limit, $description, $input, $output, $sample_input, $sample_output, $hint, $source, $spj, $OJ_DATA ,$author);
 $basedir = "$OJ_DATA/$pid";
 mkdir ( $basedir );
 if($sample_output&&!$sample_input) $sample_input="0";

@@ -68,6 +68,11 @@
       </div>
       <script src="include/underlineTranslation.js" type="text/javascript"></script>
                 <?}?>
+                
+                  <th><a href="./recent-contest.php">Recent Contest</a></th>
+
+
+
 		<th><a href="<?=isset($OJ_FAQ_LINK)?$OJ_FAQ_LINK:"faqs.php"?>"><?=$MSG_FAQ?></a></th>
 		<th><a href="./discuss.php"><?=$MSG_BBS?></a></th>
 		<th><a href="<?=$OJ_HOME?>"><?=$MSG_HOME?></a></th>
@@ -89,7 +94,7 @@
 				print "<th><a href=loginpage.php>$MSG_LOGIN</a></th>";
 				print "<th><a href=registerpage.php>$MSG_REGISTER</a></th>";
 			}
-			if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])){
+			if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])||isset($_SESSION['problem_editor'])){
 				print "<th><a href=admin>$MSG_ADMIN</a></th>";
 			
 			}
