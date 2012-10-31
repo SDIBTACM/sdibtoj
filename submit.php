@@ -22,7 +22,7 @@ if (isset($_POST['cid'])){
 			(`end_time`>NOW())and `defunct`='N'
 			))";
 	if(!isset($_SESSION['administrator']))
-		$sql.=" and defunct='N'";
+		$sql.=" and (defunct='N'  or (`author`!='' and `author`='".$_SESSION['user_id']."'". "))";
 }
 //echo $sql;	
 
