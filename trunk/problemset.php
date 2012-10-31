@@ -62,7 +62,7 @@ while ($row=mysql_fetch_array($result))
 if (!isset($_SESSION['administrator'])){
 	
            $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date` FROM `problem` ".
-           "WHERE `defunct`='N' AND `problem_id` NOT IN(
+           "WHERE (`defunct`='N'or (`author`!='' and `author`='".$_SESSION['user_id']."'". ")) AND `problem_id` NOT IN(
 		SELECT `problem_id` FROM `contest_problem` WHERE `contest_id` IN (
 			SELECT `contest_id` FROM `contest` WHERE `end_time`>NOW() 
 		)
@@ -71,7 +71,7 @@ if (!isset($_SESSION['administrator'])){
 }
 else{
 	
-        $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date` FROM `problem` WHERE ";
+        $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date`  FROM `problem` WHERE ";
        $sql=$sql0." `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
 }
 if(isset($_GET['search'])){
@@ -82,11 +82,15 @@ if(isset($_GET['search'])){
         $sql=$sql." or source like '%$search%')";
         //$sql=$sql." or problem_id='$search')";
 	if (!isset($_SESSION['administrator'])){
-        	$sql=$sql." and defunct='N'";
+           //  if (isset($_SESSION['problem_editor']))
+             //       $sql=$sql." or author='".$_SESSION['user_id']."'";
+     //        else
+     	$sql=$sql." and defunct='N'";
          }
     }
 }
 $sql=$sql." ORDER BY `problem_id`";
+//echo $sql;
 ?>
 <title>Problem Set</title>
 

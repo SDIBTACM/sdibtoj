@@ -30,11 +30,11 @@ for ($i=1;$i<=$cnt+1;$i++){
 echo "</center>";
 if(isset($_GET['search'])){
    if(trim($_GET['search'])=="")
-      $sql="select  `problem_id`,`title`,`in_date`,`defunct` FROM `problem` where `defunct`='Y'  order by `problem_id` desc  ";
+      $sql="select  `problem_id`,`title`,`in_date`,`defunct`,`author` FROM `problem` where `defunct`='Y'  order by `problem_id` desc  ";
    else
      {
       $search=mysql_real_escape_string($_GET['search']); 
-      $sql="select  `problem_id`,`title`,`in_date`,`defunct` FROM `problem` where (title like '%$search%' or source like '%$search%') order by `problem_id` desc  ";
+      $sql="select  `problem_id`,`title`,`in_date`,`defunct`,`author` FROM `problem` where (author like '%$search%' or title like '%$search%' or source like '%$search%') order by `problem_id` desc  ";
       }
 }
 else
@@ -48,22 +48,22 @@ echo "<center><table width=90% border=1>";
 if (isset($_SESSION['administrator']))
   {     
          echo "<form method=post action=contest_add.php>";
-         echo "<tr><td colspan=6><input type=submit name='problem2contest' value='CheckToNewContest'>";
+         echo "<tr><td colspan=7><input type=submit name='problem2contest' value='CheckToNewContest'>";
 }
-echo "<tr><td>PID<td>Title<td>Date";
+echo "<tr><td>PID<td>Title<td>author<td>Date";
 //if(isset($_SESSION['administrator'])){
     echo "<td>Defunct<td>Edit<td>TestData</tr>";
 //}
 for (;$row=mysql_fetch_object($result);){
-     if($row->defunct=="N"||isset($_SESSION['administrator'])||$row->author==$_SESSION['problem_editor'])
+     if($row->defunct=="N"||isset($_SESSION['administrator'])||($row->author==$_SESSION['problem_editor']&&$row->author==$_SESSION['user_id']))
      {
 	echo "<tr>";
 	echo "<td>".$row->problem_id;
          if (isset($_SESSION['administrator']))
-
-         	echo "<input type=checkbox name='pid[]' value='$row->problem_id'>";
+           echo "<input type=checkbox name='pid[]' value='$row->problem_id'>";
         echo "<td><a href='../problem.php?id=$row->problem_id'>".$row->title."</a>";
-	echo "<td>".$row->in_date;
+	echo "<td>".$row->author;
+        echo "<td>".$row->in_date;
 	if(isset($_SESSION['administrator'])||$row->author==$_SESSION['user_id']){
 		echo "<td><a href=problem_df_change.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">".($row->defunct=="N"?"Delete":"Resume")."</a>";
 		echo "<td><a href=problem_edit.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">Edit</a>";
