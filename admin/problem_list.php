@@ -1,7 +1,7 @@
 <?
 require("admin-header.php");
 require_once("../include/set_get_key.php");
-if (!(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))){
+if (!(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])||isset($_SESSION['problem_editor']))){
 	echo "<a href='../loginpage.php'>Please Login First!</a>";
 	exit(1);
 }
@@ -39,26 +39,32 @@ if(isset($_GET['search'])){
 }
 else
 {
-  $sql="select `problem_id`,`title`,`in_date`,`defunct` FROM `problem` where problem_id>=$pstart and problem_id<=$pend order by `problem_id` desc";
+  $sql="select `problem_id`,`title`,`in_date`,`defunct`,`author` FROM `problem` where problem_id>=$pstart and problem_id<=$pend order by `problem_id` desc";
  }
 //echo $sql;
 $result=mysql_query($sql) or die(mysql_error());
 echo "<center><table width=90% border=1>";
-echo "<form method=post action=contest_add.php>";
-echo "<tr><td colspan=6><input type=submit name='problem2contest' value='CheckToNewContest'>";
-echo "<tr><td>PID<td>Title<td>Date";
-if(isset($_SESSION['administrator'])){
-    echo "<td>Defunct<td>Edit<td>TestData</tr>";
+//echo "<form method=post action=contest_add.php>";
+if (isset($_SESSION['administrator']))
+  {     
+         echo "<form method=post action=contest_add.php>";
+         echo "<tr><td colspan=6><input type=submit name='problem2contest' value='CheckToNewContest'>";
 }
+echo "<tr><td>PID<td>Title<td>Date";
+//if(isset($_SESSION['administrator'])){
+    echo "<td>Defunct<td>Edit<td>TestData</tr>";
+//}
 for (;$row=mysql_fetch_object($result);){
-     if($row->defunct=="N"||isset($_SESSION['administrator']))
+     if($row->defunct=="N"||isset($_SESSION['administrator'])||$row->author==$_SESSION['problem_editor'])
      {
 	echo "<tr>";
 	echo "<td>".$row->problem_id;
-	echo "<input type=checkbox name='pid[]' value='$row->problem_id'>";
+         if (isset($_SESSION['administrator']))
+
+         	echo "<input type=checkbox name='pid[]' value='$row->problem_id'>";
         echo "<td><a href='../problem.php?id=$row->problem_id'>".$row->title."</a>";
 	echo "<td>".$row->in_date;
-	if(isset($_SESSION['administrator'])){
+	if(isset($_SESSION['administrator'])||$row->author==$_SESSION['user_id']){
 		echo "<td><a href=problem_df_change.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">".($row->defunct=="N"?"Delete":"Resume")."</a>";
 		echo "<td><a href=problem_edit.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">Edit</a>";
 	echo "<td><a href=quixplorer/index.php?action=list&dir=$row->problem_id&order=name&srt=yes>TestData</a>";
@@ -67,7 +73,7 @@ for (;$row=mysql_fetch_object($result);){
 	echo "</tr>";
     }
  }
-echo "<tr><td colspan=6><input type=submit name='problem2contest' value='CheckToNewContest'></tr></form>";
+echo "</form>";
 echo "<tr><td width='90%' colspan='4'><form>$MSG_SEARCH<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td></tr>";
 echo "</table></center>";
 require("../oj-footer.php");

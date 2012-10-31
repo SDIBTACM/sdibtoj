@@ -20,7 +20,7 @@ if (isset($_SESSION['administrator'])){
 		<a href="problem_add_page.php" target="main"><b>NewProblem</b></a>
 <?
 }
-if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])){
+if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])||isset($_SESSION['problem_editor'])){
 ?>
 	<li>
 		<a href="problem_list.php" target="main"><b>ProblemList</b></a>
@@ -70,6 +70,13 @@ if (isset($_SESSION['administrator'])){
 <?
 }
 if (isset($_SESSION['administrator'])){
+?>
+<li>
+        <a href="assign_problem.php" target="main"><b>assign problem</b></a>
+<?
+}
+
+if (isset($_SESSION['administrator'])){
 ?><li>
 	<a href="problem_export.php" target="main"><b>ExportProblem</b></a>
 <?
@@ -84,11 +91,11 @@ if (isset($_SESSION['administrator'])){
 	<a href="update_db.php" target="main"><b>Update DataBase</b></a>
 <?
 }
-if (isset($OJ_ONLINE)&&$OJ_ONLINE){
+//if (isset($OJ_ONLINE)&&$OJ_ONLINE){
 ?><li>
 	<a href="../online.php" target="main"><b>Online</b></a>
 <?
-}
+//}
 ?>
 
 <?
