@@ -1,4 +1,11 @@
-<?require_once("admin-header.php");?>
+<?require_once("admin-header.php");
+if (!(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))){
+        echo "<a href='../loginpage.php'>Please Login First!</a>";
+        exit(1);
+}
+
+
+?>
 <meta http-equiv="Content-Type" content="text/html; charset=utf8">
 <title>Add a contest</title>
 
