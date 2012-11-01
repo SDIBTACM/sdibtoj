@@ -33,7 +33,7 @@ $sql="SELECT * FROM `problem` WHERE `problem_id`=".intval($_GET['id']);
 $result=mysql_query($sql);
 $row=mysql_fetch_object($result);
 
-if(isset($_SESSION['problem_editor'])&&$row->author!=$_SESSION['user_id']){
+if(!isset($_SESSION['administrator'])&&isset($_SESSION['problem_editor'])&&$row->author!=$_SESSION['user_id']){
     echo "You don't have the privilege to edit this problem";
      exit(0);
  }
