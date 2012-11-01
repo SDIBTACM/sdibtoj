@@ -5,6 +5,24 @@
 	exit(1);
 }
 require_once("../../include/db_info.inc.php");
+if (isset($_SESSION['problem_editor']))
+{
+    $pid=intval($_GET["dir"]); 
+    $sql="SELECT `author` FROM `problem` WHERE `problem_id`='$pid'";
+    $result=mysql_query($sql);
+    $row = mysql_fetch_array($result);
+   //echo $pid ;
+    if( $_SESSION['user_id']!=$row['author']){
+        echo "You don't have the privilege to edit this problem' test data;";  
+              exit(0);
+         }
+
+
+
+}
+
+
+
 //------------------------------------------------------------------------------
 // Configuration Variables
 	
