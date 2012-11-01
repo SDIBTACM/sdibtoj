@@ -5,7 +5,7 @@
 	exit(1);
 }
 require_once("../../include/db_info.inc.php");
-if (isset($_SESSION['problem_editor']))
+if (!isset($_SESSION['administrator'])&&isset($_SESSION['problem_editor']))
 {
     $pid=intval($_GET["dir"]); 
     $sql="SELECT `author` FROM `problem` WHERE `problem_id`='$pid'";
