@@ -28,11 +28,14 @@ function addproblem($title, $time_limit, $memory_limit, $description, $input, $o
 		$result = @mysql_query ( $sql ) or die ( mysql_error () );
 		$row = mysql_fetch_row ( $result );
 		$cid = $_POST ['contest_id'];
-		$num = $row [0];
+		//echo $cid;
+                $num = $row [0];
 		echo "Num=" . $num . ":";
-		$sql = "INSERT INTO `contest_problem` (`problem_id`,`contest_id`,`num`) VALUES('$pid','$cid','$num')";
-		mysql_free_result ( $result );
-		mysql_query ( $sql );
+		if ($cid!=''){
+                   $sql = "INSERT INTO `contest_problem` (`problem_id`,`contest_id`,`num`) VALUES('$pid','$cid','$num')";
+	           mysql_free_result ( $result );
+		   mysql_query ( $sql );
+                }
 	}
 	$basedir = "$OJ_DATA/$pid";
 	echo "Please add more data file in $basedir";
