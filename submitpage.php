@@ -34,7 +34,8 @@ editAreaLoader.init({
                 ,word_wrap: true
                 ,language: "en"
                 ,syntax: "cpp"
-                        ,font_size: "10"
+                ,font_size: "10"
+                ,display: "later"
                 ,syntax_selection_allow: "basic,c,cpp,java,pas"
                         ,toolbar: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,syntax_selection,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
         });
@@ -94,6 +95,18 @@ if(isset($_GET['sid'])){
           $result=mysql_query($sql);
           $row=mysql_fetch_object($result);
           if ($row && $row->user_id==$_SESSION['user_id']) $ok=true;
+         if(isset($OJ_VIP_CONTEST)&&$OJ_VIP_CONTEST)
+          {
+                       $sql="SELECT 1 FROM `contest_problem` WHERE `problem_id`=$row->problem_id AND `contest_id` IN (
+               SELECT `contest_id` FROM `contest` WHERE `start_time`<NOW() AND `end_time`>NOW())";
+               $rrs=mysql_query($sql);
+               $flag=!(mysql_num_rows($rrs)>0);
+               if($flag)
+                  $ok=false;
+               else
+                 $ok=true;
+
+           } 
           if (isset($_SESSION['source_browser'])) $ok=true;
           mysql_free_result($result);
           if ($ok==true){

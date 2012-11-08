@@ -171,7 +171,10 @@ for ($i=$start+1;$row=mysql_fetch_object($result);$i++){
 		(isset($OJ_AUTO_SHARE)&&$OJ_AUTO_SHARE&&$AC))){
 		echo "<td>".$language_name[$row->language];
 	}else{
-		echo "<td><a target=_blank href=showsource.php?id=".$row->solution_id.">".$language_name[$row->language]."</a>";
+               if(!$OJ_VIP_CONTEST||($OJ_VIP_CONTEST&&!$flag)|| isset($_SESSION['source_browser']))
+		    echo "<td><a target=_blank href=showsource.php?id=".$row->solution_id.">".$language_name[$row->language]."</a>";
+                else
+                    echo "<td>".$language_name[$row->language]; 
 	}echo "<td>";
 	if ($flag) echo "$s_cl B";
 	else echo "------";
