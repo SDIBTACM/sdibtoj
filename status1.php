@@ -226,8 +226,7 @@ while(	$row=mysql_fetch_object($result)){
 					echo $row->sim_s_id;
 			}
 			if(isset($_GET['showsim'])&&isset($row->old_user_id)){
-					echo "$row->old_user_id";
-				
+			      echo "<a href=userinfo.php?user=".$row->old_user_id."><font color=red>".$row->old_user_id."</font></a>";	
 			}
 			echo	 "</font>";
 		}else{
@@ -246,13 +245,26 @@ while(	$row=mysql_fetch_object($result)){
 		if (!(isset($_SESSION['user_id'])&&strtolower($row->user_id)==strtolower($_SESSION['user_id']) || isset($_SESSION['source_browser']))){
 			echo "<td>".$language_name[$row->language];
 		}else{
+                        if(!$OJ_VIP_CONTEST || isset($_SESSION['source_browser'])){
 			echo "<td><a target=_blank href=showsource.php?id=".$row->solution_id.">".$language_name[$row->language]."</a>/";
 			if (isset($cid)) {
 				echo "<a target=_self href=\"submitpage.php?cid=".$cid."&pid=$row->num&sid=".$row->solution_id."\">Edit</a>";
 			}else{
 				echo "<a target=_self href=\"submitpage.php?id=".$row->problem_id."&sid=".$row->solution_id."\">Edit</a>";
 			}
-		}
+                      }
+                     else
+                        {if($row->contest_id!=''&&is_running(intval($row->contest_id))){
+                                      echo "<td><a target=_blank href=showsource.php?id=".$row->solution_id.">".$language_name[$row->language]."</a>/";
+
+                                     echo "<a target=_self href=\"submitpage.php?cid=".$cid."&pid=$row->num&sid=".$row->solution_id."\">Edit</a>";
+                       }  
+                       else
+                                   echo "<td>".$language_name[$row->language];
+                        }
+
+	
+            	}
 		echo "<td>".$row->code_length." B";
 		
 	}else echo "<td>------<td>------<td>".$language_name[$row->language]."<td>------";
