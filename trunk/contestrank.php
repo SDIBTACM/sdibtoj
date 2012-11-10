@@ -115,6 +115,7 @@ while ($row=mysql_fetch_object($result)){
 
 		$user_name=$n_user;
 	}
+	if(strtotime($row->in_date)-$start_time>=0)
 	$U[$user_cnt]->Add($row->num,strtotime($row->in_date)-$start_time,intval($row->result));
 }
 mysql_free_result($result);
