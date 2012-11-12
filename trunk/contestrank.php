@@ -92,11 +92,12 @@ $result=mysql_query($sql);
 $row=mysql_fetch_array($result);
 $pid_cnt=intval($row[0]);
 mysql_free_result($result);
-
+//echo $start_time;
+$start_timeC=strftime("%Y-%m-%d %X",($start_time));
 $sql="SELECT 
 	users.user_id,users.nick,solution.result,solution.num,solution.in_date 
 		FROM 
-			(select * from solution where solution.contest_id='$cid') solution 
+			(select * from solution where solution.contest_id='$cid'and in_date>'$start_timeC') solution 
 		left join users 
 		on users.user_id=solution.user_id 
 	ORDER BY users.user_id,in_date";
@@ -115,7 +116,7 @@ while ($row=mysql_fetch_object($result)){
 
 		$user_name=$n_user;
 	}
-	if(strtotime($row->in_date)-$start_time>=0)
+//	if(strtotime($row->in_date)-$start_time>=0)
 	$U[$user_cnt]->Add($row->num,strtotime($row->in_date)-$start_time,intval($row->result));
 }
 mysql_free_result($result);

@@ -61,7 +61,9 @@ $row=mysql_fetch_array($result);
 $pid_cnt=intval($row[0]);
 mysql_free_result($result);
 
-$sql="SELECT `result`,`num`,`language` FROM `solution` WHERE `contest_id`='$cid' and num>=0"; 
+$start_timeC=strftime("%Y-%m-%d %X",($start_time));
+
+$sql="SELECT `result`,`num`,`language` FROM `solution` WHERE `contest_id`='$cid' and num>=0 and in_date>'$start_timeC'"; 
 $result=mysql_query($sql);
 $R=array();
 while ($row=mysql_fetch_object($result)){
@@ -95,28 +97,6 @@ while ($row=mysql_fetch_object($result)){
                 $R[$pid_cnt][8]++;
 }
 mysql_free_result($result);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
          if (isset($_SESSION['administrator'])){
 
