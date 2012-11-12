@@ -30,8 +30,20 @@ if($OJ_SIM){
 */
 $sql="SELECT * FROM `solution` WHERE 1 ";
 if (isset($_GET['cid'])){
-	$cid=intval($_GET['cid']);
-	$sql=$sql." AND `contest_id`='$cid' ";
+          $cid=intval($_GET['cid']);
+          $sql1="SELECT `start_time` FROM `contest` WHERE `contest_id`='$cid'";
+          $result=mysql_query($sql1) or die(mysql_error());
+          $rows_cnt=mysql_num_rows($result);
+          $start_time=0;
+          if ($rows_cnt>0){
+                  $row=mysql_fetch_array($result);
+                    $start_time=strtotime($row[0]);
+          }
+          mysql_free_result($result);
+         $start_timeC=strftime("%Y-%m-%d %X",($start_time));
+
+	
+	$sql=$sql." AND `contest_id`='$cid' and in_date>'$start_timeC'";
 	$str2=$str2."&cid=$cid";
 	require_once("contest-header.php");
 }else{
