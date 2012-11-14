@@ -121,6 +121,23 @@ while ($row=mysql_fetch_object($result)){
 }
 mysql_free_result($result);
 usort($U,"s_cmp");
+
+
+////firstblood
+$first_blood=array();
+for($i=0;$i<$pid_cnt;$i++){
+   $sql="select user_id from solution where contest_id=$cid and result=4 and num=$i and in_date>='$start_timeC' order by in_date limit 1";
+   $result=mysql_query($sql);
+   $row_cnt=mysql_num_rows($result);
+   $row=mysql_fetch_array($result);
+   if($row_cnt==1){
+      $first_blood[$i]=$row['user_id'];
+   }else{
+      $first_blood[$i]="";
+   }
+
+}
+
 $rank=1;
 echo "<style> td{font-size:14} </style>";
 echo "<title>Contest RankList -- $title</title>";
@@ -147,7 +164,11 @@ for ($i=0;$i<$user_cnt;$i++){
  	 if(isset($U[$i])){
         	if (isset($U[$i]->p_ac_sec[$j])&& $U[$i]->p_ac_sec[$j]>0)
                        {
-			echo "<td  bgcolor='#008C00'><font color='#EEEEEE'>";
+                          /////////////first blood color blue  
+                       if($uuid==$first_blood[$j])
+                               echo "<td  bgcolor='#aaaff'><font color='#EEEEEE'>";
+                        else
+			      echo "<td  bgcolor='#008C00'><font color='#EEEEEE'>";
                         echo sec2str($U[$i]->p_ac_sec[$j]);
                         if (isset($U[$i]->p_wa_num[$j])&&$U[$i]->p_wa_num[$j]>0)
                           {
