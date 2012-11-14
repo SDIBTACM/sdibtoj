@@ -176,17 +176,21 @@ require_once("oj-header.php");
 <title>Contest List</title>
 <?
  $sz=30;
- 
+ $sql="SELECT * FROM `contest` WHERE `defunct`='N'";
        if (isset($_GET['page']))
              $page=strval(intval($_GET['page']));
         else $page=0;
             $start=$page*$sz;
-
-$sql="SELECT * FROM `contest` WHERE `defunct`='N' ORDER BY `contest_id` DESC limit $start,$sz";
+       if(isset($_GET['search'])){
+            $search=trim(mysql_real_escape_string($_GET['search']));
+            if($search!='')
+               $sql=$sql." and title like '%$search%' ORDER BY `contest_id` DESC  ";
+        }else
+               $sql=$sql." ORDER BY `contest_id` DESC limit $start,$sz";
 $result=mysql_query($sql);
 $rows_cnt = mysql_num_rows($result);
 $color=false;
-echo "<center><h2>Contest List</h2>ServerTime:<span id=nowdate></span>";
+echo "<center><h2>Contest List</h2><form>ServerTime:<span id=nowdate></span> <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type='text' name='search'><input type='submit' value='$MSG_SEARCH'</td></form> ";
 echo "<table width=90%><tr class=toprow align=center><td width=10%>ID<td width=50%>Contest Name<td width=20%>Start time<td width=10%>Status<td width=10%>Type</tr>";
 while ($row=mysql_fetch_object($result)){
 	if ($color) echo "<tr align=center class=oddrow>";
