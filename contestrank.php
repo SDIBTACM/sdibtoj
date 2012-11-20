@@ -148,8 +148,8 @@ for ($i=0;$i<$pid_cnt;$i++)
 	echo "<td><a href=problem.php?cid=$cid&pid=$i>$PID[$i]</a>";
 echo "</tr>";
 for ($i=0;$i<$user_cnt;$i++){
-	if ($i&1) echo "<tr class=oddrow align=center>";
-	else echo "<tr class=evenrow align=center>";
+	if ($i&1) echo "<tr class=oddrow align=center style=height:40px>";
+	else echo "<tr class=evenrow align=center style=height:40px>";
 	echo "<td>$rank";
 	$rank++;
 	$uuid=$U[$i]->user_id;
