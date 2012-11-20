@@ -166,9 +166,9 @@ for ($i=0;$i<$user_cnt;$i++){
                        {
                           /////////////first blood color blue  
                        if($uuid==$first_blood[$j])
-                               echo "<td  bgcolor='#aaaff'><font color='#EEEEEE'>";
+                               echo "<td  bgcolor='#008800'><font color='#EEEEEE'>";
                         else
-			      echo "<td  bgcolor='#008C00'><font color='#EEEEEE'>";
+			      echo "<td  bgcolor='a9f5af'><font color='#0d0d0d'>";
                         echo sec2str($U[$i]->p_ac_sec[$j]);
                         if (isset($U[$i]->p_wa_num[$j])&&$U[$i]->p_wa_num[$j]>0)
                           {
