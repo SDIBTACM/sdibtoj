@@ -52,9 +52,9 @@ if (isset($_GET['cid'])){
 
              
 
-     $sql="SELECT count(`num`) FROM `contest_problem` WHERE `contest_id`='$cid'";
-$result=mysql_query($sql);
-$row=mysql_fetch_array($result);
+//$sql="SELECT count(`num`) FROM `contest_problem` WHERE `contest_id`='$cid'";
+//$result=mysql_query($sql);
+//$row=mysql_fetch_array($result);
 $sql="SELECT count(`num`) FROM `contest_problem` WHERE `contest_id`='$cid'";
 $result=mysql_query($sql);
 $row=mysql_fetch_array($result);
