@@ -143,14 +143,14 @@ echo "<style> td{font-size:14} </style>";
 echo "<title>Contest RankList -- $title</title>";
 echo "<center><h3>Contest RankList -- $title</h3><a href=contestrank.xls.php?cid=$cid>Download</a></center>";
 
-echo "<table id=rank><tr class=toprow align=center><td width=5%>Rank<td width=10%>User<td width=10%>Nick<td width=5%>Solved<td width=5%>Penalty";
+echo "<table id=rank><tr class=toprow align=center><td width=8%><td width=2%>Rank<td width=10%>User<td width=10%>Nick<td width=5%>Solved<td width=5%>Penalty";
 for ($i=0;$i<$pid_cnt;$i++)
 	echo "<td><a href=problem.php?cid=$cid&pid=$i>$PID[$i]</a>";
 echo "</tr>\n";
 for ($i=0;$i<$user_cnt;$i++){
 	if ($i&1) echo "<tr class=oddrow align=center style=height:38px>\n";
 	else echo "<tr class=evenrow align=center style=height:38px>\n";
-	echo "<td>$rank";
+	echo "<td><td>$rank";
 	$rank++;
 	$uuid=$U[$i]->user_id;
         
@@ -198,7 +198,7 @@ echo "</table>";
     var total=0;
     for(var i=0;i<rows.length&&total==0;i++){
       try{
-         total=parseInt(rows[rows.length-i].cells[0].innerHTML);
+         total=parseInt(rows[rows.length-i].cells[1].innerHTML);
           if(isNaN(total)) total=0;
       }catch(e){
      
@@ -214,32 +214,42 @@ function metal(){
   var total=getTotal(rows);
   //alert(total);
           for(var i=1;i<rows.length;i++){
-                var cell=rows[i].cells[0];
-      var acc=rows[i].cells[3];
+                var cell=rows[i].cells[1];
+                var cell1=rows[i].cells[0];
+      var acc=rows[i].cells[4];
       var ac=parseInt(acc.innerText);
-      if (isNaN(ac)) ac=parseInt(acc.textContent);
-               
-               
-                if(cell.innerHTML!="*"&&ac>0){
-         
+      if (isNaN(ac)) ac=parseInt(acc.textContent); 
+                if(cell.innerHTML!="*"&&ac>0){ 
                      var r=parseInt(cell.innerHTML);
-                     
+                      cell1.style.backgroundRepeat = "no-repeat";
+                      cell1.style.backgroundPosition = "center";
                      if(r==1){
-                       cell.innerHTML="Winner";
-                       cell.style.cssText="background-color:gold;color:red";
+                    //   cell.innerHTML="Winner";
+                       //cell.style.cssText="background-color:gold;color:red";
+                       cell1.style.backgroundImage="url(./image/cup.gif)";
                      }
-                     if(r>1&&r<=total*.1+1)
-                     //  if(r>1&&r<=total*.1+1)
-                          cell.style.cssText="background-color:gold";
-                     if(r>total*.1+1&&r<=total*.30+1)
-                     // if(r>total*.1+1&&r<=total*.30+1)
-                        cell.style.cssText="background-color:silver";
-                     if(r>total*.30+1&&r<=total*.6+1)
-                    // if(r>total*.30+1&&r<=total*.6+1)
-                        cell.style.cssText="background-color:saddlebrown;color:white";
-                     if(r>total*.6+1&&ac>0)
-                     // if(r>total*.6+1&&ac>0)
-                         cell.style.cssText="background-color:steelblue;color:white";
+                     if(r>1&&r<=total*.1){
+                     //  if(r>1&&r<=total*.1)
+                         // cell.style.cssText="background-color:gold";
+                          cell1.style.backgroundImage="url(./image/gold.gif)";
+                      }     
+                     if(r>total*.1&&r<=total*.3){
+                     // if(r>total*.1&&r<=total*.30)
+                       // cell.style.cssText="background-color:silver";
+                        cell1.style.backgroundImage="url(./image/silver.gif)";
+
+                     }
+                     if(r>total*.3&&r<=total*.6){
+                    // if(r>total*.3&&r<=total*.6)
+                        //cell.style.cssText="background-color:saddlebrown;color:white";
+                        cell1.style.backgroundImage="url(./image/bronze.gif)";
+
+                     }
+                     if(r>total*.6&&ac>0){
+                     // if(r>total*.6&&ac>0)
+                        // cell.style.cssText="background-color:steelblue;color:white";
+                         cell1.style.backgroundImage="url(./image/yousheng.gif)";
+                    }
                 }
           }
   }catch(e){
