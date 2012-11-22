@@ -7,7 +7,8 @@ h2{
 .toprow{
 	background-color:#8080FF;
 	color:#FFFFFF;
-    font-weight:bold;
+        font-weight:bold;
+       background: url("image/menu_bg.png");
 }
 .toprow td{font-size:80%;}
 .toprow a:link{color:white;text-decoration:none;}

@@ -34,10 +34,11 @@
 </head>
 <body>
 <center>
-<h2><font color="red">Welcome To <?=$OJ_NAME?> ACM-ICPC Online Judge</font></h2>
-<table width=96%>
-	<tr align="center" class='hd' valign="top">
-		<th><span style="color:1a5cc8" id="dict_status"></span></th>
+<h2><img id=logo src=./image/logo.png><font color="red">Welcome To <?=$OJ_NAME?> ACM-ICPC Online Judge</font></h2>
+<table width=96% id=menu>
+	<tr align="center" class='menu_item' valign="top">
+	        <th><a href="http://acm.sdibt.edu.cn:8080/judge/"><font color=red>VIRTUAL JUDGE</font></a></th>
+        	<th><span style="color:1a5cc8" id="dict_status"></span></th>
 		<th><a href="./<?=isset($OJ_FAQ_LINK)?$OJ_FAQ_LINK:"faqs.php"?>"><?=$MSG_FAQ?></a></th>
 		<th><a href="./discuss.php"><?=$MSG_BBS?></a></th>
 		<th><a href="<?=$OJ_HOME?>"><?=$MSG_HOME?></a></th>

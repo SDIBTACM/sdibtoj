@@ -56,14 +56,11 @@
 <body>
 <center>
 <h2><img id=logo src=./image/logo.png><font color="red">Welcome To <?=$OJ_NAME?> ACM-ICPC Online Judge</font></h2>
-<table width=96%> 
-	<tr align="center" class='hd' valign="top">
-		
-
+<table width=96% id=menu> 
+	<tr align="center" class='menu_item' valign="top">
                  <th><a href="http://acm.sdibt.edu.cn:8080/judge/"><font color=red>VIRTUAL JUDGE</font></a></th>
-
 		<?if(isset($OJ_DICT)&&$OJ_DICT&&$OJ_LANG=="cn"){?>
-      <div class=menu_item >
+      <div class=hd>
 		      <span style="color:1a5cc8" id="dict_status"></span>
       </div>
       <script src="include/underlineTranslation.js" type="text/javascript"></script>
