@@ -1,11 +1,5 @@
 <?php require("admin-header.php");
 include_once("../fckeditor/fckeditor.php") ;
- $cid=intval($_GET['cid']);
-if(!(isset($_SESSION['administrator'])||isset($_SESSION["m$cid"])))
-{
-   echo "You don't have the privilage";
-   exit(0);
-}
 if (isset($_POST['syear']))
 {
 	require_once("../include/check_post_key.php");
@@ -32,10 +26,14 @@ if (isset($_POST['syear']))
 			$langmask+=1<<$t;
 	} 
 	$langmask=15&(~$langmask);
-	echo $langmask;	
+	//echo $langmask;	
 
 	$cid=intval($_POST['cid']);
-	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator']))) exit();
+	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator']))) 
+         {
+         echo "You don't have the privilage";
+          exit();
+         }
 	$sql="UPDATE `contest` set `title`='$title',description='$description',`start_time`='$starttime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask WHERE `contest_id`=$cid";
 	//echo $sql;
 	mysql_query($sql) or die(mysql_error());

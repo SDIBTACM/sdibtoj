@@ -43,5 +43,5 @@ $result=mysql_query($str_private);
 $row=mysql_fetch_row($result);
 mysql_free_result($result);
 if ($row[0]=='1' && !isset($_SESSION['c'.$cid])) $contest_ok=false;
-if (isset($_SESSION['administrator'])) $contest_ok=true;
+if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])) $contest_ok=true;
 ?>
