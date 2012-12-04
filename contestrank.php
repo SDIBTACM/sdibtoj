@@ -143,7 +143,7 @@ echo "<style> td{font-size:14} </style>";
 echo "<title>Contest RankList -- $title</title>";
 echo "<center><h3>Contest RankList -- $title</h3><a href=contestrank.xls.php?cid=$cid>Download</a></center>";
 
-echo "<table id=rank><tr class=toprow align=center><td width=8%><td width=2%>Rank<td width=10%>User<td width=10%>Nick<td width=5%>Solved<td width=5%>Penalty";
+echo "<table id=rank><tr class=toprow align=center><td width=8%><td width=3%>Rank<td width=10%>User<td width=10%>Nick<td width=3%>Solved<td width=5%>Penalty";
 for ($i=0;$i<$pid_cnt;$i++)
 	echo "<td><a href=problem.php?cid=$cid&pid=$i>$PID[$i]</a>";
 echo "</tr>\n";
@@ -225,29 +225,29 @@ function metal(){
                       cell1.style.backgroundPosition = "center";
                      if(r==1){
                     //   cell.innerHTML="Winner";
-                       //cell.style.cssText="background-color:gold;color:red";
+                       cell.style.cssText="background-color:gold;";
                        cell1.style.backgroundImage="url(./image/cup.gif)";
                      }
-                     if(r>1&&r<=total*.1){
-                     //  if(r>1&&r<=total*.1)
-                         // cell.style.cssText="background-color:gold";
+                     if(r>1&&r<=total*.1+1){
+                     //  if(r>1&&r<=total*.1+1)
+                          cell.style.cssText="background-color:gold";
                           cell1.style.backgroundImage="url(./image/gold.gif)";
                       }     
-                     if(r>total*.1&&r<=total*.3){
-                     // if(r>total*.1&&r<=total*.30)
-                       // cell.style.cssText="background-color:silver";
+                     if(r>total*.1+1&&r<=total*.3+1){
+                     // if(r>total*.1+1&&r<=total*.3+1)
+                        cell.style.cssText="background-color:silver";
                         cell1.style.backgroundImage="url(./image/silver.gif)";
 
                      }
-                     if(r>total*.3&&r<=total*.6){
-                    // if(r>total*.3&&r<=total*.6)
-                        //cell.style.cssText="background-color:saddlebrown;color:white";
+                     if(r>total*.3+1&&r<=total*.6+1){
+                    // if(r>total*.3+1&&r<=total*.6+1)
+                        cell.style.cssText="background-color:saddlebrown;color:white";
                         cell1.style.backgroundImage="url(./image/bronze.gif)";
 
                      }
                      if(r>total*.6&&ac>0){
                      // if(r>total*.6&&ac>0)
-                        // cell.style.cssText="background-color:steelblue;color:white";
+                        cell.style.cssText="background-color:steelblue;color:white";
                          cell1.style.backgroundImage="url(./image/yousheng.gif)";
                     }
                 }

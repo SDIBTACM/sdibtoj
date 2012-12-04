@@ -56,8 +56,8 @@
 <body>
 <center>
 <h2><img id=logo src=./image/logo.png><font color="red">Welcome To <?=$OJ_NAME?> ACM-ICPC Online Judge</font></h2>
-<table width=96% id=menu> 
-	<tr align="center" class='menu_item' valign="top">
+<table width=96%> 
+	<tr align="center" class='hd' valign="top">
                  <th><a href="http://acm.sdibt.edu.cn:8080/judge/"><font color=red>VIRTUAL JUDGE</font></a></th>
 		<?if(isset($OJ_DICT)&&$OJ_DICT&&$OJ_LANG=="cn"){?>
       <div class=hd>
@@ -72,7 +72,7 @@
 
 		<th><a href="<?=isset($OJ_FAQ_LINK)?$OJ_FAQ_LINK:"faqs.php"?>"><?=$MSG_FAQ?></a></th>
 		<th><a href="./discuss.php"><?=$MSG_BBS?></a></th>
-		<th><a href="<?=$OJ_HOME?>"><?=$MSG_HOME?></a></th>
+		<th><a href="../"><?=$MSG_HOME?></a></th>
 		<th><a href="./problemset.php"><?=$MSG_PROBLEMS?></a></th>
 		<th><a href="./status.php"><?=$MSG_STATUS?></a></th>
 		<th><a href="./ranklist.php"><?=$MSG_RANKLIST?></a></th>
