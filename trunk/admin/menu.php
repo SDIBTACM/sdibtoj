@@ -44,12 +44,12 @@ if (isset($_SESSION['administrator'])){
 	<a href="setmsg.php" target="main"><b>SetMessage</b></a>
 <?
 }
-if (isset($_SESSION['administrator'])){
+if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])){
 ?><li>
 	<a href="changepass.php" target="main"><b>ChangePassWD</b></a>
 <?
 }
-if (isset($_SESSION['administrator'])){
+if (isset($_SESSION['administrator'])||isset($_SESSION['problem_editor'])){
 ?><li>
 	<a href="rejudge.php" target="main"><b>Rejudge</b></a>
 <?

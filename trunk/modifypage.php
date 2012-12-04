@@ -44,7 +44,7 @@ $row=mysql_fetch_object($result);
 		</tr>
 	</table></center>
 	<br>
-	<a href=export_ac_code.php>Download All AC Source</a>
+	<!--a href=export_ac_code.php>Download All AC Source</a-->
 	<br>
 <?
 mysql_free_result($result);
