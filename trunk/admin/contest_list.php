@@ -21,7 +21,7 @@ $sql="select `contest_id`,`title`,`start_time`,`end_time`,`private`,`defunct` FR
 $result=mysql_query($sql) or die(mysql_error());
 $rows_cnt = mysql_num_rows($result);
 echo "<center><table width=90% border=1>";
-echo "<tr><td>ContestID<td>Title<td>StartTime<td>EndTime<td>Private<td>Status<td>Edit<td>Copy<td>Export"; 
+echo "<tr><td>ContestID<td>Title<td>StartTime<td>EndTime<td>Private<td>Status<td>Edit<td>Copy<td>Manager<td>Export"; 
 echo "</tr>";
 for (;$row=mysql_fetch_object($result);){
 	echo "<tr>";
@@ -35,6 +35,13 @@ for (;$row=mysql_fetch_object($result);){
 		echo "<td><a href=contest_df_change.php?cid=$row->contest_id&getkey=".$_SESSION['getkey'].">".($row->defunct=="N"?"<span class=green>Available</span>":"<span class=red>Reserved</span>")."</a>";
 		echo "<td><a href=contest_edit.php?cid=$row->contest_id>Edit</a>";
 		echo "<td><a href=contest_add.php?cid=$row->contest_id>Copy</a>";
+                
+               $sql1="select user_id from privilege where rightstr='m$row->contest_id'";
+               $result1=mysql_query($sql1) or die(mysql_error());
+               $row1=mysql_fetch_object($result1);
+               echo "<td><a href=../userinfo.php?user=$row1->user_id>$row1->user_id";
+
+
 		if(isset($_SESSION['administrator'])){
 			echo "<td><a href=\"problem_export_xml.php?cid=$row->contest_id&getkey=".$_SESSION['getkey']."\">Export</a>";
 		}else{

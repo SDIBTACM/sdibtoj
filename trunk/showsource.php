@@ -59,13 +59,22 @@ if(isset($OJ_VIP_CONTEST)&&$OJ_VIP_CONTEST)
               $ok=false;
          else 
                $ok=true; 
-
+          mysql_free_result($rrs);
 }
 
 
-if (isset($_SESSION['source_browser'])) $ok=true;
-
-
+if (isset($_SESSION['source_browser']))
+{
+   $sql="SELECT 1 FROM `problem` WHERE `defunct`='Y' and `problem_id`=$sproblem_id";//题目不可见，不能看代码
+   $rrs=mysql_query($sql);
+   $flag=!(mysql_num_rows($rrs)>0);
+   if($flag)
+     $ok=true;
+  else 
+     $ok=false;
+     mysql_free_result($rrs);
+}
+if (isset($_SESSION['administrator']))$ok=true;
 if ($ok==true){
 	$brush=strtolower($language_name[$row->language]);
 	if ($brush=='pascal') $brush='delphi';

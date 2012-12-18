@@ -107,8 +107,19 @@ if(isset($_GET['sid'])){
                  $ok=true;
 
            } 
-          if (isset($_SESSION['source_browser'])) $ok=true;
+          if (isset($_SESSION['source_browser']))
+          {
+                   $sql="SELECT 1 FROM `problem` WHERE `defunct`='Y' and `problem_id`=$row->problem_id";//题目不可见，不能看代码
+                   $rrs=mysql_query($sql);
+                   $flag=!(mysql_num_rows($rrs)>0);
+                   if($flag)
+   		        $ok=true;
+ 	           else
+                        $ok=false;
+   	           mysql_free_result($rrs);
+           }
           mysql_free_result($result);
+          if (isset($_SESSION['administrator']))$ok=true;
           if ($ok==true){
              $sql="SELECT `source` FROM `source_code` WHERE `solution_id`='".$sid."'";
           $result=mysql_query($sql);

@@ -169,11 +169,11 @@ echo "</form>";
 <?
 
 if($OJ_SIM){
-$sql="select * from ($sql order by solution_id desc ) solution left join `sim` on solution.solution_id=sim.s_id WHERE 1 ";
+$sql="select max(solution_id) as solution_id,user_id,problem_id,time,memory,in_date,result,language,ip,contest_id,valid,num,code_length,judgetime,s_id,sim_s_id,sim  from ($sql order by solution_id desc ) solution left join `sim` on solution.solution_id=sim.s_id WHERE 1 ";
 	if(isset($_GET['showsim'])&&intval($_GET['showsim'])>0){
 		$showsim=intval($_GET['showsim']);
 		$sql=$sql." and result=4 ";
-		$sql="SELECT * FROM ($sql order by solution_id desc) `solution` 
+		$sql="SELECT * FROM ($sql order by solution_id asc) `solution` 
 			left join(select solution_id old_s_id,user_id old_user_id from solution) old 
 				on old.old_s_id=sim_s_id WHERE  old_user_id!=user_id and sim_s_id!=solution_id and sim>= $showsim  ";	
 	
@@ -182,7 +182,7 @@ $sql="select * from ($sql order by solution_id desc ) solution left join `sim` o
 	//$sql=$sql.$order_str." LIMIT 20";
 
 }
-$sql=$sql." ORDER BY `user_id` ASC limit 200 ";
+$sql=$sql." group by user_id ORDER BY `user_id` ASC,solution_id desc limit 200 ";
 //echo $sql;
 $result = mysql_query($sql) or die("Error! ".mysql_error());
 $rows_cnt=mysql_num_rows($result);
@@ -221,7 +221,9 @@ while(	$row=mysql_fetch_object($result)){
 		if($OJ_SIM&&$row->sim&&$row->sim_s_id!=$row->s_id) {
 			echo "<td>*<font color=".$judge_color[$row->result].">".$judge_result[$row->result]."</font>-<font color=red>";
 			if( isset($_SESSION['source_browser'])){
-					echo "<a href=showsource.php?id=".$row->sim_s_id." target=original>".$row->sim_s_id."(".$row->sim."%)</a>";
+				//	echo "<a href=showsource.php?id=".$row->sim_s_id." target=original>".$row->sim_s_id."(".$row->sim."%)</a>";
+                                 echo "<a href=comparesource.php?left=".$row->sim_s_id."&right=".$row->solution_id."  class='btn btn-info'  target=original>".$row->sim_s_id."(".$row->sim."%)</a>";
+
 			}else{
 					echo $row->sim_s_id;
 			}
