@@ -38,7 +38,15 @@ if (isset($_GET['cid'])){
 		else echo "<font color=red>Running</font>";
 		if ($row->private=='0') echo "&nbsp;&nbsp;<font color=blue>Public</font>";
 		else echo "&nbsp;&nbsp;<font color=red>Private</font>"; 
-		if (!isset($_SESSION['administrator']) && $now<$start_time){
+		
+               $sql1="select user_id from privilege where rightstr='m$cid'";
+               $result1=mysql_query($sql1) or die(mysql_error());
+               $row1=mysql_fetch_object($result1);
+               echo "    Manager: $row1->user_id";
+
+
+
+                if (!isset($_SESSION['administrator']) && $now<$start_time){
 			echo "</center>";
 			require_once("oj-footer.php");
 			exit(0);
