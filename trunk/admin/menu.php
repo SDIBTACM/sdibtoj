@@ -41,12 +41,18 @@ if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])){
 if (isset($_SESSION['administrator'])){
 ?>
 <li>
+        <a href="team_generate.php" target="main"><b>TeamGenerate</b></a>
+
+<li>
 	<a href="setmsg.php" target="main"><b>SetMessage</b></a>
 <?
 }
-if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])){
+if (isset($_SESSION['administrator'])){
 ?><li>
 	<a href="changepass.php" target="main"><b>ChangePassWD</b></a>
+  <li>
+        <a href="changenick.php" target="main"><b>ChangeNickName</b></a>
+
 <?
 }
 if (isset($_SESSION['administrator'])||isset($_SESSION['problem_editor'])){
