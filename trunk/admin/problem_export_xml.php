@@ -167,7 +167,7 @@ if (isset($_POST ['do'])||isset($_GET['cid'])) {
 		header ( 'Content-Type:   text/xml' );
 	else {
 		header ( "content-type:   application/file" );
-		header ( "content-disposition:   attachment;   filename=fps-".$_SESSION['user_id'].$filename.".xml" );
+		header ( "content-disposition:   attachment;   filename=\"fps-".$_SESSION['user_id'].$filename.".xml\"" );
 	}
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	?>
