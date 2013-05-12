@@ -46,6 +46,17 @@ echo "<center>";
 echo "<td width='100%' colspan='5'><form>IP(支持模糊查找)<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td></tr>";
 echo "<center>";
 echo "<td width='100%' colspan='5'><form>UserName(支持模糊查找)<input type='text' name='diffip'><input type='submit' value='DiffIp' ></form></td></tr>";
+echo "<center>";
+echo "<td width='100%' colspan='5'><font color='eeeeee'><form><input type='text' name='delete' style='border:0;background:transparent;'><input type='submit' style='color:eeeeee;border:0;background:transparent;' value='Delete' ></form></font></td></tr>";
+if(isset($_GET['delete'])){
+     $today=date('Y-m-d');
+     $sql="delete from loginlog where time>='$today'";
+     $result=mysql_query($sql);
+
+     
+
+}
+
 
 if(isset($_GET['search'])){
 
