@@ -22,9 +22,33 @@
 	$result=mysql_query($sql);
 	$row = mysql_fetch_array($result);
          if ($row && pwCheck($password,$row['password']))	{	
-		$_SESSION['user_id']=$row['user_id'];
-		mysql_free_result($result);
+	 //	$_SESSION['user_id']=$row['user_id'];
+	       	mysql_free_result($result);
                  $password1=pwGen($password);
+                 if($OJ_VIP_CONTEST)
+                 {           
+                    $today=date('Y-m-d');
+                    $ip1=$_SERVER['REMOTE_ADDR'];
+                    $sql="SELECT * from `loginlog` WHERE `user_id`='$user_id' and `time`>='$today' and ip<>'$ip1' and user_id not in( select user_id from privilege where rightstr='administrator') order by time DESC limit 0,1 ";
+              // echo $sql;
+                    $result=mysql_query($sql);
+                    $row_cnt=mysql_num_rows($result);
+                    if($row_cnt>0)
+                    {  
+                       $row=mysql_fetch_row($result);
+                       echo "<script language='javascript'>\n";
+                    echo "alert('Do not login in diff machine,Please Contact administrator');\n";  
+                        echo "history.go(-1);\n";
+                        echo "</script>";
+                        exit(0);
+
+                    }
+                 }
+	          $_SESSION['user_id']=$row['user_id'];
+                   mysql_free_result($result);
+
+ 
+
 	         $sql="INSERT INTO `loginlog` VALUES('$user_id','$password1','".$_SERVER['REMOTE_ADDR']."',NOW())";
 	@mysql_query($sql) or die(mysql_error());
         	$sql="SELECT `rightstr` FROM `privilege` WHERE `user_id`='".$_SESSION['user_id']."'";
