@@ -150,10 +150,15 @@ echo "</tr>\n";
 for ($i=0;$i<$user_cnt;$i++){
 	if ($i&1) echo "<tr class=oddrow align=center style=height:38px>\n";
 	else echo "<tr class=evenrow align=center style=height:38px>\n";
-	echo "<td><td>$rank";
-	$rank++;
-	$uuid=$U[$i]->user_id;
-        
+	echo "<td><td>";
+         $uuid=$U[$i]->user_id;
+         if($uuid[0]!="*")
+              echo $rank++;
+         else
+             echo "*";
+       
+
+ 
 	$usolved=$U[$i]->solved;
 	echo "<td><a href=userinfo.php?user=$uuid>$uuid</a>";
 	echo "<td><a href=userinfo.php?user=$uuid>".$U[$i]->nick."</a>";
