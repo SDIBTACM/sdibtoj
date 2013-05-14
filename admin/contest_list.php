@@ -21,7 +21,7 @@ $sql="select `contest_id`,`title`,`start_time`,`end_time`,`private`,`defunct` FR
 $result=mysql_query($sql) or die(mysql_error());
 $rows_cnt = mysql_num_rows($result);
 echo "<center><table width=90% border=1>";
-echo "<tr><td>ContestID<td>Title<td>StartTime<td>EndTime<td>Private<td>Status<td>Edit<td>Copy<td>Manager<td>Export"; 
+echo "<tr><td>ContestID<td>Title<td>StartTime<td>EndTime<td>Private<td>Status<td>Edit<td>Copy<td>Manager<td>Export<td>logs"; 
 echo "</tr>";
 for (;$row=mysql_fetch_object($result);){
 	echo "<tr>";
@@ -47,7 +47,7 @@ for (;$row=mysql_fetch_object($result);){
 		}else{
 		echo "<td>";
 		}
-	 
+	  echo "<td> <a href=\"../export_contest_code.php?cid=$row->contest_id&getkey=".$_SESSION['getkey']."\">Logs</a>";
 	}else{
 	//	echo "<td colspan=4 align=right><a href=contest_add.php?cid=$row->contest_id>Copy</a><td>";
 		
