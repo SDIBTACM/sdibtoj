@@ -1,6 +1,9 @@
 /*
  * Copyright 2008 sempr <iamsempr@gmail.com>
  *
+ * Refacted and modified by zhblue<newsclan@gmail.com> 
+ * Bug report email newsclan@gmail.com
+ * 
  * This file is part of HUSTOJ.
  *
  * HUSTOJ is free software; you can redistribute it and/or modify
@@ -19,6 +22,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <syslog.h>
@@ -28,9 +32,10 @@
 #include <mysql/mysql.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <signal.h>
 
 static int DEBUG=0;
-#define bufsize 1024
+#define BUFFER_SIZE 1024
 #define LOCKFILE "/var/run/judged.pid"
 #define LOCKMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 #define STD_MB 1048576
@@ -50,48 +55,92 @@ static int DEBUG=0;
 #define OJ_CO 12
 
 
-static char host_name[bufsize];
-static char user_name[bufsize];
-static char password [bufsize];
-static char db_name  [bufsize];
-static char oj_home  [bufsize];
+static char host_name[BUFFER_SIZE];
+static char user_name[BUFFER_SIZE];
+static char password [BUFFER_SIZE];
+static char db_name  [BUFFER_SIZE];
+static char oj_home  [BUFFER_SIZE];
+static char oj_lang_set  [BUFFER_SIZE];
 static int port_number;
 static int max_running;
 static int sleep_time;
 static int sleep_tmp;
 static int oj_tot;
 static int oj_mod;
+static int http_judge=0;
+static char http_baseurl[BUFFER_SIZE];
+static char http_username[BUFFER_SIZE];
+static char http_password[BUFFER_SIZE];
 
-
+static bool STOP=false;
 
 static MYSQL *conn;
 static MYSQL_RES *res;
 static MYSQL_ROW row;
 //static FILE *fp_log;
-static char query[bufsize];
+static char query[BUFFER_SIZE];
+
+void call_for_exit(int s)
+{
+   STOP=true;
+   printf("Stopping judged...\n");
+}
 
 void write_log(const char *fmt, ...)
 {
 	va_list         ap;
 	char            buffer[4096];
 //	time_t          t = time(NULL);
-	int             l;
-	FILE *fp = fopen("./log/server.log","a+");
+//	int             l;
+	sprintf(buffer,"%s/log/client.log",oj_home);
+	FILE *fp = fopen(buffer, "a+");
 	if (fp==NULL){
 		 fprintf(stderr,"openfile error!\n");
 		 system("pwd");
 	}va_start(ap, fmt);
-	l = vsprintf(buffer, fmt, ap);
+	vsprintf(buffer, fmt, ap);
 	fprintf(fp,"%s\n",buffer);
 	if (DEBUG) printf("%s\n",buffer);
 	va_end(ap);
 	fclose(fp);
 
 }
+
+int after_equal(char * c){
+	int i=0;
+	for(;c[i]!='\0'&&c[i]!='=';i++);
+	return ++i;
+}
+void trim(char * c){
+    char buf[BUFFER_SIZE];
+    char * start,*end;
+    strcpy(buf,c);
+    start=buf;
+    while(isspace(*start)) start++;
+    end=start;
+    while(!isspace(*end)) end++;
+    *end='\0';
+    strcpy(c,start);
+}
+bool read_buf(char * buf,const char * key,char * value){
+   if (strncmp(buf,key, strlen(key)) == 0) {
+		strcpy(value, buf + after_equal(buf));
+		trim(value);	
+		if (DEBUG) printf("%s\n",value);
+		return 1;
+   }
+   return 0;
+}
+void read_int(char * buf,const char * key,int * value){
+	char buf2[BUFFER_SIZE];
+	if (read_buf(buf,key,buf2))
+		sscanf(buf2, "%d", value);
+		
+}
 // read the configue file
-void init_mysql_conf(){
-	FILE *fp;
-	char buf[bufsize];
+void init_mysql_conf() {
+	FILE *fp=NULL;
+	char buf[BUFFER_SIZE];
 	host_name[0]=0;
 	user_name[0]=0;
 	password[0]=0;
@@ -101,79 +150,68 @@ void init_mysql_conf(){
 	sleep_time=3;
 	oj_tot=1;
 	oj_mod=0;
-	fp=fopen("./etc/judge.conf","r");
-	while (fgets(buf,bufsize-1,fp)){
-		buf[strlen(buf)-1]=0;
-		if (      strncmp(buf,"OJ_HOST_NAME",12)==0){
-			strcpy(host_name,buf+13);
-		}else if (strncmp(buf,"OJ_USER_NAME",12)==0){
-			strcpy(user_name,buf+13);
-		}else if (strncmp(buf,"OJ_PASSWORD",11)==0){
-			strcpy(password, buf+12);
-		}else if (strncmp(buf,"OJ_DB_NAME",10)==0){
-			strcpy(db_name,buf+11);
-		}else if (strncmp(buf,"OJ_PORT_NUMBER",14)==0){
-			sscanf(buf+15,"%d",&port_number);
-		}else if (strncmp(buf,"OJ_RUNNING",10)==0){
-			sscanf(buf+11,"%d",&max_running);
-			if (max_running<1) max_running=1;
-			if (max_running>8) max_running=8;
-		}else if (strncmp(buf,"OJ_SLEEP_TIME",13)==0){
-			sscanf(buf+14,"%d",&sleep_time);
-			if (sleep_time<1) sleep_time=1;
-			if (sleep_time>20) sleep_time=20;
-		}else if (strncmp(buf,"OJ_TOTAL",8)==0){
-			sscanf(buf+9,"%d",&oj_tot);
-			if (oj_tot<=0) oj_tot=1;
-		}else if (strncmp(buf,"OJ_MOD",6)==0){
-			sscanf(buf+7,"%d",&oj_mod);
-			if (oj_mod<0 || oj_mod>=oj_tot) oj_mod=0;
+	strcpy(oj_lang_set,"0,1,2,3,4,5,6,7,8,9");
+	fp = fopen("./etc/judge.conf", "r");
+	if(fp!=NULL){
+		while (fgets(buf, BUFFER_SIZE - 1, fp)) {
+			read_buf(buf,"OJ_HOST_NAME",host_name);	
+			read_buf(buf, "OJ_USER_NAME",user_name);
+			read_buf(buf, "OJ_PASSWORD",password);
+			read_buf(buf, "OJ_DB_NAME",db_name);
+			read_int(buf , "OJ_PORT_NUMBER", &port_number);
+			read_int(buf, "OJ_RUNNING", &max_running);
+			read_int(buf, "OJ_SLEEP_TIME", &sleep_time);
+			read_int(buf , "OJ_TOTAL", &oj_tot);
+
+			read_int(buf,"OJ_MOD",&oj_mod);
+			
+			read_int(buf,"OJ_HTTP_JUDGE",&http_judge);
+			read_buf(buf,"OJ_HTTP_BASEURL",http_baseurl);
+			read_buf(buf,"OJ_HTTP_USERNAME",http_username);
+			read_buf(buf,"OJ_HTTP_PASSWORD",http_password);
+			read_buf(buf,"OJ_LANG_SET",oj_lang_set);
+			
 		}
-	}
-	sprintf(query,"SELECT solution_id FROM solution WHERE result<2 and MOD(solution_id,%d)=%d ORDER BY result ASC,solution_id ASC limit %d",oj_tot,oj_mod,max_running*2);
-	sleep_tmp=sleep_time;
+		sprintf(query,"SELECT solution_id FROM solution WHERE language in (%s) and result<2 and MOD(solution_id,%d)=%d ORDER BY result ASC,solution_id ASC limit %d",oj_lang_set,oj_tot,oj_mod,max_running*2);
+		sleep_tmp=sleep_time;
+	//	fclose(fp);
+    }
 }
 
-bool updatedb(int solution_id,int result){
-	char sql[bufsize];
-	sprintf(sql,"UPDATE solution SET result=%d,time=0,memory=0,judgetime=NOW() WHERE solution_id=%d and result<2 LIMIT 1"
-			,result,solution_id);
-	if (mysql_real_query(conn,sql,strlen(sql))){
-		syslog(LOG_ERR | LOG_DAEMON, "%s",mysql_error(conn));
-		return false;
-	}else{
-		if(mysql_affected_rows(conn)>0ul)
-			return true;
-		else
-			return false;
-	}
-	
-}
 
 void run_client(int runid,int clientid){
-    char buf[2],runidstr[1024];
+    char buf[BUFFER_SIZE],runidstr[BUFFER_SIZE];
         struct rlimit LIM;
-		LIM.rlim_max=300;
-		LIM.rlim_cur=300;
-		//setrlimit(RLIMIT_CPU,&LIM);
+		LIM.rlim_max=800;
+		LIM.rlim_cur=800;
+		setrlimit(RLIMIT_CPU,&LIM);
 
 		LIM.rlim_max=80*STD_MB;
 		LIM.rlim_cur=80*STD_MB;
-		//setrlimit(RLIMIT_FSIZE,&LIM);
+		setrlimit(RLIMIT_FSIZE,&LIM);
 
 		LIM.rlim_max=STD_MB<<11;
 		LIM.rlim_cur=STD_MB<<11;
-		//setrlimit(RLIMIT_AS,&LIM);
- 
-                //LIM.rlim_max=LIM.rlim_cur=100;
-                //setrlimit(RLIMIT_NPROC,&LIM);
+		setrlimit(RLIMIT_AS,&LIM);
+		
+	  LIM.rlim_cur=LIM.rlim_max=200;
+    setrlimit(RLIMIT_NPROC, &LIM);
+
+
+
+
 	//buf[0]=clientid+'0'; buf[1]=0;
-	sprintf(buf,"%d",clientid);
 	sprintf(runidstr,"%d",runid);
+	sprintf(buf,"%d",clientid);
+	
+	//write_log("sid=%s\tclient=%s\toj_home=%s\n",runidstr,buf,oj_home);
+	//sprintf(err,"%s/run%d/error.out",oj_home,clientid);
+	//freopen(err,"a+",stderr);
+	
 	if (!DEBUG)
-		execl("/usr/bin/judge_client","/usr/bin/judge_client",runidstr,buf,oj_home,NULL);
+		execl("/usr/bin/judge_client","/usr/bin/judge_client",runidstr,buf,oj_home,(char *)NULL);
 	else
-		execl("/usr/bin/judge_client","/usr/bin/judge_client",runidstr,buf,oj_home,"debug",NULL);
+		execl("/usr/bin/judge_client","/usr/bin/judge_client",runidstr,buf,oj_home,"debug",(char *)NULL);
 
 
 	//exit(0);
@@ -208,63 +246,180 @@ int init_mysql(){
         return 1;
 	return 0;
 }
+FILE * read_cmd_output(const char * fmt, ...) {
+	char cmd[BUFFER_SIZE];
+
+	FILE *  ret =NULL;
+	va_list ap;
+
+	va_start(ap, fmt);
+	vsprintf(cmd, fmt, ap);
+	va_end(ap);
+	//if(DEBUG) printf("%s\n",cmd);
+	ret = popen(cmd,"r");
+	
+	return ret;
+}
+int read_int_http(FILE * f){
+	char buf[BUFFER_SIZE];
+	fgets(buf,BUFFER_SIZE-1,f);
+	return atoi(buf);
+}
+bool check_login(){
+	const char  * cmd="wget --post-data=\"checklogin=1\" --load-cookies=cookie --save-cookies=cookie --keep-session-cookies -q -O - \"%s/admin/problem_judge.php\"";
+	int ret=0;
+	
+	FILE * fjobs=read_cmd_output(cmd,http_baseurl);
+	ret=read_int_http(fjobs);
+	pclose(fjobs);
+	
+	return ret>0;
+}
+void login(){
+	if(!check_login()){
+		char cmd[BUFFER_SIZE];
+		sprintf(cmd,"wget --post-data=\"user_id=%s&password=%s\" --load-cookies=cookie --save-cookies=cookie --keep-session-cookies -q -O - \"%s/login.php\"",http_username,http_password,http_baseurl);
+		system(cmd);
+	}
+	
+}
+int  _get_jobs_http(int * jobs){
+        login();
+        int ret=0;
+        int i=0;
+        char buf[BUFFER_SIZE];
+        const char * cmd="wget --post-data=\"getpending=1&max_running=%d\" --load-cookies=cookie --save-cookies=cookie --keep-session-cookies -q -O - \"%s/admin/problem_judge.php\"";
+        FILE * fjobs=read_cmd_output(cmd,max_running,http_baseurl);
+        while(fscanf(fjobs,"%s",buf) != EOF){
+                 //puts(buf);
+                 int sid=atoi(buf);
+                 if (sid>0)
+                        jobs[i++]=sid;
+                 //i++;
+         }
+        pclose(fjobs);
+        ret=i;
+        while(i<=max_running*2) jobs[i++]=0;
+        return ret;
+}
+int  _get_jobs_mysql(int * jobs){
+        if (mysql_real_query(conn,query,strlen(query))){
+                if(DEBUG)write_log("%s", mysql_error(conn));
+                sleep(20);
+                return 0;
+        }
+        res=mysql_store_result(conn);
+        int i=0;
+        int ret=0;
+        while((row=mysql_fetch_row(res))!=NULL){
+                jobs[i++]=atoi(row[0]);
+        }
+        ret=i;
+        while(i<=max_running*2) jobs[i++]=0;
+        return ret;
+}
+int get_jobs(int * jobs){
+        if (http_judge){
+                return _get_jobs_http(jobs);
+        }else
+                return _get_jobs_mysql(jobs);
+
+}
+
+bool _check_out_mysql(int solution_id,int result){
+	char sql[BUFFER_SIZE];
+	sprintf(sql,"UPDATE solution SET result=%d,time=0,memory=0,judgetime=NOW() WHERE solution_id=%d and result<2 LIMIT 1"
+			,result,solution_id);
+	if (mysql_real_query(conn,sql,strlen(sql))){
+		syslog(LOG_ERR | LOG_DAEMON, "%s",mysql_error(conn));
+		return false;
+	}else{
+		if(mysql_affected_rows(conn)>0ul)
+			return true;
+		else
+			return false;
+	}
+	
+}
+
+bool _check_out_http(int solution_id,int result){
+	login();
+	const char  * cmd="wget --post-data=\"checkout=1&sid=%d&result=%d\" --load-cookies=cookie --save-cookies=cookie --keep-session-cookies -q -O - \"%s/admin/problem_judge.php\"";
+	int ret=0;
+	FILE * fjobs=read_cmd_output(cmd,solution_id,result,http_baseurl);
+	fscanf(fjobs,"%d",&ret);
+	pclose(fjobs);
+	
+	return ret;
+}
+bool check_out(int solution_id,int result){
+	
+	if (http_judge){
+		return _check_out_http(solution_id,result);
+	}else
+		return _check_out_mysql(solution_id,result);
+
+}
 int work(){
-//	char buf[1024];
-	int retcnt;
-	int i;
-	static pid_t ID[8]={0,0,0,0,0,0,0,0};
-	static int workcnt=0;
-	int runid;
-	pid_t tmp_pid;
+//      char buf[1024];
+        static  int retcnt=0;
+        int i=0;
+        static pid_t ID[100];
+        static int workcnt=0;
+        int runid=0;
+        int  jobs[max_running*2+1];
+        pid_t tmp_pid=0;
 
-	retcnt=0;
+        
+        //for(i=0;i<max_running;i++){
+        //      ID[i]=0;
+        //}
 
+        //sleep_time=sleep_tmp;
+        /* get the database info */
+        if(!get_jobs(jobs)) retcnt=0;
+        /* exec the submit */
+        for (int j=0;jobs[j]>0;j++){
+                runid=jobs[j];
+                if (runid%oj_tot!=oj_mod) continue;
+                if(DEBUG)write_log("Judging solution %d",runid);
+                if (workcnt>=max_running){              // if no more client can running
+                        tmp_pid=waitpid(-1,NULL,0);     // wait 4 one child exit
+                        workcnt--;retcnt++;
+                        for (i=0;i<max_running;i++)     // get the client id
+                                if (ID[i]==tmp_pid) break; // got the client id
+                        ID[i]=0;
+                }else{                                                  // have free client
 
-	if (mysql_real_query(conn,query,strlen(query))){
-		if(DEBUG)write_log("%s", mysql_error(conn));
-		sleep(20);
-		return 0;
-	}
-	//sleep_time=sleep_tmp;
-	/* get the database info */
-	retcnt=0;
-	res=mysql_store_result(conn);
-	/* exec the submit */
-	while ((row=mysql_fetch_row(res))){
-		runid=atoi(row[0]);
-		if (runid%oj_tot!=oj_mod) continue;
-		if(DEBUG)write_log("Judging solution %d",runid);
-		if (workcnt==max_running){		// if no more client can running
-			tmp_pid=waitpid(-1,NULL,0);	// wait 4 one child exit
-			for (i=0;i<max_running;i++)	// get the client id
-				if (ID[i]==tmp_pid) break; // got the client id
-		}else{							// have free client
-			workcnt++;
-			for (i=0;i<max_running;i++)	// find the client id
-				if (ID[i]==0) break;	// got the client id
-		}
-		if(updatedb(atoi(row[0]),OJ_CI)){
-			ID[i]=fork();					// start to fork
-			if (ID[i]==0){
-				if(DEBUG)write_log("<<=sid=%d===clientid=%d==>>\n",runid,i);
-				run_client(runid,i);	// if the process is the son, run it
-				exit(0);
-			}
-			retcnt++;
-		}
-	}
-	if (retcnt==0){
-		while (workcnt>0){
-			workcnt--;
-			waitpid(-1,NULL,0);
+                        for (i=0;i<max_running;i++)     // find the client id
+                                if (ID[i]==0) break;    // got the client id
+                }
+                if(workcnt<max_running&&check_out(runid,OJ_CI)){
+                        workcnt++;
+                        ID[i]=fork();                                   // start to fork
+                        if (ID[i]==0){
+                                if(DEBUG)write_log("<<=sid=%d===clientid=%d==>>\n",runid,i);
+                                run_client(runid,i);    // if the process is the son, run it
+                                exit(0);
+                        }
 
-		}
-		memset(ID,0,sizeof(ID));
-	}
-	mysql_free_result(res);				// free the memory
-	executesql("commit");
+                }else{
+                        ID[i]=0;
+                }
+        }
+/*      while (workcnt>0){
+                        waitpid(-1,NULL,0);
+                        workcnt--;
+                        retcnt++;
+        }
+*/      if(!http_judge){
+                mysql_free_result(res);                         // free the memory
+                executesql("commit");
+        }
     if(DEBUG&&retcnt)write_log("<<%ddone!>>",retcnt);
-	return retcnt;
+    //free(ID);
+    //free(jobs);
+        return retcnt;
 }
 
 int lockfile(int fd)
@@ -298,49 +453,29 @@ int already_running(){
 	write(fd,buf,strlen(buf)+1);
 	return (0);
 }
+int daemon_init(void)
 
-void daemonize(){
-	int i,fd0,fd1,fd2;
-	pid_t pid;
-	struct rlimit rl;
-	struct sigaction sa;
-	umask(0);
-	if (getrlimit(RLIMIT_NOFILE, &rl)<0){
-		syslog(LOG_DAEMON|LOG_ERR,"can't get file limit");
-		exit(1);
-	}
-	if ((pid = fork()) < 0){
-		syslog(LOG_ERR|LOG_DAEMON, "Can't fork!");
-		printf("Could not daemonize!\n");
-		exit(1);
-	}
-	else if (pid != 0) /* parent */
-		exit(0);
-	setsid();
+ { pid_t pid;
 
-	sa.sa_handler = SIG_IGN;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	if (sigaction(SIGHUP, &sa, NULL) < 0){
-		syslog(LOG_ERR|LOG_DAEMON, "can't ignore SIGHUP");
-		exit(1);
-	}
+ if((pid = fork()) < 0) return(-1);
 
-	if ((pid = fork()) < 0){
-		syslog(LOG_ERR|LOG_DAEMON,"Can't fork(2)!");
-		exit(1);
-	}else if (pid != 0) exit(0);
+ else if(pid != 0) exit(0); /* parent exit */
 
-	if (chdir(oj_home) < 0){
-		syslog(LOG_ERR|LOG_DAEMON,"can't change dirctory to /");
-		exit(1);
-	}
-	if (rl.rlim_max == RLIM_INFINITY) rl.rlim_max=1024;
-	if (rl.rlim_max>1024) rl.rlim_max=1024;
-	for (i=0; i < (int)rl.rlim_max; i++) close(i);
-	fd0 = open("/dev/null", O_RDWR);
-	fd1 = dup(0);
-	fd2 = dup(0);
+ /* child continues */
+
+ setsid(); /* become session leader */
+
+ chdir(oj_home); /* change working directory */
+
+ umask(0); /* clear file mode creation mask */
+
+ close(0); /* close stdin */
+
+ close(1); /* close stdout */
+
+ close(2); /* close stderr */
+
+ return(0); 
 }
 
 int main(int argc, char** argv){
@@ -351,28 +486,29 @@ int main(int argc, char** argv){
 	   strcpy(oj_home,"/home/judge");
 	chdir(oj_home);// change the dir
 
-	if (!DEBUG) daemonize();
+	if (!DEBUG) daemon_init();
 	if ( strcmp(oj_home,"/home/judge")==0&&already_running()){
 		syslog(LOG_ERR|LOG_DAEMON, "This daemon program is already running!\n");
-		return 1;
+		return 1; 
 	}
 //	struct timespec final_sleep;
 //	final_sleep.tv_sec=0;
 //	final_sleep.tv_nsec=500000000;
 	init_mysql_conf();	// set the database info
-
-	while (1){			// start to run
-	    if(!init_mysql()){
-	        int j=work();
-	        //mysql_close(conn);	//keep connection if possible to save resource
-            if (j==0){	// if nothing done
-                sleep(sleep_time);	// sleep
-                syslog(LOG_ERR|LOG_DAEMON,"No WORK -- sleeping once");
-            }
-
-		}else{
-			sleep(sleep_time*2);
+	signal(SIGQUIT,call_for_exit);
+	signal(SIGKILL,call_for_exit);
+	signal(SIGTERM,call_for_exit);
+	int j=1;
+	while (!STOP){			// start to run
+	    while(j&&(http_judge||!init_mysql())){ 
+	
+	       
+			    j=work();
+			    
+		    
 		}
+		sleep(sleep_time);
+		j=1;
 	}
 	return 0;
 }
