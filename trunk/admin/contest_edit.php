@@ -1,5 +1,20 @@
 <?php require("admin-header.php");
 include_once("../fckeditor/fckeditor.php") ;
+
+
+if(isset($_POST['cid']))
+      $cid=intval($_POST['cid']);
+if(isset($_GET['cid']))
+      $cid=intval($_GET['cid']);
+if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))
+    {
+      echo "You don't have the privilage";
+      exit();
+    }
+
+
+
+
 if (isset($_POST['syear']))
 {
 	require_once("../include/check_post_key.php");
@@ -26,9 +41,10 @@ if (isset($_POST['syear']))
 			$langmask+=1<<$t;
 	} 
 	$langmask=15&(~$langmask);
-	//echo $langmask;	
+//	echo $langmask;	
 
 	$cid=intval($_POST['cid']);
+            //echo $cid;
 	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator']))) 
          {
          echo "You don't have the privilage";
