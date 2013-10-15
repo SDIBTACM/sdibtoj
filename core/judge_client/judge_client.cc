@@ -740,9 +740,9 @@ void update_problem(int pid) {
 int compile(int lang) {
         int pid;
 
-        const char * CP_C[] = { "gcc", "Main.c", "-o", "Main", "-O2","-Wall", "-lm",
+        const char * CP_C[] = { "gcc", "Main.c", "-o", "Main", "-fno-asm","-Wall", "-lm",
                         "--static", "-std=c99", "-DONLINE_JUDGE", NULL };
-        const char * CP_X[] = { "g++", "Main.cc", "-o", "Main","-O2", "-Wall",
+        const char * CP_X[] = { "g++", "Main.cc", "-o", "Main","-fno-asm", "-Wall",
                         "-lm", "--static", "-DONLINE_JUDGE", NULL };
         const char * CP_P[] = { "fpc", "Main.pas", "-O2","-Co", "-Ct","-Ci", NULL };
 //      const char * CP_J[] = { "javac", "-J-Xms32m", "-J-Xmx256m", "Main.java",NULL };
@@ -1521,8 +1521,8 @@ int get_sim(int solution_id, int lang, int pid, int &sim_s_id) {
         sprintf(src_pth, "Main.%s", lang_ext[lang]);
 
         int sim = execute_cmd("sim.sh %s %d", src_pth, pid);
-        printf("hahha%dkkkkkkkkkk\n",sim); 
-       if (sim/256<=75) {
+    //    printf("hahha%dkkkkkkkkkk\n",sim); 
+       if (sim/256<=80) {
                 execute_cmd("mkdir ../data/%d/ac/", pid);
 
                 execute_cmd("mv %s ../data/%d/ac/%d.%s", src_pth, pid, solution_id,
