@@ -45,7 +45,7 @@
                     }
                  }
 	          $_SESSION['user_id']=$row['user_id'];
-                   mysql_free_result($result);
+                   //mysql_free_result($result);
 
  
 

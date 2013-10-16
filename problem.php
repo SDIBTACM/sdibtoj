@@ -13,11 +13,19 @@ if (isset($_GET['id'])){
 	// practice
 	$id=intval($_GET['id']);
 	require_once("oj-header.php");
-	if (!isset($_SESSION['administrator']))
-		$sql="SELECT * FROM `problem` WHERE `problem_id`=$id AND (`defunct`='N' or (`author`!='' and `author`='".$_SESSION['user_id']."'". ")) AND `problem_id` NOT IN (
+	if (!isset($_SESSION['administrator'])){
+            if(isset($_SESSION['user_id']))
+		$sql="SELECT * FROM `problem` WHERE `problem_id`=$id AND (`defunct`='N' or (`author`='".$_SESSION['user_id']."'". ")) AND `problem_id` NOT IN (
 				SELECT `problem_id` FROM `contest_problem` WHERE `contest_id` IN(
 						SELECT `contest_id` FROM `contest` WHERE `end_time`>NOW()))
                                 ";
+            else
+                 $sql="SELECT * FROM `problem` WHERE `problem_id`=$id AND `defunct`='N'  AND `problem_id` NOT IN (
+                                SELECT `problem_id` FROM `contest_problem` WHERE `contest_id` IN(
+                                                SELECT `contest_id` FROM `contest` WHERE `end_time`>NOW()))
+                                ";
+
+          }
 	else
 		$sql="SELECT * FROM `problem` WHERE `problem_id`=$id";
 
