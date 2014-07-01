@@ -86,5 +86,18 @@
 	$MSG_Time_Limit="시간 제한";
 	$MSG_Memory_Limit="메모리 제한";
 	
+   //cstregister.php
+	$MSG_CSTREGISTER = "신청"; 
+	$MSG_SIGN_UP_INFO = "신청정보";
+	$MSG_STU_REALNAME = "실명";
+	$MSG_STU_ID = "학번";
+	$MSG_STU_SEX = "성별";
+	$MSG_STU_PHONE="전화";
+	$MSG_STU_EMAIL = "이메일";
+	$MSG_STU_SCHOOL_NAME = "학교";
+	$MSG_STU_DEPARTMENT = "학과";
+	$MSG_STU_MAJOR = "전문직";
+	$MSG_SEX_MALE="남";
+	$MSG_SEX_FEMALE="녀";
 	
 ?>
