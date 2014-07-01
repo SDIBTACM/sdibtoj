@@ -38,7 +38,7 @@ if (strlen($msg)>5){
 }
 
 $contest_ok=true;
-$str_private="SELECT count(*) FROM `contest` WHERE `contest_id`='$cid' && `private`='1'";
+$str_private="SELECT count(*) FROM `contest` WHERE `contest_id`='$cid' && (`private`='1' || `private`='2')";
 $result=mysql_query($str_private);
 $row=mysql_fetch_row($result);
 mysql_free_result($result);
