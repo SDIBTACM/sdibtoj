@@ -85,5 +85,19 @@
 	$MSG_Time_Limit="时间限制";
 	$MSG_Memory_Limit="内存限制";
 	
+  //cstregister.php
+	$MSG_CSTREGISTER = "报名参赛"; 
+	$MSG_MODIFYREGISTER="修改报名";
+	$MSG_SIGN_UP_INFO = "报名信息";
+	$MSG_STU_REALNAME = "真实姓名";
+	$MSG_STU_ID = "学号";
+	$MSG_STU_SEX = "性别";
+	$MSG_STU_PHONE="电话";
+	$MSG_STU_EMAIL = "邮箱";
+	$MSG_STU_SCHOOL_NAME = "学校";
+	$MSG_STU_DEPARTMENT = "院系";
+	$MSG_STU_MAJOR = "专业";
+	$MSG_SEX_MALE="男";
+	$MSG_SEX_FEMALE="女";
 
 ?>
