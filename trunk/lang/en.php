@@ -86,5 +86,19 @@
 	$MSG_Time_Limit="Time Limit";
 	$MSG_Memory_Limit="Memory Limit";
 	
+  //cstregister.php
+	$MSG_CSTREGISTER = "Register";
+	$MSG_MODIFYREGISTER="ModifyInfo";
+	$MSG_SIGN_UP_INFO = "Sign Up Informations";
+	$MSG_STU_REALNAME = "Real Name";
+	$MSG_STU_ID = "Student No";
+	$MSG_STU_SEX = "Sex";
+	$MSG_STU_PHONE="Tel";
+	$MSG_STU_EMAIL = "Email";
+	$MSG_STU_SCHOOL_NAME = "School Name";
+	$MSG_STU_DEPARTMENT = "Department";
+	$MSG_STU_MAJOR = "Major";
+	$MSG_SEX_MALE="Male";
+	$MSG_SEX_FEMALE="Female";
 	
 ?>
