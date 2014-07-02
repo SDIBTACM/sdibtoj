@@ -12,11 +12,11 @@ require_once("oj-header.php");
 		require_once("oj-footer.php");
 		exit(0);
 	}
-	if (isset($_SESSION['administrator'])||isset($_SESSION["m$cid"]))
+	$cid=intval($_GET['cid']);
+  if (isset($_SESSION['administrator'])||isset($_SESSION["m$cid"]))
 	{
 		$admin_ok=1;
 	}
-	$cid=intval($_GET['cid']);
 	$sql="SELECT `private`,`title`,`end_time` FROM `contest` WHERE `contest`.`contest_id` ='$cid'";
 	$result=mysql_query($sql);
 	$row=mysql_fetch_object($result);
