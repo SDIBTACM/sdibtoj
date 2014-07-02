@@ -21,13 +21,25 @@ if (isset($_POST['syear']))
 	
 	$starttime=intval($_POST['syear'])."-".intval($_POST['smonth'])."-".intval($_POST['sday'])." ".intval($_POST['shour']).":".intval($_POST['sminute']).":00";
 	$endtime=intval($_POST['eyear'])."-".intval($_POST['emonth'])."-".intval($_POST['eday'])." ".intval($_POST['ehour']).":".intval($_POST['eminute']).":00";
+	
 //	echo $starttime;
 //	echo $endtime;
-	 
 	$title=mysql_real_escape_string($_POST['title']);
 	$description=mysql_real_escape_string($_POST['description']);
 	$private=mysql_real_escape_string($_POST['private']);
-
+	if($private=='2'){
+		$regstarttime=intval($_POST['rsyear'])."-".intval($_POST['rsmonth'])."-".intval($_POST['rsday'])." ".intval($_POST['rshour']).":".intval($_POST['rsminute']).":00";
+         	$regendtime=intval($_POST['reyear'])."-".intval($_POST['remonth'])."-".intval($_POST['reday'])." ".intval($_POST['rehour']).":".intval($_POST['reminute']).":00";
+		$a=strtotime($regendtime);
+		$b=strtotime($regstarttime);
+		if($a<$b)
+		{
+			print "<script language='javascript'>\n";
+			print "alert('register time is wrong!\\n');\n";
+			print "history.go(-1);\n</script>";
+			exit(0);
+		}
+	}
         if (get_magic_quotes_gpc ()) {
              $title = stripslashes ( $title);
               $description = stripslashes ( $description);
@@ -50,7 +62,7 @@ if (isset($_POST['syear']))
          echo "You don't have the privilage";
           exit();
          }
-	$sql="UPDATE `contest` set `title`='$title',description='$description',`start_time`='$starttime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask WHERE `contest_id`=$cid";
+	$sql="UPDATE `contest` set `title`='$title',description='$description',`start_time`='$starttime',`reg_start_time`='$regstarttime',`reg_end_time`='$regendtime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask WHERE `contest_id`=$cid";
 	//echo $sql;
 	mysql_query($sql) or die(mysql_error());
 	$sql="DELETE FROM `contest_problem` WHERE `contest_id`=$cid";
@@ -105,6 +117,8 @@ if (isset($_POST['syear']))
 	$langmask=$row['langmask'];
 	$description=$row['description'];
 	$title=htmlspecialchars($row['title']);
+	$regstarttime=$row['reg_start_time'];
+	$regendtime=$row['reg_end_time'];
 	mysql_free_result($result);
 	$plist="";
 	$sql="SELECT `problem_id` FROM `contest_problem` WHERE `contest_id`=$cid ORDER BY `num`";
@@ -126,7 +140,7 @@ if (isset($_POST['syear']))
 	
 }
 ?>
-
+<body onload="JudgeUp()">
 <form method=POST action='<?php echo $_SERVER['PHP_SELF']?>'>
 <?php require_once("../include/set_post_key.php");?>
 <p align=center><font size=4 color=#333399>Edit a Contest</font></p>
@@ -146,10 +160,17 @@ Day:<input type=text name=eday size=7 value=<?php echo substr($endtime,8,2)?>>&n
 Hour:<input type=text name=ehour size=7 value=<?php echo substr($endtime,11,2)?>> &nbsp;
 Minute:<input type=text name=eminute size=7 value=<?php echo substr($endtime,14,2)?>></p>
 
-Public/Private:<select name=private>
+Public:<select name=private id=private onchange="JudgePrivate(this.value)">
 	<option value=0 <?php echo $private=='0'?'selected=selected':''?>>Public</option>
 	<option value=1 <?php echo $private=='1'?'selected=selected':''?>>Private</option>
+	<option value=2 <?php echo $private=='2'?'selected=selected':''?>>Register</option>
 </select>
+Language:<select name="lang[]" multiple>
+		<option value=0 <?php echo $C_select?>>C</option>
+		<option value=1 <?php echo $CPP_select?>>C++</option>
+		<option value=2 <?php echo $P_select?>>Pascal</option>
+		<option value=3 <?php echo $J_select?>>Java</option>	
+	</select>
 <br>Problems:<input type=text size=60 name=cproblem value='<?php echo $plist?>'>
 <?php $lang=(~((int)$langmask))&1023;
  $C_select=($lang&1)>0?"selected":"";
@@ -158,17 +179,42 @@ Public/Private:<select name=private>
  $J_select=($lang&8)>0?"selected":"";
 // echo $lang;
 ?>
-
- Language:<select name="lang[]" multiple>
-		<option value=0 <?php echo $C_select?>>C</option>
-		<option value=1 <?php echo $CPP_select?>>C++</option>
-		<option value=2 <?php echo $P_select?>>Pascal</option>
-		<option value=3 <?php echo $J_select?>>Java</option>	
-	</select>
-	
+	<div id="registertime" style="display:none">
+	<p align=left>Register Start:<br>&nbsp;&nbsp;&nbsp;
+	Year:<input type=text name=rsyear value=<?php echo substr($regstarttime,0,4)?> size=7 >
+	Month:<input type=text name=rsmonth value='<?php echo substr($regstarttime,5,2)?>' size=7 >
+	Day:<input type=text name=rsday size=7 value='<?php echo substr($regstarttime,8,2)?>'>
+	Hour:<input type=text name=rshour size=7 value='<?php echo substr($regstarttime,11,2)?>'>
+	Minute:<input type=text name=rsminute size=7 value=<?php echo substr($regstarttime,14,2)?>></p>
+	<p align=left>Register End:<br>&nbsp;&nbsp;&nbsp;
+	Year:<input type=text name=reyear value=<?php echo substr($regendtime,0,4)?> size=7 >
+	Month:<input type=text name=remonth value=<?php echo substr($regendtime,5,2)?> size=7 >
+	Day:<input type=text name=reday size=7 value=<?php echo substr($regendtime,8,2)?>>&nbsp;
+	Hour:<input type=text name=rehour size=7 value=<?php echo substr($regendtime,11,2)?>> &nbsp;
+	Minute:<input type=text name=reminute size=7 value=<?php echo substr($regendtime,14,2)?>></p>
+	</div>
 
 <p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
-
+<script language='javascript'>
+		function JudgePrivate(temp)
+		{
+			var divn=document.getElementById('registertime');
+			if(temp==2)
+				divn.style.display='';
+			else
+				divn.style.display='none';
+		}
+		function JudgeUp()
+		{
+			var ispublic=document.getElementById('private');
+			var divn=document.getElementById('registertime');
+			var value=ispublic.value;
+			if(value==2)
+				divn.style.display='';
+			else
+				divn.style.display='none';
+		}
+</script>
 <?php
 $fck_description = new FCKeditor('description') ;
 $fck_description->BasePath = '../fckeditor/' ;
@@ -184,6 +230,5 @@ Users:<textarea name="ulist" rows="20" cols="20"><?php if (isset($ulist)) { echo
 <p><input type=submit value=Submit name=submit><input type=reset value=Reset name=reset></p>
 
 </form>
+</body>
 <?php require_once("../oj-footer.php");?>
-
-
