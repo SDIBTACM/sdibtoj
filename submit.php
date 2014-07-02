@@ -57,7 +57,7 @@ if (isset($_POST['id'])) {
 		$row=mysql_fetch_array($result);
 		$isprivate=intval($row[0]);
 		mysql_free_result($result);
-		if ($isprivate==1){
+		if ($isprivate==1||$isprivate==2){
 			$sql="SELECT count(*) FROM `privilege` WHERE `user_id`='$user_id' AND `rightstr`='c$cid'";
 			$result=mysql_query($sql) or die (mysql_error()); 
 			$row=mysql_fetch_array($result);
