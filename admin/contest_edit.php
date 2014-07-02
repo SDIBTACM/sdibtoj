@@ -165,13 +165,6 @@ Public:<select name=private id=private onchange="JudgePrivate(this.value)">
 	<option value=1 <?php echo $private=='1'?'selected=selected':''?>>Private</option>
 	<option value=2 <?php echo $private=='2'?'selected=selected':''?>>Register</option>
 </select>
-Language:<select name="lang[]" multiple>
-		<option value=0 <?php echo $C_select?>>C</option>
-		<option value=1 <?php echo $CPP_select?>>C++</option>
-		<option value=2 <?php echo $P_select?>>Pascal</option>
-		<option value=3 <?php echo $J_select?>>Java</option>	
-	</select>
-<br>Problems:<input type=text size=60 name=cproblem value='<?php echo $plist?>'>
 <?php $lang=(~((int)$langmask))&1023;
  $C_select=($lang&1)>0?"selected":"";
  $CPP_select=($lang&2)>0?"selected":"";
@@ -179,6 +172,13 @@ Language:<select name="lang[]" multiple>
  $J_select=($lang&8)>0?"selected":"";
 // echo $lang;
 ?>
+Language:<select name="lang[]" multiple>
+		<option value=0 <?php echo $C_select?>>C</option>
+		<option value=1 <?php echo $CPP_select?>>C++</option>
+		<option value=2 <?php echo $P_select?>>Pascal</option>
+		<option value=3 <?php echo $J_select?>>Java</option>	
+	</select>
+<br>Problems:<input type=text size=60 name=cproblem value='<?php echo $plist?>'>
 	<div id="registertime" style="display:none">
 	<p align=left>Register Start:<br>&nbsp;&nbsp;&nbsp;
 	Year:<input type=text name=rsyear value=<?php echo substr($regstarttime,0,4)?> size=7 >
