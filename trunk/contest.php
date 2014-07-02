@@ -30,14 +30,15 @@ if (isset($_GET['cid'])){
 		echo "<title>Contest - $row->title</title>";
 		echo "<h3>Contest - $row->title</h3>
                <p>$description</p>
-               Start Time: <font color=#993399>$row->start_time</font> ";
+                Start Time: <font color=#993399>$row->start_time</font> ";
 		echo "End Time: <font color=#993399>$row->end_time</font><br>";
 		echo "Current Time: <font color=#993399><span id=nowdate >".date("Y-m-d H:i:s")."</span></font> Status:";
 		if ($now>$end_time) echo "<font color=red>Ended</font>";
 		else if ($now<$start_time) echo "<font color=red>Not Started</font>";
 		else echo "<font color=red>Running</font>";
 		if ($row->private=='0') echo "&nbsp;&nbsp;<font color=blue>Public</font>";
-		else echo "&nbsp;&nbsp;<font color=red>Private</font>"; 
+		else if($row->private=='1') echo "&nbsp;&nbsp;<font color=red>Private</font>";
+		else echo "&nbsp;&nbsp;<font color=purple>Register Private</font>";
 		
                $sql1="select user_id from privilege where rightstr='m$cid'";
                $result1=mysql_query($sql1) or die(mysql_error());
@@ -199,15 +200,61 @@ $result=mysql_query($sql);
 $rows_cnt = mysql_num_rows($result);
 $color=false;
 echo "<center><h2>Contest List</h2><form>ServerTime:<span id=nowdate></span> <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type='text' name='search'><input type='submit' value='$MSG_SEARCH'</td></form> ";
-echo "<table width=90%><tr class=toprow align=center><td width=10%>ID<td width=50%>Contest Name<td width=20%>Start time<td width=10%>Status<td width=10%>Type</tr>";
+echo "<table width=90%><tr class=toprow align=center>
+<td width=5%>ID
+<td width=37%>Contest Name
+<td width=18%>Start time
+<td width=8%>Status
+<td width=20%>Type
+<td width=12%>Register Content
+</tr>";
 while ($row=mysql_fetch_object($result)){
 	if ($color) echo "<tr align=center class=oddrow>";
 	else echo "<tr align=center class=evenrow>";
-	echo "<td>$row->contest_id";
-	echo "<td align=left><a href='contest.php?cid=$row->contest_id'>$row->title</a>";
+	echo "<td>$row->contest_id</td>";
+	echo "<td><div style=\"float:left;\"><a href='contest.php?cid=$row->contest_id'>$row->title</a></div>";
+
 	$start_time=strtotime($row->start_time);
 	$end_time=strtotime($row->end_time);
+	$reg_start_time=strtotime($row->reg_start_time);
+	$reg_end_time=strtotime($row->reg_end_time);
 	$now=time();
+	//0 public 1 private 2 register
+	if($row->private=='2'){
+		if (($now>=$reg_start_time)&& ($now<=$reg_end_time))
+		{
+			$query_cnt=0;
+			if(isset($_SESSION['user_id']))
+			{
+				$user_id=$_SESSION['user_id'];
+				$sql2="SELECT * FROM `contestreg` WHERE `contestreg`.`user_id`='".$user_id."' AND `contestreg`.`contest_id`='$row->contest_id'";
+				$result2=mysql_query($sql2);
+				$query_cnt=mysql_num_rows($result2);
+				mysql_free_result($result2);
+			}
+			if((!isset($_SESSION['user_id']))||($query_cnt==0)){
+			echo "<div style=\"float:right;text-align:right;font-size:80%\">
+			<a href='cstregisterpage.php?cid=$row->contest_id'>
+			<span style='color:#F30808'><u>$MSG_CSTREGISTER >></u></span></a></div>";
+			}
+			else{
+			echo "<div style=\"float:right;text-align:right;font-size:80%\">
+			<a href='updateregisterpage.php?cid=$row->contest_id'>
+			<span style='color:#F30808'><u>$MSG_MODIFYREGISTER >></u></span></a></div>";
+			}
+			
+		}
+		else{
+		echo "<div style=\"float:right;text-align:right;font-size:80%\">
+		<a href='contestrank.php?cid=$row->contest_id'>
+		<span style='color:#27BB2D'><u>Standings</u></span></a><div>";
+		}
+	}
+	else{
+	echo "<div style=\"float:right;text-align:right;font-size:80%\">
+	<a href='contestrank.php?cid=$row->contest_id'>
+	<span style='color:#27BB2D'><u>Standings</u></span></a><div>";
+	}
         echo "<td>$row->start_time";
 	// past
 	if ($now>$end_time) echo "<td><font color=green>Ended</font>";
@@ -217,7 +264,25 @@ while ($row=mysql_fetch_object($result)){
 	else echo "<td><font color=red> Running </font>";
 	$private=intval($row->private);
 	if ($private==0) echo "<td><font color=blue>Public</font>";
-	else echo "<td><font color=red>Private</font>";
+	else if($private==1) echo "<td><font color=red>Private</font>";
+	else {
+		echo "<td><font color=purple>Register</font>";
+		echo "<br>Start:$row->reg_start_time";
+		echo "<br>End:$row->reg_end_time";
+	}
+	if($private==2){
+	if ($now>$reg_end_time) echo "<td><font color=gray>Registerion Ended</font>";
+	else if ($now<$reg_start_time) echo "<td><font color=blue>Registerion Pending</font>";
+	else echo "<td><font color=red>Registering</font>";
+	$tmpsql="SELECT count(`user_id`) FROM `contestreg` WHERE `contestreg`.`contest_id`='$row->contest_id'";
+	$tmpresult=mysql_query($tmpsql);
+	$tmprow=mysql_fetch_array($tmpresult);
+	$cntpeople=intval($tmprow[0]);
+	mysql_free_result($tmpresult);
+	echo "<td><a href='showallregister.php?cid=$row->contest_id'><img src='./image/user.png'>x$cntpeople";
+	}
+	else
+		echo "<td><font color=gray>-------------</font>";
 	echo "</tr>";
 	$color=!$color;
 }
