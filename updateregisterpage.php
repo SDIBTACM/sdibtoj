@@ -51,6 +51,7 @@ if($row==false){
 		<tr><td><?=$MSG_STU_ID?>:
 			<td><input name="stuid" size=28 type=text
 				value="<?=htmlspecialchars($row->stuid)?>">
+			<span style="color:#FF0000">*</span>
 			</td></td>
 		</tr>
 		<tr><td><?=$MSG_STU_SEX?>:
@@ -89,11 +90,13 @@ if($row==false){
 		<tr><td><?=$MSG_STU_DEPARTMENT?>:
 			<td><input name="studepartment" size=28 type=text
 				value="<?=htmlspecialchars($row->studepartment)?>">
+			<span style="color:#FF0000">*</span>
 			</td></td>
 		</tr>
 		<tr><td><?=$MSG_STU_MAJOR?>:
 			<td><input name="stumajor" size=28 type=text
 				value="<?=htmlspecialchars($row->stumajor)?>">
+			<span style="color:#FF0000">*</span>
 			</td></td>
 		</tr>
 		<tr><td>
@@ -108,4 +111,3 @@ if($row==false){
 </form>
 <?mysql_free_result($result)?>
 <?require_once('oj-footer.php');?>
-
