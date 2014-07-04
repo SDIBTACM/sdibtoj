@@ -28,6 +28,7 @@ if($OJ_SIM){
 	$sql="SELECT * FROM `solution` WHERE 1 ";
 }
 */
+$seatmark=0;
 $sql="SELECT * FROM `solution` WHERE 1 ";
 if (isset($_GET['cid'])){
           $cid=intval($_GET['cid']);
@@ -166,10 +167,20 @@ echo "</form>";
 ?>
 </td></tr>
 </table>
-<table align=center>
+<table align=center width=95%>
 <tr align=center  class='toprow'>
 <td width="8%"><?=$MSG_RUNID?>
 <td width="10%"><?=$MSG_USER?>
+<?if(isset($cid)){
+	$sql_cid="SELECT `private` FROM `contest` WHERE `contest`.`contest_id` ='$cid'";
+	$result_cid=mysql_query($sql_cid);
+	$row_cid=mysql_fetch_array($result_cid);
+	mysql_free_result($result_cid);
+	if($row_cid[0]=='2'){
+	echo "<td width=\"5%\">seat";
+	$seatmark=1;	
+	}
+}?>
 <td width="6%"><?=$MSG_PROBLEM?>
 <td width="17%"><?=$MSG_RESULT?>
 <td width="10%"><?=$MSG_MEMORY?>
@@ -223,6 +234,14 @@ while(	$row=mysql_fetch_object($result)){
 	$cnt=1-$cnt;
 	echo "<td>".$row->solution_id;
 	echo "<td><a href='userinfo.php?user=".$row->user_id."'>".$row->user_id."</a>";
+	if($seatmark)
+	{
+$sql_seat="SELECT `seatnum` FROM `contestreg` WHERE `contestreg`.`contest_id` ='$cid' AND `contestreg`.`user_id`='".$row->user_id."'";
+		$result_seat=mysql_query($sql_seat);
+		$row_seat=mysql_fetch_array($result_seat);
+		mysql_free_result($result_seat);
+		echo "<td>$row_seat[0]";
+	}
 	if (isset($cid)) 
 		echo "<td><a href='problem.php?cid=$cid&pid=$row->num'>".$PID[$row->num]."</a>";
 	else 
