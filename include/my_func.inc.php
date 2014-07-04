@@ -82,4 +82,31 @@ function check_ac($cid,$pid){
 	if ($sub>0) return "<font color=red>N</font>";
 	else return "";
 }
+
+function isstuno($str)
+{
+	$moder="/^[a-zA-Z]*\d+$/";
+	if(preg_match($moder,$str))
+		return true;
+	else
+		return false;
+}
+
+function isphonenum($str)
+{
+	$moder="/^1[34578]{1}\d{9}$/";
+	if(preg_match($moder,$str))
+		return true;
+	else
+		return false;
+}
+
+function isemail($str)
+{
+	$moder="/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/";
+	if(preg_match($moder,$str))
+		return true;
+	else
+		return false;
+}
 ?>
