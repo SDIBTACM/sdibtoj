@@ -233,12 +233,12 @@ while ($row=mysql_fetch_object($result)){
 			}
 			if((!isset($_SESSION['user_id']))||($query_cnt==0)){
 			echo "<div style=\"float:right;text-align:right;font-size:90%\">
-			<a href='cstregisterpage.php?cid=$row->contest_id' title='Register\nStart time:$row->reg_start_time\nEnd time:$row->reg_end_time'>
+			<a href='cstregisterpage.php?cid=$row->contest_id' title='Register\nStart time:$row->reg_start_time\nEnd   time:$row->reg_end_time'>
 			<font color=white style='background-color:rgb(15,209,22)'><u><strong>$MSG_CSTREGISTER >></strong></u></font></a>&nbsp;&nbsp;</div>";
 			}
 			else{
 			echo "<div style=\"float:right;text-align:right;font-size:90%\">
-			<a href='updateregisterpage.php?cid=$row->contest_id' title='Register\nStart time:$row->reg_start_time\nEnd time:$row->reg_end_time'>
+			<a href='updateregisterpage.php?cid=$row->contest_id' title='Register\nStart time:$row->reg_start_time\nEnd   time:$row->reg_end_time'>
 			<font color=white style='background-color:rgb(15,209,22)'><u><strong>$MSG_MODIFYREGISTER</strong></u></font></a>&nbsp;&nbsp;</div>";
 			}
 			
@@ -265,9 +265,9 @@ while ($row=mysql_fetch_object($result)){
 	if ($private==0) echo "<td><font color=blue>Public</font>";
 	else if($private==1) echo "<td><font color=red>Private</font>";
 	else {
-		if ($now>$reg_end_time) echo "<td><font color=gray title='Registration\nStart time:$row->reg_start_time\nEnd time:$row->reg_end_time'>Registration Ended</font>";
-		else if ($now<$reg_start_time) echo "<td><font color=blue title='Registration\nStart time:$row->reg_start_time\nEnd time:$row->reg_end_time'>Registration Pending</font>";
-		else echo "<td><font color=red title='Registration\nStart time:$row->reg_start_time\nEnd time:$row->reg_end_time'>Registering</font>";
+		if ($now>$reg_end_time) echo "<td><font color=gray title='Registration\nStart time:$row->reg_start_time\nEnd   time:$row->reg_end_time'>Registration Ended</font>";
+		else if ($now<$reg_start_time) echo "<td><font color=blue title='Registration\nStart time:$row->reg_start_time\nEnd   time:$row->reg_end_time'>Registration Pending</font>";
+		else echo "<td><font color=red title='Registration\nStart time:$row->reg_start_time\nEnd   time:$row->reg_end_time'>Registering</font>";
 		//echo "<br><font size=1px>Start:$row->reg_start_time";
 		//echo "<br>End:$row->reg_end_time";
 		$tmpsql="SELECT count(`user_id`) FROM `contestreg` WHERE `contestreg`.`contest_id`='$row->contest_id'";
