@@ -2,6 +2,11 @@
 	require_once("./include/db_info.inc.php");
 	$to=$_GET['to'];
 	$cid=intval($_GET['cid']);
+	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))
+  {
+      		echo "You don't have the privilage";
+      		exit();
+  }
 	$user_id=mysql_real_escape_string($_GET['user']);
 	$pending=intval($to);
 	if($pending==1)
