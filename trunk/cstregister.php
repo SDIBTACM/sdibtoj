@@ -33,6 +33,10 @@
 		$err_str=$err_str."Phone Num Too Long!\\n";
 		$err_cnt++;
 	}
+	else if(!isphonenum($stuphone)){
+		$err_str=$err_str."Phone Num is invaild!\\n";
+		$err_cnt++;	
+	}
 	$len=strlen($stuemail);
 	if($len<7){
 		$err_str=$err_str."Email Too Short!\\n";
@@ -42,10 +46,22 @@
 		$err_str=$err_str."Email Too Long!\\n";
 		$err_cnt++;
 	}
+	else if(!isemail($stuemail)){
+		$err_str=$err_str."Email is invaild!\\n";
+		$err_cnt++;	
+	}
 	$len=strlen($stuid);
 	if($len>20){
-		$err_str=$err_str."Student No Too Long!\\n";
+		$err_str=$err_str."Student No. Too Long!\\n";
 		$err_cnt++;
+	}
+	else if($len<2){
+		$err_str=$err_str."Student No. Too short!\\n";
+		$err_cnt++;	
+	}
+	else if(!isstuno($stuid)){
+		$err_str=$err_str."Student No. is invalid\\n";
+		$err_cnt++;	
 	}
 	$len=strlen($stuschoolname);
 	if($len>100){
@@ -61,9 +77,17 @@
 		$err_str=$err_str."Department name Too Long!\\n";
 		$err_cnt++;
 	}
+	else if($len<4){
+		$err_str=$err_str."Department name too short!\\n";
+		$err_cnt++;
+	}
 	$len=strlen($stumajor);
 	if($len>100){
 		$err_str=$err_str."Major name Too Long!\\n";
+		$err_cnt++;
+	}
+	else if($len<4){
+		$err_str=$err_str."Major name too short!\\n";
 		$err_cnt++;
 	}
 	if ($err_cnt>0){
