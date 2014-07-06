@@ -29,6 +29,7 @@ class TM{
 	var $p_ac_sec;
 	var $user_id;
         var $nick;
+	var $realname;
 	function TM(){
 		$this->solved=0;
 		$this->time=0;
@@ -65,14 +66,20 @@ function s_cmp($A,$B){
 if (!isset($_GET['cid'])) die("No Such Contest!");
 $cid=intval($_GET['cid']);
 require_once("contest-header.php");
-$sql="SELECT `start_time`,`title` FROM `contest` WHERE `contest_id`='$cid'";
+$sql="SELECT `start_time`,`title`,`end_time`,`private` FROM `contest` WHERE `contest_id`='$cid'";
 $result=mysql_query($sql) or die(mysql_error());
+if($result)
 $rows_cnt=mysql_num_rows($result);
+else
+$rows_cnt=0;
 $start_time=0;
+$end_time=0;
 if ($rows_cnt>0){
 	$row=mysql_fetch_array($result);
 	$start_time=strtotime($row[0]);
+	$end_time=strtotime($row['end_time']);
 	$title=$row[1];
+	$isregister=intval($row['private']);
 }
 mysql_free_result($result);
 if ($start_time==0){
@@ -86,21 +93,43 @@ if ($start_time>time()){
 	require_once("oj-footer.php");
 	exit(0);
 }
-
+if(!isset($OJ_RANK_LOCK_PERCENT)) $OJ_RANK_LOCK_PERCENT=0;
+$lock=$end_time-($end_time-$start_time)*$OJ_RANK_LOCK_PERCENT;
+$lock_sql="";
+$islock=0;//only to show the clock or not
+if($isregister==2){
+	if(time()>$lock&&time()<$end_time){
+		if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))//show the rank or not
+			$lock_sql="and in_date<'".date("Y-m-d H:i:s",$lock)."'";
+		$islock=1;//to show the clock
+		//echo $lock;
+		//echo $lock_sql;
+	}
+	else
+		$islock=0;
+}
 $sql="SELECT count(1) FROM `contest_problem` WHERE `contest_id`='$cid'";
 $result=mysql_query($sql);
 $row=mysql_fetch_array($result);
 $pid_cnt=intval($row[0]);
 mysql_free_result($result);
 //echo $start_time;
+
 $start_timeC=strftime("%Y-%m-%d %X",($start_time));
+if($isregister!=2){
 $sql="SELECT 
-	users.user_id,users.nick,solution.result,solution.num,solution.in_date 
+	users.user_id,users.nick,solution.result,solution.num,solution.in_date
 		FROM 
-			(select * from solution where solution.contest_id='$cid'and in_date>'$start_timeC') solution 
+			(select * from solution where solution.contest_id='$cid' and in_date>'$start_timeC') solution 
 		left join users 
 		on users.user_id=solution.user_id 
 	ORDER BY users.user_id,in_date";
+}
+else{
+$sql="SELECT stuinfo.user_id,stuinfo.nick,stuinfo.result,stuinfo.num,stuinfo.in_date,contestreg.sturealname FROM
+	( SELECT users.user_id,users.nick,solution.result,solution.num,solution.in_date from users,solution where solution.contest_id='$cid' and in_date>'$start_timeC' $lock_sql and solution.user_id=users.user_id )stuinfo 
+	left join contestreg on contestreg.user_id=stuinfo.user_id ORDER BY stuinfo.user_id,in_date";
+}
 //echo $sql;
 $result=mysql_query($sql);
 $user_cnt=0;
@@ -113,9 +142,11 @@ while ($row=mysql_fetch_object($result)){
 		$U[$user_cnt]=new TM();
 		$U[$user_cnt]->user_id=$row->user_id;
                 $U[$user_cnt]->nick=$row->nick;
-
+		if($isregister==2) $U[$user_cnt]->realname=$row->sturealname;
 		$user_name=$n_user;
 	}
+	//if(time()<$end_time&&$lock<strtotime($row->in_date))
+	//$U[$user_cnt]->Add($row->num,strtotime($row->in_date)-$start_time,0);
 //	if(strtotime($row->in_date)-$start_time>=0)
 	$U[$user_cnt]->Add($row->num,strtotime($row->in_date)-$start_time,intval($row->result));
 }
@@ -141,8 +172,14 @@ for($i=0;$i<$pid_cnt;$i++){
 $rank=1;
 echo "<style> td{font-size:14} </style>";
 echo "<title>Contest RankList -- $title</title>";
+if($islock){
+	echo "<h1 align=center>已封榜</h1>";
+	echo "<link rel=\"stylesheet\" href=\"mergely/jquery.countdown.css\" />";
+	echo "<script src=\"mergely/jquery-1.4.1.js\"></script>";
+	echo "<script src=\"mergely/jquery.countdown.js\"></script>";
+	echo "<div id=\"countdown\"></div>";
+}
 echo "<center><h3>Contest RankList -- $title</h3><a href=contestrank.xls.php?cid=$cid>Download</a></center>";
-
 echo "<table id=rank><tr class=toprow align=center><td width=8%><td width=3%>Rank<td width=10%>User<td width=10%>Nick<td width=3%>Solved<td width=5%>Penalty";
 for ($i=0;$i<$pid_cnt;$i++)
 	echo "<td><a href=problem.php?cid=$cid&pid=$i>$PID[$i]</a>";
@@ -161,7 +198,10 @@ for ($i=0;$i<$user_cnt;$i++){
  
 	$usolved=$U[$i]->solved;
 	echo "<td><a href=userinfo.php?user=$uuid>$uuid</a>";
-	echo "<td><a href=userinfo.php?user=$uuid>".$U[$i]->nick."</a>";
+	if($isregister==2)
+		echo "<td><a href=userinfo.php?user=$uuid>".$U[$i]->realname."</a>";
+	else
+		echo "<td><a href=userinfo.php?user=$uuid>".$U[$i]->nick."</a>";
 	echo "<td><a href=status.php?user_id=$uuid&cid=$cid>$usolved</a>";
 	echo "<td>".sec2str($U[$i]->time);
 	for ($j=0;$j<$pid_cnt;$j++){
@@ -263,6 +303,18 @@ function metal(){
 }
 metal();
 
+function showlocktime()
+{
+	var endtime=<?echo $end_time?>;
+	var islock=<?echo $islock?>;
+	endtime=endtime*1000;
+	if(islock==1){	
+		$('#countdown').countdown({
+			timestamp:endtime,
+		});
+	}
+}
+showlocktime();
 
 </script>
 
