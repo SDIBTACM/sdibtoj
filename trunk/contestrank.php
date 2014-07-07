@@ -126,8 +126,8 @@ $sql="SELECT
 }
 else{
 $sql="SELECT stuinfo.user_id,stuinfo.nick,stuinfo.result,stuinfo.num,stuinfo.in_date,contestreg.sturealname FROM
-	( SELECT users.user_id,users.nick,solution.result,solution.num,solution.in_date from users,solution where solution.contest_id='$cid' and in_date>'$start_timeC' $lock_sql and solution.user_id=users.user_id )stuinfo 
-	left join contestreg on contestreg.user_id=stuinfo.user_id and contestreg.contest_id=stuinfo.contest_id ORDER BY stuinfo.user_id,in_date";
+        ( SELECT users.user_id,users.nick,solution.result,solution.num,solution.in_date,solution.contest_id from users,solution where solution.contest_id='$cid' and in_date>'$start_timeC' $lock_sql and solution.user_id=users.user_id )stuinfo 
+        left join contestreg on contestreg.user_id=stuinfo.user_id and contestreg.contest_id=stuinfo.contest_id ORDER BY stuinfo.user_id,in_date";
 }
 //echo $sql;
 $result=mysql_query($sql);
