@@ -34,7 +34,10 @@
                 $result1=mysql_query($sql1);
                 if(!$result1) return false;
                 $row1=mysql_fetch_row($result1);
-	       	$retmsg="<font color=red>(".$row[0]."/".$row1[0].")</font>";
+		if($row[0]==0)
+	       		$retmsg="<font color=red>(".$row[0]."/".$row1[0].")</font>";
+		else
+			$retmsg="<font id=blink color=red>(".$row[0]."/".$row1[0].")</font>";
 		mysql_free_result($result);mysql_free_result($result1);
 
 		return $retmsg;
@@ -66,7 +69,7 @@
       <script src="include/underlineTranslation.js" type="text/javascript"></script>
                 <?}?>
                 
-                  <th><a href="./recent-contest.php">Recent Contest</a></th>
+                  <th><a href="./recent-contest.php"><?=$MSG_RECENTCONTEST?></a></th>
 
 
 
@@ -116,3 +119,6 @@ if (strlen($msg)>5){
 ?>
 <script src="include/underlineTranslation.js" type="text/javascript"></script> 
 <script type="text/javascript">dictInit();</script> 
+<script>
+setInterval(function(){blink.color=blink.color=='red'?'white':'red'},500)
+</script>
