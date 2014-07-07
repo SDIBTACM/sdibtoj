@@ -65,12 +65,44 @@ if (isset($_GET['top'])){
 // check the problem arg
 $problem_id="";
 if (isset($_GET['problem_id'])){
-	$problem_id=strval(intval($_GET['problem_id']));
-	if ($problem_id!='0'){
-		$sql=$sql."AND `problem_id`='".$problem_id."' ";
-		$str2=$str2."&problem_id=".$problem_id;
+	if(isset($_GET['cid']))
+	{
+		$cid=intval($_GET['cid']);
+		$numid=ord($_GET['problem_id'])-65;
+		$sql2="SELECT `problem_id` FROM `contest_problem` WHERE `contest_id`='$cid' AND `num`='$numid'";
+		$cnt=0;
+		$result2=mysql_query($sql2);
+		if($result2)
+			$cnt=mysql_num_rows($result2);
+		else
+			$cnt=0;
+		if($cnt)
+		{
+			$row2=mysql_fetch_array($result2);
+			mysql_free_result($result2);
+			if($row2['problem_id']!=0)
+			{
+				$problem_id=chr($numid+65);
+				//echo $problem_id;
+				$sql=$sql."AND `problem_id`='".$row2['problem_id']."' ";
+				$str2=$str2."&problem_id=".$row2['problem_id'];
+			}
+			else
+				$problem_id="";
+		}
+		else
+			$problem_id="";
+		//echo $problem_id;
 	}
-	else $problem_id="";
+	else
+	{
+		$problem_id=strval(intval($_GET['problem_id']));
+		if ($problem_id!='0'){
+			$sql=$sql."AND `problem_id`='".$problem_id."' ";
+			$str2=$str2."&problem_id=".$problem_id;
+		}
+		else $problem_id="";
+	}
 }
 // check the user_id arg
 $user_id="";
