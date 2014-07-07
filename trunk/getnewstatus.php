@@ -3,10 +3,10 @@
 	$to=$_GET['to'];
 	$cid=intval($_GET['cid']);
 	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))
-  {
+    	{
       		echo "You don't have the privilage";
       		exit();
-  }
+    	}
 	$user_id=mysql_real_escape_string($_GET['user']);
 	$pending=intval($to);
 	if($pending==1)
@@ -30,6 +30,16 @@ $sql_1="SELECT count(*) FROM `privilege` WHERE `privilege`.`user_id`='".$user_id
 		{
 			$sql="DELETE FROM `privilege` WHERE `privilege`.`user_id`='".$user_id."' AND `privilege`.`rightstr`='c$cid'";
 			mysql_query($sql) or die(mysql_error());
+			if($pending==2)
+			{
+				$content="您所注册的ID为\"$cid\"的比赛,因注册信息不完整或有错误而不能被接受,为了不影响您正常参赛,请在注册时间截止之前正确修改信息";
+				$to_user=$user_id;
+				$from_user="admin";
+				$title="比赛信息修改提醒";
+				$sql="INSERT INTO mail(to_user,from_user,title,content,in_date)
+					values('$to_user','$from_user','$title','$content',now())";
+				mysql_query($sql) or die(mysql_error());
+			}
 		}
 	}
 	else
@@ -40,7 +50,18 @@ $sql_1="SELECT count(*) FROM `privilege` WHERE `privilege`.`user_id`='".$user_id
 			mysql_query($sql) or die(mysql_error());
 		}
 		else if($pending==-1||$pending==2)
-			;
+		{
+			if($pending==2)
+			{
+				$content="您所注册的ID为\"$cid\"的比赛,因注册信息不完整或有错误而不能被接受,为了不影响您正常参赛,请在注册时间截止之前正确修改信息";
+				$to_user=$user_id;
+				$from_user="admin";
+				$title="比赛信息修改提醒";
+				$sql="INSERT INTO mail(to_user,from_user,title,content,in_date)
+					values('$to_user','$from_user','$title','$content',now())";
+				mysql_query($sql) or die(mysql_error());
+			}
+		}
 	}
 	echo	$response;
 ?>
