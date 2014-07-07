@@ -145,12 +145,12 @@ mysql_free_result($result);
 		echo "<td>";
 		if (isset($_SESSION['user_id'])) echo check_ac($cid,$cnt);
 	        if(!$end_flag){
-        	echo "<td>$row->pid Problem $PID[$cnt]
+        	echo "<td>Problem $PID[$cnt]
 			<td><a href='problem.php?cid=$cid&pid=$cnt'>$row->title</a>
 			";}
                 else
                 {
-                     echo "<td>$row->pid Problem $PID[$cnt]
+                     echo "<td>Problem $PID[$cnt]
                          <td><a href='problem.php?id=$row->pid'>$row->title</a>
                         ";}
 	        echo "<td><center>";
@@ -228,18 +228,29 @@ while ($row=mysql_fetch_object($result)){
 				$user_id=$_SESSION['user_id'];
 				$sql2="SELECT * FROM `contestreg` WHERE `contestreg`.`user_id`='".$user_id."' AND `contestreg`.`contest_id`='$row->contest_id'";
 				$result2=mysql_query($sql2);
-				$query_cnt=mysql_num_rows($result2);
+				if($result2)
+					$query_cnt=mysql_num_rows($result2);
+				else 
+					$query_cnt=0;
+				if($query_cnt>0)
+					$row2=mysql_fetch_array($result2);
 				mysql_free_result($result2);
 			}
+			//do not register
 			if((!isset($_SESSION['user_id']))||($query_cnt==0)){
 			echo "<div style=\"float:right;text-align:right;font-size:90%\">
 			<a href='cstregisterpage.php?cid=$row->contest_id' title='Register\nStart time:$row->reg_start_time\nEnd   time:$row->reg_end_time'>
 			<font color=white style='background-color:rgb(15,209,22)'><u><strong>$MSG_CSTREGISTER >></strong></u></font></a>&nbsp;&nbsp;</div>";
 			}
 			else{
+			if($row2['ispending']!=1)
 			echo "<div style=\"float:right;text-align:right;font-size:90%\">
 			<a href='updateregisterpage.php?cid=$row->contest_id' title='Register\nStart time:$row->reg_start_time\nEnd   time:$row->reg_end_time'>
 			<font color=white style='background-color:rgb(15,209,22)'><u><strong>$MSG_MODIFYREGISTER</strong></u></font></a>&nbsp;&nbsp;</div>";
+			else
+				echo "<div style=\"float:right;text-align:right;font-size:90%\">
+				<a href='contestrank.php?cid=$row->contest_id'>
+				<span style='color:blue'><u>Standings</u></span></a>&nbsp;&nbsp;<div>";
 			}
 			
 		}
