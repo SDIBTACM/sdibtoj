@@ -97,17 +97,15 @@ if(!isset($OJ_RANK_LOCK_PERCENT)) $OJ_RANK_LOCK_PERCENT=0;
 $lock=$end_time-($end_time-$start_time)*$OJ_RANK_LOCK_PERCENT;
 $lock_sql="";
 $islock=0;//only to show the clock or not
-if($isregister==2){
-	if(time()>$lock&&time()<$end_time){
-		if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))//show the rank or not
-			$lock_sql="and in_date<'".date("Y-m-d H:i:s",$lock)."'";
-		$islock=1;//to show the clock
-		//echo $lock;
-		//echo $lock_sql;
-	}
-	else
-		$islock=0;
+if(time()>$lock&&time()<$end_time){
+	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))//show the rank or not
+		$lock_sql="and in_date<'".date("Y-m-d H:i:s",$lock)."'";
+	$islock=1;//to show the clock
+	//echo $lock;
+	//echo $lock_sql;
 }
+else
+	$islock=0;
 $sql="SELECT count(1) FROM `contest_problem` WHERE `contest_id`='$cid'";
 $result=mysql_query($sql);
 $row=mysql_fetch_array($result);
@@ -116,18 +114,19 @@ mysql_free_result($result);
 //echo $start_time;
 
 $start_timeC=strftime("%Y-%m-%d %X",($start_time));
-if($isregister!=2){
+if($isregister!=2)//only register' have realname
+{
 $sql="SELECT 
 	users.user_id,users.nick,solution.result,solution.num,solution.in_date
 		FROM 
-			(select * from solution where solution.contest_id='$cid' and in_date>'$start_timeC') solution 
+			(select * from solution where solution.contest_id='$cid' and in_date>'$start_timeC' $lock_sql) solution 
 		left join users 
 		on users.user_id=solution.user_id 
 	ORDER BY users.user_id,in_date";
 }
 else{
 $sql="SELECT stuinfo.user_id,stuinfo.nick,stuinfo.result,stuinfo.num,stuinfo.in_date,contestreg.sturealname FROM
-	( SELECT users.user_id,users.nick,solution.result,solution.num,solution.in_date,solution.contest_id from users,solution where solution.contest_id='$cid' and in_date>'$start_timeC' $lock_sql and solution.user_id=users.user_id )stuinfo 
+	( SELECT users.user_id,users.nick,solution.result,solution.num,solution.in_date from users,solution where solution.contest_id='$cid' and in_date>'$start_timeC' $lock_sql and solution.user_id=users.user_id )stuinfo 
 	left join contestreg on contestreg.user_id=stuinfo.user_id and contestreg.contest_id=stuinfo.contest_id ORDER BY stuinfo.user_id,in_date";
 }
 //echo $sql;
@@ -173,13 +172,16 @@ $rank=1;
 echo "<style> td{font-size:14} </style>";
 echo "<title>Contest RankList -- $title</title>";
 if($islock){
-	echo "<h1 align=center>已封榜</h1>";
+	$locktime=date("Y-m-d H:i:s",$lock);
+	echo "<h1 align=center>已封榜:rank最后更新于$locktime</h1>";
 	echo "<link rel=\"stylesheet\" href=\"mergely/jquery.countdown.css\" />";
 	echo "<script src=\"mergely/jquery-1.4.1.js\"></script>";
 	echo "<script src=\"mergely/jquery.countdown.js\"></script>";
 	echo "<div id=\"countdown\"></div>";
 }
-echo "<center><h3>Contest RankList -- $title</h3><a href=contestrank.xls.php?cid=$cid>Download</a></center>";
+echo "<center><h3>Contest RankList -- $title</h3>";
+if(time()>$end_time) 
+	echo "<a href=contestrank.xls.php?cid=$cid>Download</a></center>";
 echo "<table id=rank><tr class=toprow align=center><td width=8%><td width=3%>Rank<td width=10%>User<td width=10%>Nick<td width=3%>Solved<td width=5%>Penalty";
 for ($i=0;$i<$pid_cnt;$i++)
 	echo "<td><a href=problem.php?cid=$cid&pid=$i>$PID[$i]</a>";
