@@ -159,7 +159,7 @@ if($islock){
 	$locktime=date("Y-m-d H:i:s",$lock);
 	echo "<h1 align=center>已封榜:rank最后更新于$locktime</h1>";
 	echo "<link rel=\"stylesheet\" href=\"mergely/jquery.countdown.css\" />";
-	echo "<script src=\"mergely/jquery-1.4.1.js\"></script>";
+	echo "<script src=\"mergely/jquery-1.7.1.min.js\"></script>";
 	echo "<script src=\"mergely/jquery.countdown.js\"></script>";
 	echo "<div id=\"countdown\"></div>";
 }
