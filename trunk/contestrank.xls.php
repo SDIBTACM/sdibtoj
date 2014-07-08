@@ -82,7 +82,7 @@ if ($rows_cnt>0){
 	if(strpos($_SERVER['HTTP_USER_AGENT'],'MSIE')){
 		$title=iconv("utf8","gbk",$title);
 	}
-	header ( "content-disposition:   attachment;   filename=contest".$cid.".xls" );
+          header ( "content-disposition:   attachment;   filename=contest".$cid."_".$title.".xls" );
 }
 mysql_free_result($result);
 if ($start_time==0){
