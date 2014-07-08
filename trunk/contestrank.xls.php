@@ -70,18 +70,19 @@ function s_cmp($A,$B){
 if (!isset($_GET['cid'])) die("No Such Contest!");
 $cid=intval($_GET['cid']);
 //require_once("contest-header.php");
-$sql="SELECT `start_time`,`title` FROM `contest` WHERE `contest_id`='$cid'";
+$sql="SELECT `start_time`,`title`,`end_time` FROM `contest` WHERE `contest_id`='$cid'";
 $result=mysql_query($sql) or die(mysql_error());
 $rows_cnt=mysql_num_rows($result);
 $start_time=0;
 if ($rows_cnt>0){
 	$row=mysql_fetch_array($result);
 	$start_time=strtotime($row[0]);
+	$end_time=strtotime($row[2]);
 	$title=$row[1];
 	if(strpos($_SERVER['HTTP_USER_AGENT'],'MSIE')){
 		$title=iconv("utf8","gbk",$title);
 	}
-	header ( "content-disposition:   attachment;   filename=contest".$cid."_".$title.".xls" );
+	header ( "content-disposition:   attachment;   filename=contest".$cid.".xls" );
 }
 mysql_free_result($result);
 if ($start_time==0){
@@ -92,6 +93,12 @@ if ($start_time==0){
 
 if ($start_time>time()){
 	echo "Contest Not Started!";
+	//require_once("oj-footer.php");
+	exit(0);
+}
+
+if ($end_time>time()){
+	echo "Contest Not ended!";
 	//require_once("oj-footer.php");
 	exit(0);
 }
@@ -182,3 +189,4 @@ for ($i=0;$i<$user_cnt;$i++){
 echo "</table>";
 
 ?>
+
