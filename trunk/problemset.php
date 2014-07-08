@@ -1,202 +1,185 @@
 <?
-require_once("oj-header.php");
-require_once("./include/db_info.inc.php");
+    require_once("./include/db_info.inc.php");
+
+	if(isset($OJ_LANG)){
+		require_once("./lang/$OJ_LANG.php");
+	}
 ?>
-<script src="include/sortTable.js"></script>
+
 <?
-$sql="SELECT max(`problem_id`) as upid FROM `problem`";
-$page_cnt=100;
-$result=mysql_query($sql);
-echo mysql_error();
-$row=mysql_fetch_object($result);
-$cnt=intval($row->upid)-1000;
-$cnt=$cnt/$page_cnt;
-
-
-//remember page
-  $page="1";
-if (isset($_GET['page'])){
-    $page=intval($_GET['page']);
-    if(isset($_SESSION['user_id'])){
-         $sql="update users set volume=$page where user_id='".$_SESSION['user_id']."'";
-         mysql_query($sql);
-    }
-}else{
-    if(isset($_SESSION['user_id'])){
-            $sql="select volume from users where user_id='".$_SESSION['user_id']."'";
-            $result=@mysql_query($sql);
-            $row=mysql_fetch_array($result);
-            $page=intval($row[0]);
-    }
-    if(!is_numeric($page))
-        $page='1';
-}
-  //end of remember page
-
-$pstart=1000+$page_cnt*intval($page)-$page_cnt;
-$pend=$pstart+$page_cnt;
-
-$sub_arr=Array();
-// submit
-if (isset($_SESSION['user_id'])){
-$sql="SELECT `problem_id` FROM `solution` WHERE `user_id`='".$_SESSION['user_id']."'".
-//	" AND `problem_id`>='$pstart'".
-//	" AND `problem_id`<'$pend'".
-	" group by `problem_id`";
-$result=@mysql_query($sql) or die(mysql_error());
-while ($row=mysql_fetch_array($result))
-	$sub_arr[$row[0]]=true;
-}
-$acc_arr=Array();
-// ac
-if (isset($_SESSION['user_id'])){
-$sql="SELECT `problem_id` FROM `solution` WHERE `user_id`='".$_SESSION['user_id']."'".
-//	" AND `problem_id`>='$pstart'".
-//	" AND `problem_id`<'$pend'".
-	" AND `result`=4".
-	" group by `problem_id`";
-$result=@mysql_query($sql) or die(mysql_error());
-while ($row=mysql_fetch_array($result))
-	$acc_arr[$row[0]]=true;
-}
- $filter_sql="  `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
-
-if (!isset($_SESSION['administrator'])){
-      if(isset($_SESSION['user_id']))	
-           $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date` FROM `problem` ".
-           "WHERE (`defunct`='N'  or (`author`='".$_SESSION['user_id']."'". ")) AND `problem_id` NOT IN(
-		SELECT `problem_id` FROM `contest_problem` WHERE  $filter_sql and `contest_id` IN (
-			SELECT `contest_id` FROM `contest` WHERE `end_time`>NOW() 
-		)
-	) AND";
-      else
-            $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date` FROM `problem` ".
-           "WHERE `defunct`='N' AND `problem_id` NOT IN(
-                SELECT `problem_id` FROM `contest_problem` WHERE   $filter_sql and `contest_id` IN (
-                        SELECT `contest_id` FROM `contest` WHERE `end_time`>NOW()
-                )
-         ) AND";
-        //echo $sql10;
-	$sql=$sql0."  `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
-}
-else{
-	
-        $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date`  FROM `problem` WHERE ";
-       $sql=$sql0." `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
-}
-//echo $sql;
-if(isset($_GET['search'])){
-    $search=trim(mysql_real_escape_string($_GET['search']));
-    if($search!='')
-     {
-        $sql=$sql0." ( title like '%$search%'";
-        $sql=$sql." or source like '%$search%')";
-        //$sql=$sql." or problem_id='$search')";
+$pr_flag=false;
+$co_flag=false;
+if (isset($_GET['id'])){
+	// practice
+	$id=intval($_GET['id']);
+	require_once("oj-header.php");
 	if (!isset($_SESSION['administrator'])){
-           //  if (isset($_SESSION['problem_editor']))
-             //       $sql=$sql." or author='".$_SESSION['user_id']."'";
-     //        else
-     	$sql=$sql." and defunct='N'";
-         }
-    }
-}
-$sql=$sql." ORDER BY `problem_id`";
-//echo $sql;
-?>
-<title>Problem Set</title>
+            if(isset($_SESSION['user_id']))
+		$sql="SELECT * FROM `problem` WHERE `problem_id`=$id AND (`defunct`='N' or (`author`='".$_SESSION['user_id']."'". ")) AND `problem_id` NOT IN (
+				SELECT `problem_id` FROM `contest_problem` WHERE `contest_id` IN(
+						SELECT `contest_id` FROM `contest` WHERE `end_time`>NOW()))
+                                ";
+            else
+                 $sql="SELECT * FROM `problem` WHERE `problem_id`=$id AND `defunct`='N'  AND `problem_id` NOT IN (
+                                SELECT `problem_id` FROM `contest_problem` WHERE `contest_id` IN(
+                                                SELECT `contest_id` FROM `contest` WHERE `end_time`>NOW()))
+                                ";
 
-<?
+          }
+	else
+		$sql="SELECT * FROM `problem` WHERE `problem_id`=$id";
+
+	$pr_flag=true;
+}else if (isset($_GET['cid']) && isset($_GET['pid'])){
+	// contest
+	$cid=intval($_GET['cid']);
+	$pid=intval($_GET['pid']);
+
+	if (!isset($_SESSION['administrator']))
+		$sql="SELECT langmask,start_time,end_time FROM `contest` WHERE `defunct`='N' AND `contest_id`=$cid AND `start_time`<NOW()";
+	else
+		$sql="SELECT langmask,start_time,end_time FROM `contest` WHERE `defunct`='N' AND `contest_id`=$cid";
+	$result=mysql_query($sql);
+	$rows_cnt=mysql_num_rows($result);
+        $ok_cnt=$rows_cnt==1;		
+	$row=mysql_fetch_row($result);
+	$langmask=$row[0];
+        $start_time=strtotime($row[1]);
+        $end_time=strtotime($row[2]);
+        $start_timeC=strftime("%Y-%m-%d %X",($start_time));
+        $end_timeC=strftime("%Y-%m-%d %X",($end_time));
+	mysql_free_result($result);
+	if ($ok_cnt!=1){
+		// not started
+		echo "No such Contest or Contest not Start!";
+		require_once("oj-footer.php");
+		exit(0);
+	}else{
+		// started
+		$sql="SELECT * FROM `problem` WHERE `defunct`='N' AND `problem_id`=(
+			SELECT `problem_id` FROM `contest_problem` WHERE `contest_id`=$cid AND `num`=$pid
+			)";
+	}
+	// public
+	require_once("contest-header.php");
+	if (!$contest_ok){
+		echo "<center><h1>Not Invited!</h1></center>";
+		require_once("oj-footer.php");
+		exit(1);
+	}
+
+       $sql11="SELECT count(`solution_id`) as count  FROM solution WHERE `contest_id`=$cid AND `problem_id`=(
+                        SELECT `problem_id` FROM `contest_problem` WHERE `contest_id`=$cid AND `num`=$pid
+                        ) AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' ";
+
+        $result11=mysql_query($sql11);
+        $row11=mysql_fetch_array($result11);       
+        $all=$row11['count'];
+        $sql11=$sql11." AND result=4";	
+        $result11=mysql_query($sql11);
+        $row11=mysql_fetch_array($result11);       
+        $ac=$row11['count'];
+	mysql_free_result($result11);
+       $co_flag=true;
+}else{
+	require_once("oj-header.php");
+	echo "<title>$MSG_NO_SUCH_PROBLEM</title><h2>$MSG_NO_SUCH_PROBLEM</h2>";
+	require_once("oj-footer.php");
+	exit(0);
+}
 $result=mysql_query($sql) or die(mysql_error());
-echo "<h3 align='center'>";
-for ($i=1;$i<=$cnt+1;$i++){
-	if ($i>1) echo '&nbsp;';
-	if ($i==$page) echo "<span class=red>$i</span>";
-	else echo "<a href='problemset.php?page=".$i."'>".$i."</a>";
-}
-$cnt=0;
-echo "</h3>";
-echo "<center><table id=problemset width=90%>";
-//echo "<thead><tr align=center class='evenrow'><td width=5><td width=100% colspan=5><form>Title、Source or ID<input type=text name=search><input type=submit value=GO ></form> </tr>";
-echo "<thead><tr align='center' class='evenrow'><td width='5'></td>";
-echo "<td width='90%' colspan='2'><form>Title or Source<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td>";
+if (mysql_num_rows($result)!=1){
+   if(isset($_GET['id'])){
+      $id=intval($_GET['id']);
+	   mysql_free_result($result);
+	   $sql="SELECT  contest.`contest_id` , contest.`title`,contest_problem.num FROM `contest_problem`,`contest` WHERE contest.contest_id=contest_problem.contest_id and `problem_id`=$id and defunct='N' and NOW()< contest.end_time ORDER BY `num`";
+	   //echo $sql;
+           $result=mysql_query($sql);
+	   if($i=mysql_num_rows($result)){
+	      echo "This problem is in Contest(s) below:<br>";
+		   for (;$i>0;$i--){
+				$row=mysql_fetch_row($result);
+				echo "<a href=problem.php?cid=$row[0]&pid=$row[2]>Contest $row[0]:$row[1]</a><br>";
+		//	echo "<title>$MSG_NO_SUCH_PROBLEM!</title>";
+                  //      echo "<h2>$MSG_NO_SUCH_PROBLEM!</h2>";
+	
+			}
+		}else{
+			echo "<title>$MSG_NO_SUCH_PROBLEM!</title>";
+			echo "<h2>$MSG_NO_SUCH_PROBLEM!</h2>";
+		}
+   }else{
+		echo "<title>$MSG_NO_SUCH_PROBLEM!</title>";
+		echo "<h2>$MSG_NO_SUCH_PROBLEM!</h2>";
+	}
+}else{
+	$row=mysql_fetch_object($result);
+	if ($pr_flag){
+		echo "<title>$MSG_PROBLEM $row->problem_id. -- $row->title</title>";
+		echo "<center><h2>$row->title</h2>";
+	}else{
+		$PID="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		echo "<title>$MSG_PROBLEM $PID[$pid]: $row->title </title>";
+		echo "<center><h2>$MSG_PROBLEM $PID[$pid]: $row->title</h2>";
+	}
+	echo "<span class=green>$MSG_Time_Limit: </span>$row->time_limit Sec&nbsp;&nbsp;";
+	echo "<span class=green>$MSG_Memory_Limit: </span>".$row->memory_limit." MB";
+	if ($row->spj) echo "&nbsp;&nbsp;<span class=red>Special Judge</span>";
+     	
+	if ($pr_flag){
+             echo "<br><span class=green>$MSG_SUBMIT: </span>".$row->submit."&nbsp;&nbsp;";
+	     echo "<span class=green>$MSG_SOVLED: </span>".$row->accepted."<br>"; 
+        }else{
 
-echo "<td width='10%' colspan='2'><form action=problem.php>Problem ID<input type='text' name='id' size=5><input type='submit' value='GO' ></form></td>";
-echo "</tr><tr align=center class='toprow'>";
-
-
-
-if(isset($_GET['search']))
-    echo "<tr align=center class='toprow'><td width=3%><td width=10%>Problem ID<td width=40%>Title<td width=7%>AC<td width=40%>Source</tr>";
-
-else
-   echo "<tr align=center class='toprow'><td width=3%><td width=10%>Problem ID<td width=55%>Title<td width=14%>Ratio(AC/Submit)<td width=7%>Difficulty<td width=26%>Date</tr>";
-$cnt=0;
-while ($row=mysql_fetch_object($result)){
-        if ($cnt) echo "<tr class='oddrow'>";
-        else echo "<tr class='evenrow'>";
-        echo "<td>";
-        if (isset($sub_arr[$row->problem_id])){
-                if (isset($acc_arr[$row->problem_id])) echo "<font color=green>Y</font>";
-                else echo "<font color=red>N</font>";
+             echo "<br><span class=green>$MSG_SUBMIT: </span>".$all."&nbsp;&nbsp;";
+	     echo "<span class=green>$MSG_SOVLED: </span>".$ac."<br>"; 
         }
-        echo "<td align=center>".$row->problem_id;
-
-   //    echo "<td align=left><a href='problem.php?id=".$row->problem_id."'>".$row->title."</a>";
-        echo "<td align=left><a href='problem.php?id=".$row->problem_id."'>".$row->title."<font color='#AAAAAA'> ".$row->source."</a>";
-
-       // echo "<td align=left>".$row->source;
-       if(isset($_GET['search'])){
-         echo "<td align=center><a href='status.php?problem_id=".$row->problem_id."&jresult=4'>".$row->accepted."</a>";
-         echo "<td align=center>".$row->source;
-       }
-       else
-       {
-       echo "<td align=center>";
-            if ($row->submit==0)
-              echo sprintf("%.00lf%%",$row->submit);
-            else
-             echo  sprintf ( "%.00lf%%", 100 *( $row->accepted / $row->submit) );
-          echo  "(<a href='status.php?problem_id=".$row->problem_id."&jresult=4'>"
-                .$row->accepted."</a>/<a href='status.php?problem_id=".$row->problem_id."'>".$row->submit."</a>)";
-        echo "<td align=center>";
-            if($row->submit==0)
-             echo sprintf("%.00lf%%",100*(1-$row->submit));
-            else
-                echo sprintf ( "%.00lf%%", 100 *( 1-$row->accepted / $row->submit) );
-        echo "<td align=center>";
-        echo substr($row->in_date,0,10);
+     	
+	if ($pr_flag){
+		echo "[<a href='submitpage.php?id=$id'>$MSG_SUBMIT</a>]";
+	}else{
+		echo "[<a href='submitpage.php?cid=$cid&pid=$pid&langmask=$langmask'>$MSG_SUBMIT</a>]";
+	}
+	if($pr_flag){
+                 echo "[<a href='problemstatus.php?id=".$row->problem_id."'>$MSG_STATUS</a>]";
+        }else{
+                 echo  "[<a href='status.php?cid=$cid&problem_id=$PID[$pid]'>$MSG_STATUS</a>]";
         }
-        echo "</tr>";
-        $cnt=1-$cnt;
-}
 
+       if($pr_flag){	
+             echo "[<a href='./discuss.php?pid=".$row->problem_id."'>$MSG_BBS</a>]";
+	}else{
+             echo "[<a href='./discuss.php?pid=".$row->problem_id."&cid=$cid'>$MSG_BBS</a>]";
+           }
+	echo "</center>";
+	
+	echo "<h2>$MSG_Description</h2><p>".$row->description."</p>";
+	echo "<h2>$MSG_Input</h2><p>".$row->input."</p>";
+	echo "<h2>$MSG_Output</h2><p>".$row->output."</p>";
+	echo "<h2>$MSG_Sample_Input</h2><pre>".htmlspecialchars($row->sample_input)."</pre>";
+	echo "<h2>$MSG_Sample_Output</h2><pre>".htmlspecialchars($row->sample_output)."</pre>";
+	if ($pr_flag||true) echo "<h2>$MSG_HINT</h2><p>".nl2br($row->hint)."</p>";
+	if ($pr_flag) echo "<h2>$MSG_Source</h2><p><a href='problemset.php?search=$row->source'>".nl2br($row->source)."</a></p>";
+	echo "<center>";
+	if ($pr_flag){
+		echo "[<a href='submitpage.php?id=$id'>$MSG_SUBMIT</a>]";
+	}else{
+		echo "[<a href='submitpage.php?cid=$cid&pid=$pid&langmask=$langmask'>$MSG_SUBMIT</a>]";
+	}
+
+       if($pr_flag){
+                 echo "[<a href='problemstatus.php?id=".$row->problem_id."'>$MSG_STATUS</a>]";
+        }else{
+                 echo  "[<a href='status.php?cid=$cid&problem_id=$PID[$pid]'>$MSG_STATUS</a>]";
+        }
+        if($pr_flag){
+             echo "[<a href='./discuss.php?pid=".$row->problem_id."'>$MSG_BBS</a>]";
+        }else{
+             echo "[<a href='./discuss.php?pid=".$row->problem_id."&cid=$cid'>$MSG_BBS</a>]";
+           }
+
+	echo "</center>";
+}
 mysql_free_result($result);
-
-
-
-echo "</tbody>";
-
-echo "</table></center>";
-
 ?>
-
-<?
-$sql="SELECT max(`problem_id`) as upid FROM `problem`";
-$page_cnt=100;
-$result=mysql_query($sql);
-echo mysql_error();
-$row=mysql_fetch_object($result);
-$cnt=intval($row->upid)-1000;
-$cnt=$cnt/$page_cnt;
-echo "<h3 align='center'>";
-for ($i=1;$i<=$cnt+1;$i++){
-	if ($i>1) echo '&nbsp;';
-	if ($i==$page) echo "<span class=red>$i</span>";
-	else echo "<a href='problemset.php?page=".$i."'>".$i."</a>";
-}
-echo "</h3>";
-
-?>
-
-
 <?require_once("oj-footer.php")?>
