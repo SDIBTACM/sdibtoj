@@ -29,6 +29,7 @@ if($OJ_SIM){
 }
 */
 $seatmark=0;
+$contestsql="";
 $sql="SELECT * FROM `solution` WHERE 1 ";
 if (isset($_GET['cid'])){
           $cid=intval($_GET['cid']);
@@ -48,6 +49,11 @@ if (isset($_GET['cid'])){
 	$str2=$str2."&cid=$cid";
 	require_once("contest-header.php");
 }else{
+	if(!isset($_SESSION['administrator'])){
+	$nowtime=strftime("%Y-%m-%d %X",time());
+	$contestsql=$contestsql."AND (`contest_id` NOT IN(SELECT `contest_id` FROM `contest` WHERE `start_time`<'$nowtime' AND `end_time`>'$nowtime') or `contest_id` is NULL)";
+	$sql=$sql.$contestsql;
+	}
 	require_once("oj-header.php");
 }
 ?>
