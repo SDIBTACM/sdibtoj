@@ -98,19 +98,20 @@ mysql_free_result($result);
 //echo $start_time;
 
 $start_timeC=strftime("%Y-%m-%d %X",($start_time));
+$end_timeC=strftime("%Y-%m-%d %X",($end_time));
 if($isregister!=2)//only register' have realname
 {
 $sql="SELECT 
 	users.user_id,users.nick,solution.result,solution.num,solution.in_date
 		FROM 
-			(select * from solution where solution.contest_id='$cid' and in_date>'$start_timeC' $lock_sql) solution 
+			(select * from solution where solution.contest_id='$cid' and in_date>'$start_timeC' and in_date<'$end_timeC' $lock_sql) solution 
 		left join users 
 		on users.user_id=solution.user_id 
 	ORDER BY users.user_id,in_date";
 }
 else{
 $sql="SELECT stuinfo.user_id,stuinfo.nick,stuinfo.result,stuinfo.num,stuinfo.in_date,contestreg.sturealname FROM
-        ( SELECT users.user_id,users.nick,solution.result,solution.num,solution.in_date,solution.contest_id from users,solution where solution.contest_id='$cid' and in_date>'$start_timeC' $lock_sql and solution.user_id=users.user_id )stuinfo 
+        ( SELECT users.user_id,users.nick,solution.result,solution.num,solution.in_date,solution.contest_id from users,solution where solution.contest_id='$cid' and solution.in_date>'$start_timeC' and solution.in_date<'$end_timeC' $lock_sql and solution.user_id=users.user_id )stuinfo 
         left join contestreg on contestreg.user_id=stuinfo.user_id and contestreg.contest_id=stuinfo.contest_id ORDER BY stuinfo.user_id,in_date";
 }
 //echo $sql;
