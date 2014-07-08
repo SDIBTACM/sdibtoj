@@ -92,7 +92,7 @@ if (isset($_GET['problem_id'])){
 				$problem_id=chr($numid+65);
 				//echo $problem_id;
 				$sql=$sql."AND `problem_id`='".$row2['problem_id']."' ";
-				$str2=$str2."&problem_id=".$row2['problem_id'];
+				$str2=$str2."&problem_id=".$problem_id;
 			}
 			else
 				$problem_id="";
