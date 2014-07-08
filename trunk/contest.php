@@ -71,8 +71,9 @@ $pid_cnt=intval($row[0]);
 mysql_free_result($result);
 
 $start_timeC=strftime("%Y-%m-%d %X",($start_time));
+$end_timeC=strftime("%Y-%m-%d %X",($end_time));
 
-$sql="SELECT `result`,`num`,`language`  FROM `solution` WHERE `contest_id`='$cid' and num>=0 and in_date>'$start_timeC'"; 
+$sql="SELECT `result`,`num`,`language`  FROM `solution` WHERE `contest_id`='$cid' and num>=0 and in_date>'$start_timeC' and in_date<'$end_timeC'"; 
 $result=mysql_query($sql);
 $R=array();
 while ($row=mysql_fetch_object($result)){
