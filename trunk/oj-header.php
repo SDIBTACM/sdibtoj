@@ -69,7 +69,7 @@
       <script src="include/underlineTranslation.js" type="text/javascript"></script>
                 <?}?>
                 
-                  <th><a href="./recent-contest.php"><?=$MSG_RECENTCONTEST?></a></th>
+                  <th><a href="./recent-contest.php">Recent Contest</a></th>
 
 
 
