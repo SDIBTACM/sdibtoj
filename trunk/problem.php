@@ -36,14 +36,18 @@ if (isset($_GET['id'])){
 	$pid=intval($_GET['pid']);
 
 	if (!isset($_SESSION['administrator']))
-		$sql="SELECT langmask FROM `contest` WHERE `defunct`='N' AND `contest_id`=$cid AND `start_time`<NOW()";
+		$sql="SELECT langmask,start_time,end_time FROM `contest` WHERE `defunct`='N' AND `contest_id`=$cid AND `start_time`<NOW()";
 	else
-		$sql="SELECT langmask FROM `contest` WHERE `defunct`='N' AND `contest_id`=$cid";
+		$sql="SELECT langmask,start_time,end_time FROM `contest` WHERE `defunct`='N' AND `contest_id`=$cid";
 	$result=mysql_query($sql);
 	$rows_cnt=mysql_num_rows($result);
         $ok_cnt=$rows_cnt==1;		
 	$row=mysql_fetch_row($result);
 	$langmask=$row[0];
+        $start_time=strtotime($row[1]);
+        $end_time=strtotime($row[2]);
+        $start_timeC=strftime("%Y-%m-%d %X",($start_time));
+        $end_timeC=strftime("%Y-%m-%d %X",($end_time));
 	mysql_free_result($result);
 	if ($ok_cnt!=1){
 		// not started
@@ -63,7 +67,20 @@ if (isset($_GET['id'])){
 		require_once("oj-footer.php");
 		exit(1);
 	}
-	$co_flag=true;
+
+       $sql11="SELECT count(`solution_id`) as count  FROM solution WHERE `contest_id`=$cid AND `problem_id`=(
+                        SELECT `problem_id` FROM `contest_problem` WHERE `contest_id`=$cid AND `num`=$pid
+                        ) AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' ";
+
+        $result11=mysql_query($sql11);
+        $row11=mysql_fetch_array($result11);       
+        $all=$row11['count'];
+        $sql11=$sql11." AND result=4";	
+        $result11=mysql_query($sql11);
+        $row11=mysql_fetch_array($result11);       
+        $ac=$row11['count'];
+	mysql_free_result($result11);
+       $co_flag=true;
 }else{
 	require_once("oj-header.php");
 	echo "<title>$MSG_NO_SUCH_PROBLEM</title><h2>$MSG_NO_SUCH_PROBLEM</h2>";
@@ -108,9 +125,16 @@ if (mysql_num_rows($result)!=1){
 	echo "<span class=green>$MSG_Time_Limit: </span>$row->time_limit Sec&nbsp;&nbsp;";
 	echo "<span class=green>$MSG_Memory_Limit: </span>".$row->memory_limit." MB";
 	if ($row->spj) echo "&nbsp;&nbsp;<span class=red>Special Judge</span>";
-	echo "<br><span class=green>$MSG_SUBMIT: </span>".$row->submit."&nbsp;&nbsp;";
-	echo "<span class=green>$MSG_SOVLED: </span>".$row->accepted."<br>"; 
-	
+     	
+	if ($pr_flag){
+             echo "<br><span class=green>$MSG_SUBMIT: </span>".$row->submit."&nbsp;&nbsp;";
+	     echo "<span class=green>$MSG_SOVLED: </span>".$row->accepted."<br>"; 
+        }else{
+
+             echo "<br><span class=green>$MSG_SUBMIT: </span>".$all."&nbsp;&nbsp;";
+	     echo "<span class=green>$MSG_SOVLED: </span>".$ac."<br>"; 
+        }
+     	
 	if ($pr_flag){
 		echo "[<a href='submitpage.php?id=$id'>$MSG_SUBMIT</a>]";
 	}else{
