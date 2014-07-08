@@ -116,7 +116,11 @@ if (mysql_num_rows($result)!=1){
 	}else{
 		echo "[<a href='submitpage.php?cid=$cid&pid=$pid&langmask=$langmask'>$MSG_SUBMIT</a>]";
 	}
-	echo "[<a href='problemstatus.php?id=".$row->problem_id."'>$MSG_STATUS</a>]";
+	if($pr_flag){
+                 echo "[<a href='problemstatus.php?id=".$row->problem_id."'>$MSG_STATUS</a>]";
+        }else{
+                 echo  "[<a href='status.php?cid=$cid&problem_id=$PID[$pid]'>$MSG_STATUS</a>]";
+        }
 
        if($pr_flag){	
              echo "[<a href='./discuss.php?pid=".$row->problem_id."'>$MSG_BBS</a>]";
