@@ -19,10 +19,8 @@ if(isset($OJ_LANG)){
 		}
 }
 echo "<title>$MSG_MAIL</title>";
-$sql="SELECT `contest_id` FROM `contest` WHERE (`end_time`>NOW() and `start_time`<NOW()) and `defunct`='N'";
-$result= mysql_query($sql);
-$row=mysql_num_rows($result);
-if($row)
+   $OJ_MAIL=true;
+if($OJ_VIP_CONTEST)
    $OJ_MAIL=false;
 //echo $row->contest_id;
 
@@ -73,10 +71,12 @@ if($OJ_MAIL||isset($_SESSION['administrator']))
 	</form>
    </table>
 </center> 
-<?
-	 
+<?	 
 }
+else
+ echo "正式比赛期间禁用此功能";
 ?>
+
 
 <?
 //send mail
