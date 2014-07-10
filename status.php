@@ -39,21 +39,29 @@ if (isset($_GET['cid'])){
           $start_time=0;
           if ($rows_cnt>0){
                   $row=mysql_fetch_array($result);
-                    $start_time=strtotime($row[0]);
-                     $end_time=strtotime($row[1]);
+                  $start_time=strtotime($row[0]);
+                  $end_time=strtotime($row[1]);
           }
-          mysql_free_result($result);
+         mysql_free_result($result);
          $start_timeC=strftime("%Y-%m-%d %X",($start_time));
-         $end_timeC=strftime("%Y-%m-%d %X",($end_time));
+         $end_timeC=strftime("%Y-%m-%d %X",($end_time)); 
+
+         if(!isset($OJ_RANK_LOCK_PERCENT)) $OJ_RANK_LOCK_PERCENT=0;
+         $lock_time=$end_time-($end_time-$start_time)*$OJ_RANK_LOCK_PERCENT;
+         $lock_timeC=strftime("%Y-%m-%d %X",($lock_time));
+
 	
-	$sql=$sql." AND `contest_id`='$cid' and in_date>'$start_timeC' and in_date<'$end_timeC' ";
+	if(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))
+  	     $sql=$sql." AND `contest_id`='$cid' and in_date>'$start_timeC' and in_date<'$end_timeC' ";
+        else
+  	     $sql=$sql." AND `contest_id`='$cid' and in_date>'$start_timeC' and in_date<'$lock_timeC' ";
 	$str2=$str2."&cid=$cid";
 	require_once("contest-header.php");
 }else{
 	if(!isset($_SESSION['administrator'])){
-	$nowtime=strftime("%Y-%m-%d %X",time());
-	$contestsql=$contestsql."AND (`contest_id` NOT IN(SELECT `contest_id` FROM `contest` WHERE `start_time`<'$nowtime' AND `end_time`>'$nowtime') or `contest_id` is NULL)";
-	$sql=$sql.$contestsql;
+	   $nowtime=strftime("%Y-%m-%d %X",time());
+	   $contestsql=$contestsql."AND (`contest_id` NOT IN(SELECT `contest_id` FROM `contest` WHERE `start_time`<'$nowtime' AND `end_time`>'$nowtime') or `contest_id` is NULL)";
+           $sql=$sql.$contestsql;
 	}
 	require_once("oj-header.php");
 }
