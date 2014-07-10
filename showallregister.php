@@ -6,6 +6,7 @@ require_once("oj-header.php");
 <script src="mergely/changestatus.js"></script>
 <?
 	$admin_ok=0;
+   $flag=0;
 	if(!isset($_GET['cid']))
 	{
 		echo "No such contest!\n";
@@ -16,6 +17,7 @@ require_once("oj-header.php");
 	if (isset($_SESSION['administrator'])||isset($_SESSION["m$cid"]))
 	{
 		$admin_ok=1;
+      $flag=1;
 	}
 	$sql="SELECT `private`,`title`,`end_time`,`reg_start_time`,`reg_end_time` FROM `contest` WHERE `contest`.`contest_id` ='$cid'";
 	$result=mysql_query($sql);
@@ -35,6 +37,8 @@ require_once("oj-header.php");
 	echo "<center><h1 style=\"COLOR:#1A5CC8\">报名列表</h1>";
 	echo "<font style=\"COLOR:#1A5CC8\">比赛名称：$row->title</font>";
 	echo "<br><font style=\"COLOR:#1A5CC8\">注册时间：    $row->reg_start_time 到     $row->reg_end_time    </font>";
+   if($endtime>$nowtime&&$flag)
+		echo "<span style=\"COLOR:red\">报名表下载:<a href=cstregister.xls.php?cid=$cid>Download</a></font>";
 	if($admin_ok){
 		echo "<form action=\"admin/setseatnum.php?cid=$cid\" method=\"post\">";
 		echo "<input value=\"生成座位号\" id=\"seat\" type=\"Submit\"></form>";
