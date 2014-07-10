@@ -57,7 +57,14 @@ if (isset($_GET['cid'])){
                         $timetoend=$lock_timeC;
         }else
                        $timetoend=$end_timeC;
-  	     $sql=$sql." AND `contest_id`='$cid' and in_date>'$start_timeC' and in_date<'$timetoend' ";
+  	
+        $sql=$sql." AND `contest_id`='$cid' and in_date>'$start_timeC' and (in_date<'$timetoend' ";
+        if(isset($_SESSION['user_id'])){
+                   $user_id=$_SESSION['user_id'];
+               $sql=$sql." or (in_date<'$end_timeC' and user_id='$user_id' ) )";
+                     
+        }else
+               $sql=$sql." ) ";
 	$str2=$str2."&cid=$cid";
 	require_once("contest-header.php");
 }else{
