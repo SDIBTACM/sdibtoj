@@ -34,7 +34,7 @@ else{
 }
 mysql_free_result($result);
 
-if ($reg_end_time<time()){
+if ($reg_end_time>time()){
 	echo "Registration is running!";
 	exit(0);
 }
