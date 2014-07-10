@@ -48,7 +48,16 @@ if (isset($_GET['id'])){
         $end_time=strtotime($row[2]);
         $start_timeC=strftime("%Y-%m-%d %X",($start_time));
         $end_timeC=strftime("%Y-%m-%d %X",($end_time));
-	mysql_free_result($result);
+	if(!isset($OJ_RANK_LOCK_PERCENT)) $OJ_RANK_LOCK_PERCENT=0;
+        $lock_time=$end_time-($end_time-$start_time)*$OJ_RANK_LOCK_PERCENT;
+        $lock_timeC=strftime("%Y-%m-%d %X",($lock_time));
+        if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))
+             $timetoend=$end_timeC;
+        else
+             $timetoend=$lock_timeC;
+
+
+        mysql_free_result($result);
 	if ($ok_cnt!=1){
 		// not started
 		echo "No such Contest or Contest not Start!";
@@ -70,7 +79,7 @@ if (isset($_GET['id'])){
 
        $sql11="SELECT count(`solution_id`) as count  FROM solution WHERE `contest_id`=$cid AND `problem_id`=(
                         SELECT `problem_id` FROM `contest_problem` WHERE `contest_id`=$cid AND `num`=$pid
-                        ) AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' ";
+                        ) AND `in_date`>'$start_timeC' AND `in_date`<'$timetoend' ";
 
         $result11=mysql_query($sql11);
         $row11=mysql_fetch_array($result11);       
