@@ -68,13 +68,13 @@ function is_running($cid){
 
 function check_ac($cid,$pid){
 	require_once("./include/db_info.inc.php");
-	$sql="SELECT count(*) FROM `solution` WHERE `contest_id`='$cid' AND `num`='$pid' AND `result`='4' AND `user_id`='".$_SESSION['user_id']."'";
-	$result=mysql_query($sql);
+	$sql="SELECT count(*) FROM `solution`,`contest` WHERE contest.contest_id='$cid'  AND solution.contest_id='$cid' AND `num`='$pid' AND contest.start_time < solution.in_date AND contest.end_time > solution.in_date  AND `result`='4' AND `user_id`='".$_SESSION['user_id']."'";
+        $result=mysql_query($sql);
 	$row=mysql_fetch_array($result);
 	$ac=intval($row[0]);
 	mysql_free_result($result);
 	if ($ac>0) return "<font color=green>Y</font>";
-	$sql="SELECT count(*) FROM `solution` WHERE `contest_id`='$cid' AND `num`='$pid' AND `user_id`='".$_SESSION['user_id']."'";
+	$sql="SELECT count(*) FROM `solution`,`contest` WHERE contest.contest_id='$cid'  AND solution.contest_id='$cid' AND `num`='$pid' AND contest.start_time<solution.in_date AND contest.end_time>solution.in_date AND `user_id`='".$_SESSION['user_id']."'";
 	$result=mysql_query($sql);
 	$row=mysql_fetch_array($result);
 	$sub=intval($row[0]);
