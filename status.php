@@ -49,12 +49,15 @@ if (isset($_GET['cid'])){
          if(!isset($OJ_RANK_LOCK_PERCENT)) $OJ_RANK_LOCK_PERCENT=0;
          $lock_time=$end_time-($end_time-$start_time)*$OJ_RANK_LOCK_PERCENT;
          $lock_timeC=strftime("%Y-%m-%d %X",($lock_time));
-
-	
-	if(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))
-  	     $sql=$sql." AND `contest_id`='$cid' and in_date>'$start_timeC' and in_date<'$end_timeC' ";
-        else
-  	     $sql=$sql." AND `contest_id`='$cid' and in_date>'$start_timeC' and in_date<'$lock_timeC' ";
+         if($end_time>time())
+	{
+	     if(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))
+                         $timetoend=$end_timeC;
+             else
+                        $timetoend=$lock_timeC;
+        }else
+                       $timetoend=$end_timeC;
+  	     $sql=$sql." AND `contest_id`='$cid' and in_date>'$start_timeC' and in_date<'$timetoend' ";
 	$str2=$str2."&cid=$cid";
 	require_once("contest-header.php");
 }else{
