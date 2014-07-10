@@ -1,6 +1,6 @@
 <?php
 		ob_start();
-		header('Content-type: application/vnd.ms-excel');  
+		header('Content-type: application/excel');  
 ?>
 <?
 require_once("./include/db_info.inc.php");
@@ -59,12 +59,12 @@ while($row=mysql_fetch_object($result))
 	$studep=$row->studepartment;
 	$stumajor=$row->stumajor;
 	$seat=$row->seatnum;
-	if(strpos($_SERVER['HTTP_USER_AGENT'],'MSIE')){
+	/*if(strpos($_SERVER['HTTP_USER_AGENT'],'MSIE')){
 		$realname=iconv("utf8","gbk",$realname);
 		$stuschool=iconv("utf8","gbk",$stuschool);
 		$studep=iconv("utf8","gbk",$studep);
 		$stumajor=iconv("utf8","gbk",$stumajor);
-	}
+	}*/
 	/*echo "<tr>";
 	echo "<td>$realname</td>";
 	echo "<td>$sex</td>";
