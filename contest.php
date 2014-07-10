@@ -77,11 +77,14 @@ $end_timeC=strftime("%Y-%m-%d %X",($end_time));
  $lock_time=$end_time-($end_time-$start_time)*$OJ_RANK_LOCK_PERCENT;
  $lock_timeC=strftime("%Y-%m-%d %X",($lock_time));
 
-
-if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))
-          $timetoend=$end_timeC;
-else
-          $timetoend=$lock_timeC;
+if($end_time>time())
+{
+      if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))
+              $timetoend=$end_timeC;
+       else
+              $timetoend=$lock_timeC;
+}else
+             $timetoend=$end_timeC;
 
 $sql="SELECT `result`,`num`,`language`  FROM `solution` WHERE `contest_id`='$cid' and num>=0 and in_date>'$start_timeC' and in_date<'$timetoend'"; 
 $result=mysql_query($sql);
