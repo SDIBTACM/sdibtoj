@@ -73,7 +73,17 @@ mysql_free_result($result);
 $start_timeC=strftime("%Y-%m-%d %X",($start_time));
 $end_timeC=strftime("%Y-%m-%d %X",($end_time));
 
-$sql="SELECT `result`,`num`,`language`  FROM `solution` WHERE `contest_id`='$cid' and num>=0 and in_date>'$start_timeC' and in_date<'$end_timeC'"; 
+ if(!isset($OJ_RANK_LOCK_PERCENT)) $OJ_RANK_LOCK_PERCENT=0;
+ $lock_time=$end_time-($end_time-$start_time)*$OJ_RANK_LOCK_PERCENT;
+ $lock_timeC=strftime("%Y-%m-%d %X",($lock_time));
+
+
+if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))
+          $timetoend=$end_timeC;
+else
+          $timetoend=$lock_timeC;
+
+$sql="SELECT `result`,`num`,`language`  FROM `solution` WHERE `contest_id`='$cid' and num>=0 and in_date>'$start_timeC' and in_date<'$timetoend'"; 
 $result=mysql_query($sql);
 $R=array();
 while ($row=mysql_fetch_object($result)){
