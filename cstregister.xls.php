@@ -1,6 +1,6 @@
 <?php
 		ob_start();
-		header('Content-type: application/excel');  
+		header('Content-type: application/vnd.ms-excel;charset:utf-8');   
 ?>
 <?
 require_once("./include/db_info.inc.php");
