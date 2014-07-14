@@ -1,4 +1,3 @@
-
 <?
 require_once("./include/my_func.inc.php");
 require_once("./include/db_info.inc.php");
@@ -154,7 +153,6 @@ if ($language!=-1){
 <form id=simform action="status.php" method="get">
 <? if(isset($_GET['cid'])){
                 $cid=intval($_GET['cid']);
-                $numid=ord($_GET['problem_id'])-65;
                 $sql22="SELECT count('problem_id') FROM `contest_problem` WHERE `contest_id`='$cid'";
                 $cnt=0;
                 $result22=mysql_query($sql22);
