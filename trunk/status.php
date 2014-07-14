@@ -152,7 +152,38 @@ if ($language!=-1){
 }
 ?>
 <form id=simform action="status.php" method="get">
-<br><?=$MSG_PROBLEM_ID?>:<input type=text size=4 name=problem_id value='<?=$problem_id?>'>
+<? if(isset($_GET['cid'])){
+                $cid=intval($_GET['cid']);
+                $numid=ord($_GET['problem_id'])-65;
+                $sql22="SELECT count('problem_id') FROM `contest_problem` WHERE `contest_id`='$cid'";
+                $cnt=0;
+                $result22=mysql_query($sql22);
+                if($result22)
+                {
+                        
+                        echo "$MSG_PROBLEM_ID<select size=1 name=problem_id>";
+                        $row22=mysql_fetch_array($result22);
+                        mysql_free_result($result22);
+                       if(isset($_GET['problem_id']))
+                            $pro_selectid=$_GET['problem_id'];
+                       if($pro_selectid==-1) echo "<option value='' selected>All</option>";
+                                else echo "<option value=''>All</option>"; 
+                       for($i=0;$i<$row22[0];$i++)
+                        {
+                             $pro_id=chr($i+65);
+                             if($pro_id==$pro_selectid)
+                              echo "<option value=$pro_id selected>$pro_id</option>";
+                             else
+                              echo "<option value=$pro_id>$pro_id</option>";
+                        }
+                       echo "</select>";
+                }
+
+}
+else
+    echo "<br>".$MSG_PROBLEM_ID.":<input type=text size=4 name=problem_id value='".$problem_id."'>";
+
+?>
 <?=$MSG_USER?>:<input type=text size=6 name=user_id value='<?=$user_id?>'>
 <?if (isset($cid)) echo "<input type='hidden' name='cid' value='$cid'>";?>
 <?=$MSG_LANG?>:<select size="1" name="language">
