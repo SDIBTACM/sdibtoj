@@ -87,8 +87,15 @@
 				print "<th><a href=./modifypage.php><b>$MSG_USERINFO</b></a><a href='userinfo.php?user=$sid'>
 				<font color=red>$sid</font></a>";
 				$mail=checkmail();
-				if ($mail)
+				if ($mail){
+					
+					if(strpos($mail,"blink") === false)//三个等于号 
+						$flag=0;//没有blink
+					else
+						$flag=1;
+					
 					print "<a href=mail.php>$mail</a>";
+				}
 				print "</th><th><a href=logout.php>$MSG_LOGOUT</a></th>";
 			}else{
 				print "<th><a href=loginpage.php>$MSG_LOGIN</a></th>";
@@ -120,5 +127,7 @@ if (strlen($msg)>5){
 <script src="include/underlineTranslation.js" type="text/javascript"></script> 
 <script type="text/javascript">dictInit();</script> 
 <script>
-setInterval(function(){blink.color=blink.color=='red'?'white':'red'},500)
+var mark=<?php echo $flag?>;
+if(mark)
+  setInterval(function(){blink.color=blink.color=='red'?'white':'red'},500)
 </script>
