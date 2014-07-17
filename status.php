@@ -1,3 +1,4 @@
+
 <?
 require_once("./include/my_func.inc.php");
 require_once("./include/db_info.inc.php");
@@ -156,12 +157,12 @@ if ($language!=-1){
                 $sql22="SELECT count('problem_id') FROM `contest_problem` WHERE `contest_id`='$cid'";
                 $cnt=0;
                 $result22=mysql_query($sql22);
-                if($result22)
+                $row22=mysql_fetch_array($result22);
+                mysql_free_result($result22);
+                if($row22[0])
                 {
-                        
                         echo "$MSG_PROBLEM_ID<select size=1 name=problem_id>";
-                        $row22=mysql_fetch_array($result22);
-                        mysql_free_result($result22);
+                       $pro_selectid=-1;
                        if(isset($_GET['problem_id']))
                             $pro_selectid=$_GET['problem_id'];
                        if($pro_selectid==-1) echo "<option value='' selected>All</option>";
