@@ -81,7 +81,7 @@
 		<th><a href="./ranklist.php"><?=$MSG_RANKLIST?></a></th>
 		<th><a href="./contest.php"><?=checkcontest($MSG_CONTEST)?></a></th>
 		<?
-			
+		       $flag=0;	
 			if (isset($_SESSION['user_id'])){
 				$sid=$_SESSION['user_id'];
 				print "<th><a href=./modifypage.php><b>$MSG_USERINFO</b></a><a href='userinfo.php?user=$sid'>
@@ -89,8 +89,8 @@
 				$mail=checkmail();
 				if ($mail){
 					
-					if(strpos($mail,"blink") === false)//三个等于号 
-						$flag=0;//没有blink
+					if(strpos($mail,"blink") === false)//ä‰äªç‰äºŽå· 
+						$flag=0;//ææœ‰blink
 					else
 						$flag=1;
 					
