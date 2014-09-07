@@ -73,7 +73,7 @@ SyntaxHighlighter.all();
 </script>
 
 <!-- Requires jQuery -->
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" type="text/javascript"></script>
+	<script src="mergely/jquery.min.js" type="text/javascript"></script>
 	<!-- Optional jquery.corner for rounded buttons -->
 	<script src="jquery.corner.js" type="text/javascript"></script>
 	
