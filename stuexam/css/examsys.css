@@ -1,0 +1,226 @@
+.nav a {
+  color: #5a5a5a;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 14px 10px;
+  text-transform: uppercase;
+}
+
+.nav li {
+  display: inline;
+}
+
+.jumbotron {
+	 background-image:url('../image/bg.jpg');
+	 margin-right: 100px;
+   margin-left: 100px;
+   height:150px;
+}
+
+.jumbotron .container {
+  position: relative;
+  top:0px;
+}
+
+.jumbotron h1 {
+  color: #fff;
+  font-size: 48px;  
+  font-family: 'Shift', sans-serif;
+  font-weight: bold;
+  padding-top: 40px;
+  text-align: center;
+}
+
+.mytable{
+  margin-left: 100px;
+  margin-right: 100px;
+  width:85%;
+  height: auto;
+  padding-bottom: 170px;
+}
+#examtime{
+  /*padding-bottom: 170px;*/
+}
+.mainpage{
+  background-image: url('../image/bggg.png');
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.mainpage .container {
+  position: relative;
+  top:0px;
+}
+
+.mainpage h5 {
+  font:bold 40px "微软雅黑","黑体";
+  padding-top: 13%;
+  text-align: center;
+}
+
+.inforleft{
+  margin-left: 90px;
+  padding: 18px 26px;
+}
+
+.inforleft label{
+  font-weight: bold;
+}
+
+.inforright{
+  padding: 18px 26px;
+}
+
+.inforright li{
+    line-height: 26px;
+    font-family: "宋体";
+    text-align: left;
+}
+.btn-start{
+  width:180px;
+  height: 22px;
+  background-color: rgb(34, 216, 85);
+  margin-top: 5em;
+  margin-right: 4em;
+  padding: 18px 26px;
+}
+
+.btn-start a{
+  color: white;
+  font-size: 23px;
+  font-weight: bold;
+  text-align: center;
+  padding-left: 1.7em;
+  text-decoration: none;
+}
+.btn-start:hover{
+  background-color: gray;
+}
+
+.learn-more {
+  background-color: #2d2e2f;
+  text-align: center;
+  border-bottom: 1px solid #111;
+  margin-bottom: 0px;
+}
+
+.learn-more .container{
+  float: center;
+}
+
+.learn-more h3 {
+  font-family: 'Shift', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  color:#CCC;
+}
+
+.learn-more a {
+  color: #00b0ff;
+}
+
+#copyright{
+  background-color: #2d2e2f;
+  text-align: center;
+  color: #555;
+}
+.span4 ul li{
+  line-height: 8px;
+}
+#userinfo{
+  line-height: 8px;
+}
+.bs-docs-sidenav li a {
+    display: block;
+    width: 182px;
+    margin: 0 0 1px;
+    padding: 15px 18px;
+    font-size: 14px;
+    font-weight: normal;
+    color:gray;
+}
+.bs-docs-sidenav {
+    width: 220px;
+    margin-left: 0px;
+    margin-bottom: 0px;
+}
+.leftmenu{
+  background-image: linear-gradient(to bottom, #222222, #111111);
+  margin: 0px;
+}
+.mybutton{
+  background-color: #585858;
+  color: #C0C0C0;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100px;
+  height: 30px;
+  border: 2px;
+  border-left: 2px solid #303030;
+  border-bottom: 2px solid #303030;
+  border-top: 2px solid #B0B0B0;
+  border-right: 2px solid #B0B0B0;
+  margin: 5px;
+}
+.mybutton:hover{
+  background-color: #707070;
+  color:white;
+}
+.huanhang{
+  width:70%;
+  table-layout: fixed;
+}
+.huanhang td{
+  word-wrap:break-word;
+}
+.jiadian{
+  table-layout: fixed;
+}
+.jiadian td{
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+}
+.myfont{
+  font-family: Verdana,"Courier New",Georgia,"Time New Roman";
+}
+.jiacu pre{
+  font-size: 14px;
+}
+#examsubmit{
+    width:180px;
+    height:50px;
+    position: absolute;
+    top:50px;
+    right: 200px;
+    border:0px;
+    background-color: #DA4242;
+    color:white;
+    font-size: 20px;
+}
+#examsubmit:hover{
+  background-color: orange;
+}
+.tixinga,.tixingb,.tixing,.tixing button{
+  width: 180px;
+  height: 50px;
+  position: fixed;
+  top:50px;
+  left: 0px;
+  border:0px;
+  background-color: rgb(12, 204, 204);
+  color:white;
+  font-size: 20px;
+}
+.tixingb{
+  top:100px;
+}
+.tixing,.tixing button{
+  top:150px;
+  background-color:rgb(243, 97, 28);
+}
+.tixing button:hover{
+  background-color: rgb(44, 218, 65);
+}
