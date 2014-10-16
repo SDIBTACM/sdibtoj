@@ -1,4 +1,3 @@
-
 <?
 require_once("./include/my_func.inc.php");
 require_once("./include/db_info.inc.php");
@@ -349,7 +348,7 @@ $sql_seat="SELECT `seatnum` FROM `contestreg` WHERE `contestreg`.`contest_id` ='
 			echo "<td>*<font color=".$judge_color[$row->result].">".$judge_result[$row->result]."</font>-<font color=red>";
 			if( isset($_SESSION['source_browser'])){
 					//echo "<a href=showsource.php?id=".$row->sim_s_id." target=original>".$row->sim_s_id."(".$row->sim."%)</a>";
-                                        echo "<a href=comparesource.php?left=".$row->solution_id."&right=".$row->sim_s_id."  class='btn btn-info'  target=original>".$row->solution_id."(".$row->sim."%)</a>";
+                                        echo "<a href=comparesource.php?left=".$row->solution_id."&right=".$row->sim_s_id."  class='btn btn-info'  target=original>".$row->sim_s_id."(".$row->sim."%)</a>";
 			}else{
 					echo $row->sim_s_id;
 			}
