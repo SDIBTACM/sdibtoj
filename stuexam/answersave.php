@@ -78,8 +78,12 @@
 	$result=mysql_query($query) or die(mysql_error());
 	while($row=mysql_fetch_object($result)){
 		$name=$row->fill_id."tkda";
-		if(isset($_POST["$name$row->answer_id"])&&!empty($_POST["$name$row->answer_id"])){
-			$myanswer=trim($_POST["$name$row->answer_id"]);
+		$myanswer = $_POST["$name$row->answer_id"];
+		if(isset($_POST["$name$row->answer_id"])&&(!empty($myanswer)||$myanswer=="0")){
+  			$myanswer = trim($myanswer);
+  			$myanswer = stripslashes($myanswer);
+  			$myanswer = htmlspecialchars($myanswer);
+  			$myanswer = mysql_real_escape_string($myanswer);
 			$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
 			mysql_query($tempsql) or die(mysql_error());
 		}
