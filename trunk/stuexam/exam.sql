@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `ex_choose`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ex_choose` (
 	`choose_id` int(11) NOT NULL AUTO_INCREMENT,
-	`question` tinytext,
+	`question` text,
 	`ams` varchar(255) DEFAULT NULL,
 	`bms` varchar(255) DEFAULT NULL,
 	`cms` varchar(255) DEFAULT NULL,
@@ -42,7 +42,7 @@ DROP TABLE IF EXISTS `ex_judge`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ex_judge` (
 	`judge_id` int(11) NOT NULL AUTO_INCREMENT,
-	`question` tinytext,
+	`question` text,
 	`answer` char(1) DEFAULT NULL,
 	`point` varchar(100) DEFAULT '',
 	`addtime` datetime DEFAULT NULL,
@@ -57,7 +57,7 @@ DROP TABLE IF EXISTS `ex_fill`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ex_fill` (
 	`fill_id` int(11) NOT NULL AUTO_INCREMENT,
-	`question` tinytext,
+	`question` text,
 	`answernum` tinyint(4) DEFAULT 0,
 	`point` varchar(100) DEFAULT '',
 	`addtime` datetime DEFAULT NULL,
