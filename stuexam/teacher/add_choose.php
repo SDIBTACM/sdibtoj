@@ -50,16 +50,16 @@
 		<div class="pull-left span4">
 			<font color=red>*如果要输入'\',请写成'\\',或使用中文引号</font>
 			<label>题目描述:</label>
-			<textarea style="width:250px;height:150px;overflow-x:visible;overflow-y:visible;" 
+			<textarea style="width:250px;height:295px;overflow-x:visible;overflow-y:visible;" 
 			name="choose_des"></textarea>
 		</div>
 		<?require_once("../../include/set_post_key.php");?>
 		<div class="span4">
 			<label>选项描述:</label>
-			选项A: <input type="text" maxlength="80" name="ams"><br/>
-			选项B: <input type="text" maxlength="80" name="bms"><br/>
-			选项C: <input type="text" maxlength="80" name="cms"><br/>
-			选项D: <input type="text" maxlength="80" name="dms"><br/>
+			选项A: <textarea name="ams" style="width:319px;height:40px"></textarea></br>
+			选项B: <textarea name="bms" style="width:319px;height:40px"></textarea></br>
+			选项C: <textarea name="cms" style="width:319px;height:40px"></textarea></br>
+			选项D: <textarea name="dms" style="width:319px;height:40px"></textarea></br>
 			<strong>答案:</strong>
 			A<input type="radio" name="answer" value="A">&nbsp;
 			B<input type="radio" name="answer" value="B">&nbsp;
@@ -82,15 +82,17 @@
 			</select>
 			<label>难度系数:</label>
 			<select name="easycount" id="easycount">
+				<option value="0">0</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
 				<option value="10">10</option>
-				<option value="20">20</option>
-				<option value="30">30</option>
-				<option value="40">40</option>
-				<option value="50">50</option>
-				<option value="60">60</option>
-				<option value="70">70</option>
-				<option value="80">80</option>
-				<option value="90">90</option>
 			</select><br />
 			<input type="submit" value="提交" class="mybutton">
 			<input type="reset" value="重置" class="mybutton">

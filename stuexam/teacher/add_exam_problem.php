@@ -498,6 +498,11 @@
 					<li><a href="../">退出管理页面</a></li>
 					</ul>
 					</div>
+					<style>
+						.container pre{
+							font-size: 16px;
+						}
+					</style>
 					<div class="container" style="margin-left:23%" id="right">
 					<h2 style="text-align:center">试卷一览</h2>
 					<div style="height:40px">
@@ -531,14 +536,14 @@
 							echo "<tr><td>$numofchoose.&nbsp;&nbsp;$question";
 							echo "<a href=\"del_exam_problem.php?eid=$eid&type=1&qid=$row1->choose_id\">[去除该题]</a>
 							<font color=red>答案:$row1->answer</font></td></tr>";
-							echo "<tr><td>(A).$row1->ams";
-							echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-							echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-							echo "(B).$row1->bms</td></tr>";
-							echo "<tr><td>(C).$row1->cms";
-							echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-							echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-							echo "(D).$row1->dms</td></tr>";
+							echo "<tr><td>(A) $row1->ams</td></tr>";
+							//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+							//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+							echo "<tr><td>(B) $row1->bms</td></tr>";
+							echo "<tr><td>(C) $row1->cms</td></tr>";
+							//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+							//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+							echo "<tr><td>(D) $row1->dms</td></tr>";
 						}
 						mysql_free_result($result1);
 					?>

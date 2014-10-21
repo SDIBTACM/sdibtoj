@@ -89,15 +89,17 @@
 			</select>
 			<label>难度系数:</label>
 			<select name="easycount" id="easycount">
+				<option value="0">0</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
 				<option value="10">10</option>
-				<option value="20">20</option>
-				<option value="30">30</option>
-				<option value="40">40</option>
-				<option value="50">50</option>
-				<option value="60">60</option>
-				<option value="70">70</option>
-				<option value="80">80</option>
-				<option value="90">90</option>
 			</select><br />
 			<strong>答案:<font color=red id="warnmsg">(*请确保下面文本框个数与题目中的填空数相同)</font></strong>
 			<input class="btn" type="button" value="添加答案空" onclick="addinput()" />

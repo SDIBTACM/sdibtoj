@@ -174,7 +174,19 @@ function GetRTime(){
 }
 window.onload=GetRTime;
 </script>
-<body>
+
+<style>
+	.nocopy{
+		-moz-user-select:none;
+	}
+	input[type="radio"]{
+		margin-top: 0px;
+	}
+	.jiacu pre{
+  		font-size: 16px;
+	}
+</style>
+<body onselectstart="return false" class="nocopy">
 	<div class="jumbotron">
   		<div class="container" align="center" style="color:white">
   			<h1>程序设计考试系统</h1>
@@ -246,27 +258,28 @@ window.onload=GetRTime;
 				else
 					$myanswer="";
 				echo "<tr><td><pre><font color=red>($choosescore 分)</font>$numofchoose.$question</pre></td></tr>";
-				echo "<tr><td><pre>(A).$row1->ams\n";
-				echo "(B).$row1->bms\n";
-				echo "(C).$row1->cms\n";
-				echo "(D).$row1->dms</pre></td></tr>";
 				echo "<tr><td><pre>";
 				if($myanswer=='A')
-					echo "A.<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"A\" checked>\t";
+					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"A\" checked>";
 				else
-					echo "A.<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"A\">\t";
+					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"A\">";
+				echo "(A) $row1->ams\n";
 				if($myanswer=='B')
-					echo "B.<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"B\" checked>\t";
+					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"B\" checked>";
 				else
-					echo "B.<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"B\">\t";
+					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"B\">";
+				echo "(B) $row1->bms\n";
 				if($myanswer=='C')
-					echo "C.<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"C\" checked>\t";
+					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"C\" checked>";
 				else
-					echo "C.<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"C\">\t";
+					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"C\">";
+				echo "(C) $row1->cms\n";
 				if($myanswer=='D')
-					echo "D.<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"D\" checked>\t";
+					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"D\" checked>";
 				else
-					echo "D.<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"D\">\t";
+					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"D\">";
+				echo "(D) $row1->dms</pre></td></tr>";
+				echo "<tr><td><pre>";
 				echo "</pre></td></tr>";
 			}
 			mysql_free_result($result1);
@@ -367,7 +380,7 @@ window.onload=GetRTime;
 				echo "<tr><td><pre>";
 				for($i=1;$i<=$row3->answernum;$i++)
 				{
-					if(!empty($fillarr[$row3->fill_id][$i]))
+					if(!empty($fillarr[$row3->fill_id][$i])||$fillarr[$row3->fill_id][$i]=="0")
 						$myanswer=$fillarr[$row3->fill_id][$i];
 					else
 						$myanswer="";
