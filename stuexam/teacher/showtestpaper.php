@@ -15,7 +15,7 @@
 	$user_id=$_SESSION['user_id'];
 	$users=trim($_GET['users']);
 	$users=mysql_real_escape_string($users);
-	$sql ="SELECT `title`,`end_time` FROM `exam` WHERE `exam_id`='$eid'";
+	$sql ="SELECT `title`,`end_time`,`creator` FROM `exam` WHERE `exam_id`='$eid'";
 	$result=mysql_query($sql) or die(mysql_error());
 	$cnt = mysql_num_rows($result);
 	if($cnt==0)
@@ -28,10 +28,13 @@
 	$end_time=$row[1];
 	$endtimeC=strtotime($end_time);
 	$now=time();
+    $creator=$row[2];
 	mysql_free_result($result);
-	if($now<$endtimeC){
-		echo "<h1>Exam is not Over</h1>";
-		exit(0);
+	if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id'])){   
+     		if($now<$endtimeC){
+	  	        echo "<h1>Exam is not Over</h1>";
+	              exit(0);
+             }
 	}
 	$prisql="SELECT `creator` FROM `exam` WHERE `exam_id`='$eid'";
 	$priresult=mysql_query($prisql) or die(mysql_error());
@@ -217,3 +220,4 @@
 		<?
 	}
 ?>
+
