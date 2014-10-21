@@ -153,16 +153,16 @@ function chkinput(form){
 		<div class="pull-left span4">
 			<font color=red>*如果要输入'\',请写成'\\',或使用中文引号</font>
 			<label>题目描述:</label>
-			<textarea style="width:250px;height:150px;overflow-x:visible;overflow-y:visible;" 
+			<textarea style="width:250px;height:295px;overflow-x:visible;overflow-y:visible;" 
 			name="choose_des"><?=$question?></textarea>
 		</div>
 		<?require_once("../../include/set_post_key.php");?>
 		<div class="span4">
 			<label>选项描述:</label>
-			选项A: <input type="text" maxlength="80" name="ams" value="<?=$ams?>" ><br/>
-			选项B: <input type="text" maxlength="80" name="bms" value="<?=$bms?>" ><br/>
-			选项C: <input type="text" maxlength="80" name="cms" value="<?=$cms?>" ><br/>
-			选项D: <input type="text" maxlength="80" name="dms" value="<?=$dms?>" ><br/>
+			选项A: <textarea name="ams" style="width:319px;height:40px"><?=$ams?></textarea></br>
+			选项B: <textarea name="bms" style="width:319px;height:40px"><?=$bms?></textarea></br>
+			选项C: <textarea name="cms" style="width:319px;height:40px"><?=$cms?></textarea></br>
+			选项D: <textarea name="dms" style="width:319px;height:40px"><?=$dms?></textarea></br>
 			<strong>答案:</strong>
 			A<input type="radio" name="answer" value="A" <?=($answer=='A')?"checked":""?> >&nbsp;
 			B<input type="radio" name="answer" value="B" <?=($answer=='B')?"checked":""?> >&nbsp;
@@ -189,15 +189,17 @@ function chkinput(form){
 			<!-- <input type="text" name="point" maxlength="80" value=<?=$point?> > -->
 			<label>难度系数:</label>
 			<select name="easycount" id="easycount">
+				<option value="0" <?echo $easycount==0?"selected":""?> >0</option>
+				<option value="1" <?echo $easycount==1?"selected":""?> >1</option>
+				<option value="2" <?echo $easycount==2?"selected":""?> >2</option>
+				<option value="3" <?echo $easycount==3?"selected":""?> >3</option>
+				<option value="4" <?echo $easycount==4?"selected":""?> >4</option>
+				<option value="5" <?echo $easycount==5?"selected":""?> >5</option>
+				<option value="6" <?echo $easycount==6?"selected":""?> >6</option>
+				<option value="7" <?echo $easycount==7?"selected":""?> >7</option>
+				<option value="8" <?echo $easycount==8?"selected":""?> >8</option>
+				<option value="9" <?echo $easycount==9?"selected":""?> >9</option>
 				<option value="10" <?echo $easycount==10?"selected":""?> >10</option>
-				<option value="20" <?echo $easycount==20?"selected":""?> >20</option>
-				<option value="30" <?echo $easycount==30?"selected":""?> >30</option>
-				<option value="40" <?echo $easycount==40?"selected":""?> >40</option>
-				<option value="50" <?echo $easycount==50?"selected":""?> >50</option>
-				<option value="60" <?echo $easycount==60?"selected":""?> >60</option>
-				<option value="70" <?echo $easycount==70?"selected":""?> >70</option>
-				<option value="80" <?echo $easycount==80?"selected":""?> >80</option>
-				<option value="90" <?echo $easycount==90?"selected":""?> >90</option>
 			</select><br />
 			<input type="submit" value="提交" class="mybutton">
 			<input type="button" value="返回" onclick="javascript:history.go(-1);" class="mybutton">
