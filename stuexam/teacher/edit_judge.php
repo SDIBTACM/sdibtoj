@@ -4,7 +4,7 @@
 <?
 	function test_input($data){
 		$data = trim($data);
-  		$data = stripslashes($data);
+  		//$data = stripslashes($data);
   		$data = htmlspecialchars($data);
   		$data = mysql_real_escape_string($data);
   		return $data;
@@ -150,15 +150,17 @@ function chkinput(form){
 			</select>
 			<label>难度系数:</label>
 			<select name="easycount" id="easycount">
+				<option value="0" <?echo $easycount==0?"selected":""?> >0</option>
+				<option value="1" <?echo $easycount==1?"selected":""?> >1</option>
+				<option value="2" <?echo $easycount==2?"selected":""?> >2</option>
+				<option value="3" <?echo $easycount==3?"selected":""?> >3</option>
+				<option value="4" <?echo $easycount==4?"selected":""?> >4</option>
+				<option value="5" <?echo $easycount==5?"selected":""?> >5</option>
+				<option value="6" <?echo $easycount==6?"selected":""?> >6</option>
+				<option value="7" <?echo $easycount==7?"selected":""?> >7</option>
+				<option value="8" <?echo $easycount==8?"selected":""?> >8</option>
+				<option value="9" <?echo $easycount==9?"selected":""?> >9</option>
 				<option value="10" <?echo $easycount==10?"selected":""?> >10</option>
-				<option value="20" <?echo $easycount==20?"selected":""?> >20</option>
-				<option value="30" <?echo $easycount==30?"selected":""?> >30</option>
-				<option value="40" <?echo $easycount==40?"selected":""?> >40</option>
-				<option value="50" <?echo $easycount==50?"selected":""?> >50</option>
-				<option value="60" <?echo $easycount==60?"selected":""?> >60</option>
-				<option value="70" <?echo $easycount==70?"selected":""?> >70</option>
-				<option value="80" <?echo $easycount==80?"selected":""?> >80</option>
-				<option value="90" <?echo $easycount==90?"selected":""?> >90</option>
 			</select><br />
 			<input type="submit" value="提交" class="mybutton">
 			<input type="button" value="返回" onclick="javascript:history.go(-1);" class="mybutton">
