@@ -122,6 +122,7 @@
 				<th width=7%>程序题成绩</th>
 				<th width=7%>总成绩</th>
 				<th width=7%>试卷</th>
+				<th width=7%>操作</th>
 				</tr>
 				</thead>
 				<tbody>
@@ -139,6 +140,10 @@
 							echo "<td>[未参加考试]</td>";
 						else
 							echo "<td><a href=\"showtestpaper.php?users=$row->user_id&eid=$eid\">[查看试卷]</a></td>";
+						if($row->score=="")
+							echo "<td>无</td>";
+						else
+							echo "<td><a href=\"del_user_score.php?users=$row->user_id&eid=$eid\" onclick=\"return suredo('是否要删除该考生成绩,让考生重新参加考试？')\">[删除分数]</a></td>";
 						echo"</tr>";
 					}
 					mysql_free_result($result);
@@ -167,6 +172,11 @@
 	}
 ?>
 <script type="text/javascript">
+function suredo(q){
+	var ret;
+	ret = confirm(q);
+	return ret;
+}
 $(function(){
 	if($("#left").height()<700)
 		$("#left").css("height",700)
