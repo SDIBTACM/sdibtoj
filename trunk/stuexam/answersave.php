@@ -81,7 +81,7 @@
 		$myanswer = $_POST["$name$row->answer_id"];
 		if(isset($_POST["$name$row->answer_id"])&&(!empty($myanswer)||$myanswer=="0")){
   			$myanswer = trim($myanswer);
-  			$myanswer = stripslashes($myanswer);
+  			//$myanswer = stripslashes($myanswer);
   			$myanswer = htmlspecialchars($myanswer);
   			$myanswer = mysql_real_escape_string($myanswer);
 			$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
