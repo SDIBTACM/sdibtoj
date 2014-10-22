@@ -28,13 +28,13 @@
 	$end_time=$row[1];
 	$endtimeC=strtotime($end_time);
 	$now=time();
-    $creator=$row[2];
+	$creator=$row[2];
 	mysql_free_result($result);
-	if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id'])){   
-     		if($now<$endtimeC){
-	  	        echo "<h1>Exam is not Over</h1>";
-	              exit(0);
-             }
+	if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id'])){
+		if($now<$endtimeC){
+			echo "<h1>Exam is not Over</h1>";
+			exit(0);
+		}
 	}
 	$prisql="SELECT `creator` FROM `exam` WHERE `exam_id`='$eid'";
 	$priresult=mysql_query($prisql) or die(mysql_error());
@@ -121,10 +121,10 @@
 				else
 					$myanswer="";
 				echo "<tr><td><pre><font color=red>($choosescore 分)</font>$numofchoose.$question</pre></td></tr>";
-				echo "<tr><td><pre>(A).$row1->ams\n";
-				echo "(B).$row1->bms\n";
-				echo "(C).$row1->cms\n";
-				echo "(D).$row1->dms</pre></td></tr>";
+				echo "<tr><td><pre>(A) $row1->ams\n";
+				echo "(B) $row1->bms\n";
+				echo "(C) $row1->cms\n";
+				echo "(D) $row1->dms</pre></td></tr>";
 				echo "<tr><td><pre>";
 				echo "<strong>我的答案:$myanswer\t正确答案:$row1->answer</strong>";
 				echo "</pre></td></tr>";
@@ -193,8 +193,10 @@
 				echo "<tr><td><pre>";
 				for($i=1;$i<=$row3->answernum;$i++)
 				{
-					if(!empty($fillarr[$row3->fill_id][$i]))
+					if(!empty($fillarr[$row3->fill_id][$i])||$fillarr[$row3->fill_id][$i]=="0")
+					{
 						$myanswer=$fillarr[$row3->fill_id][$i];
+					}
 					else
 						$myanswer="";
 					if($i==1)
@@ -220,4 +222,3 @@
 		<?
 	}
 ?>
-
