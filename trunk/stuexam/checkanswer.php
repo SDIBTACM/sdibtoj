@@ -115,7 +115,10 @@
 	while($row=mysql_fetch_object($result)){
 		$name=$row->fill_id."tkda";
 		if(isset($_POST["$name$row->answer_id"])){
-			$myanswer=trim($_POST["$name$row->answer_id"]);
+			$myanswer = trim($_POST["$name$row->answer_id"]);
+			//$myanswer = stripslashes($myanswer);
+  			$myanswer = htmlspecialchars($myanswer);
+  			$myanswer = mysql_real_escape_string($myanswer);
 			$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
 			mysql_query($tempsql) or die(mysql_error());
 			if($myanswer==$row->answer){
