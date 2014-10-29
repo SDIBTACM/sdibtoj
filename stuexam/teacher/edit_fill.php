@@ -17,14 +17,17 @@
 		$easycount=intval($_POST['easycount']);
 		$answernum=intval($_POST['numanswer']);
 		$kind=intval($_POST['kind']);
+		$isprivate=intval($_POST['isprivate']);
 		//$answernum=count($_POST)-6;
 		//important the first is the postkey the second is the fill_des 
 		//the third is the hidden fillid
 		//the forth is the point the fifth is the easycount the sixth is kind
 		$fillid=intval($_POST['fillid']);
-		$prisql="SELECT `creator` FROM `ex_fill` WHERE `fill_id`='$fillid'";
+		$prisql="SELECT `creator`,`isprivate` FROM `ex_fill` WHERE `fill_id`='$fillid'";
 		$priresult=mysql_query($prisql) or die(mysql_error());
-		$creator=mysql_result($priresult, 0);
+		$prirow=mysql_fetch_array($priresult);
+		$creator=$prirow['creator'];
+		$private2=$prirow['isprivate'];
 		mysql_free_result($priresult);
 		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
 		{
@@ -33,10 +36,17 @@
         	echo "location='edit_fill.php?id=$fillid'\n";
         	echo "</script>";
 		}
+		else if($private2==2&&!isset($_SESSION['administrator']))
+		{
+			echo "<script language='javascript'>\n";
+	    	echo "alert(\"You have no privilege to modify it!\");\n";  
+        	echo "location='admin_fill.php'\n";
+        	echo "</script>";
+		}
 		else
 		{
-			$query="UPDATE `ex_fill` SET `question`='".$question."',`answernum`='$answernum',`point`='".$point."',`easycount`='$easycount',`kind`='$kind' 
-			WHERE `fill_id`='$fillid'";
+			$query="UPDATE `ex_fill` SET `question`='".$question."',`answernum`='$answernum',`point`='".$point."',`easycount`='$easycount',
+			`kind`='$kind',`isprivate`='$isprivate' WHERE `fill_id`='$fillid'";
 			mysql_query($query) or die(mysql_error());
 			$query="DELETE FROM `fill_answer` WHERE `fill_id`='$fillid'";
 			mysql_query($query) or die(mysql_error());
@@ -59,7 +69,7 @@
 			$id=intval($_GET['id']);
 			if(filter_var($id, FILTER_VALIDATE_INT))
 			{
-				$query="SELECT `question`,`answernum`,`point`,`easycount`,`kind` FROM `ex_fill` 
+				$query="SELECT `question`,`answernum`,`point`,`creator`,`easycount`,`kind`,`isprivate` FROM `ex_fill` 
 				WHERE `fill_id`='$id'";
 				$result=mysql_query($query) or die(mysql_error());
 				$row_cnt=mysql_num_rows($result);
@@ -70,8 +80,27 @@
 					$question=$row['question'];
 					$answernumC=$row['answernum'];
 					$point=$row['point'];
+					$creator=$row['creator'];
 					$easycount=$row['easycount'];
 					$kind=$row['kind'];
+					$isprivate=$row['isprivate'];
+					if($isprivate==2&&!isset($_SESSION['administrator']))
+					{
+						echo "<script language='javascript'>\n";
+	    				echo "alert(\"You have no privilege!\");\n";  
+        				echo "location='admin_fill.php'\n";
+        				echo "</script>";
+					}
+					if(!isset($_SESSION['administrator']))
+					{
+						if($isprivate==1&&$creator!=$_SESSION['user_id'])
+						{
+							echo "<script language='javascript'>\n";
+	    					echo "alert(\"You have no privilege!\");\n";  
+        					echo "location='admin_fill.php'\n";
+        					echo "</script>";
+						}
+					}
 				}
 				else
 				{
@@ -118,7 +147,6 @@
 	<h2 style="text-align:center">查看修改填空题</h2>
 	<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])?>" onSubmit="return chkinput(this)">
 		<div class="pull-left span8">
-			<font color=red>*如果要输入'\',请写成'\\',或使用中文引号</font>
 			<label>题目描述:</label>
 			<textarea style="width:490px;height:160px;overflow-x:visible;overflow-y:visible;" 
 			name="fill_des"><?=$question?></textarea>
@@ -135,7 +163,7 @@
 				<option value="2" <?echo $kind==2?"selected":""?> >写运行结果</option>
 				<option value="3" <?echo $kind==3?"selected":""?> >程序填空</option>
 			</select>
-			<label>知识点:</label>
+			<label for="point">知识点:</label>
 			<select name="point" id="point">
 			<?
 				$sql="SELECT * FROM `ex_point`";
@@ -150,7 +178,7 @@
 				mysql_free_result($result);
 			?>
 			</select>
-			<label>难度系数:</label>
+			<label for="easycount">难度系数:</label>
 			<select name="easycount" id="easycount">
 				<option value="0" <?echo $easycount==0?"selected":""?> >0</option>
 				<option value="1" <?echo $easycount==1?"selected":""?> >1</option>
@@ -163,7 +191,13 @@
 				<option value="8" <?echo $easycount==8?"selected":""?> >8</option>
 				<option value="9" <?echo $easycount==9?"selected":""?> >9</option>
 				<option value="10" <?echo $easycount==10?"selected":""?> >10</option>
-			</select><br />
+			</select>
+			<label for="isprivate">请选题库类型:</label>
+			<select name="isprivate" id="isprivate" onchange="showmsg()">
+				<option value="0" <?echo $isprivate==0?"selected":""?> >公共题库</option>
+				<option value="1" <?echo $isprivate==1?"selected":""?> >私人题库</option>
+				<option value="2" <?echo $isprivate==2?"selected":""?> >系统隐藏</option>
+			</select><strong><font color=red id="msg"></font></strong><br/>
 			<strong>答案:<font color=red id="warnmsg"></font></strong>
 			<input class="btn" type="button" value="添加答案空" onclick="addinput()" />
 			<input class="btn" type="button" value="删除答案空" onclick="delinput()" />
@@ -253,6 +287,15 @@ function showspan()
 		$('#warnmsg').html('(*请确保空数个数与程序在编译器端运行结果的行数一致)');
 	else if($('#kind').val()==3)
 		$('#warnmsg').html('(*请确保下面文本框个数与题目中的填空数相同)');
+}
+function showmsg()
+{
+	if($('#isprivate').val()==0)
+		$('#msg').html('(*公共题库所有人都可见)');
+	else if($('#isprivate').val()==1)
+		$('#msg').html('(*私人题库仅限本人和最高管理员可见)');
+	else if($('#isprivate').val()==2)
+		$('#msg').html('(*系统隐藏选择确认后,仅限最高管理员可以查看和修改，请谨慎选择和查看)');
 }
 $(function(){
 	if($("#left").height()<700)
