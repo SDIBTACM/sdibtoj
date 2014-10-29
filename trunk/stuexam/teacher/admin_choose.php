@@ -90,11 +90,12 @@
 		<?
 			require_once("../../include/set_get_key.php");
 			$key=$_SESSION['getkey'];
-			$sql="SELECT `choose_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_choose` $searchsql ORDER BY `choose_id` DESC $sqladd";
+			$numofchoose=1+($page-1)*$each_page;
+			$sql="SELECT `choose_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_choose` $searchsql ORDER BY `choose_id` ASC $sqladd";
 			$result = mysql_query($sql) or die(mysql_error());
 			while($row=mysql_fetch_object($result)){
 				echo "<tr>";
-				echo "<td>$row->choose_id</td>";
+				echo "<td>$numofchoose</td>";
 				$question=$row->question;
 				echo "<td>$question</td>";
 				echo "<td style=\"font-size:9px\">$row->addtime</td>";
@@ -104,6 +105,7 @@
 				echo "<td><a href='javascript:suredo(\"delquestion.php?type=1&id=$row->choose_id&getkey=".$key."\",\"确定删除?\")'>删除</a></td>";
 				echo "<td><a href='./edit_choose.php?id=$row->choose_id'>编辑</a></td>";
 				echo "</tr>";
+				$numofchoose++;
 			}
 			mysql_free_result($result);
 		?>
