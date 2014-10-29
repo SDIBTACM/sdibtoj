@@ -21,7 +21,7 @@
 			{
 				$search=mysql_real_escape_string($_GET['search']);
 				if($search!='')
-					$searchsql=" WHERE `creator` like '%$search%' or `point` like '%$search%'";
+					$searchsql=" WHERE (`creator` like '%$search%' or `point` like '%$search%')";
 				else
 					$searchsql="";
 			}
@@ -29,6 +29,42 @@
 			{
 				$search="";
 				$searchsql="";
+			}
+			if(isset($_GET['problem']))
+			{
+				$problem=intval($_GET['problem']);
+				if($problem<0||$problem>2)
+					$problem=0;
+				if(!isset($_SESSION['administrator'])&&$problem==2)
+					$problem=0;
+				if($searchsql=="")
+				{
+					if($problem==0||isset($_SESSION['administrator']))
+						$prosql=" WHERE `isprivate`='$problem'";
+					else
+					{
+						$user=$_SESSION['user_id'];
+						$prosql=" WHERE `isprivate`='$problem' AND `creator` like '$user'";
+					}
+				}
+				else
+				{
+					if($problem==0||isset($_SESSION['administrator']))
+						$prosql=" AND `isprivate`='$problem'";
+					else
+					{
+						$user=$_SESSION['user_id'];
+						$prosql=" AND `isprivate`='$problem' AND `creator` like '$user'";
+					}
+				}
+			}
+			else
+			{
+				$problem=0;
+				if($searchsql=="")
+					$prosql=" WHERE `isprivate`='$problem'";
+				else
+					$prosql=" AND `isprivate`='$problem'";
 			}
 			if(filter_var($type, FILTER_VALIDATE_INT)&&filter_var($eid, FILTER_VALIDATE_INT)&&$eid>0)
 			{
@@ -46,11 +82,11 @@
 					$each_page=15;// each page data num
 					$pagenum=10;//the max of page num
 					if($type==1)
-						$sql="SELECT COUNT(*) FROM `ex_choose` $searchsql";
+						$sql="SELECT COUNT(*) FROM `ex_choose` $searchsql $prosql";
 					else if($type==2)
-						$sql="SELECT COUNT(*) FROM `ex_judge` $searchsql";
+						$sql="SELECT COUNT(*) FROM `ex_judge` $searchsql $prosql";
 					else if($type==3)
-						$sql="SELECT COUNT(*) FROM `ex_fill` $searchsql";
+						$sql="SELECT COUNT(*) FROM `ex_fill` $searchsql $prosql";
 					$result=mysql_query($sql) or die(mysql_error());
 					$total=mysql_result($result, 0);
 					mysql_free_result($result);
@@ -201,18 +237,29 @@
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
 					</ul>
 					</div>
+					<div class="pull-left" style="width:400px">
+					<input type="button" value="查看公共题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=0'">
+					<input type="button" value="查看私人题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=1'">
+					<?
+						if(isset($_SESSION['administrator']))
+						{
+							echo "<input type=\"button\" value=\"查看隐藏题库\" class=\"mybutton\" onclick=\"window.location.href='?eid=$eid&type=$type&problem=2'\">";
+						}
+					?>
+					</div>
 					<form class="form-search pull-right">
   					<div class="input-append">
   					<input type="hidden" name="eid" value="<?=$eid?>" />
   					<input type="hidden" name="type" value="<?=$type?>" />
   					<input type="hidden" name="page" value="<?=$page?>" />
+  					<input type="hidden" name="problem" value="<?=$problem?>">
    	 				<input type="text" class="span3 search-query" value="<?=$search?>" name="search" placeholder="查询创建者或知识点">
     				<input type="submit" class="btn" value="Search">
     		 		</div>
 					</form>
 					<table class="table table-hover table-bordered table-striped table-condensed jiadian">
 					<thread>
-					<th width=5%>题目ID</th>
+					<th width=5%>序号</th>
 					<th width=32%>题目描述</th>
 					<th width=10%>创建时间</th>
 					<th width=8%>创建者</th>
@@ -222,12 +269,14 @@
 					</thread>
 					<tbody>
 					<?
-						$sql="SELECT `choose_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_choose` $searchsql ORDER BY `choose_id` DESC $sqladd";
+						$cntchoose=1+($page-1)*$each_page;
+						$sql="SELECT `choose_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_choose` $searchsql $prosql ORDER BY `choose_id` ASC $sqladd";
 						$result = mysql_query($sql) or die(mysql_error());
 						while($row=mysql_fetch_object($result)){
 						echo "<tr>";
-						echo "<td>$row->choose_id</td>";
+						echo "<td>$cntchoose</td>";
 						$question=$row->question;
+						$cntchoose++;
 						echo "<td>$question</td>";
 						echo "<td style=\"font-size:9px\">$row->addtime</td>";
 						echo "<td>$row->creator</td>";
@@ -250,23 +299,23 @@
 						echo "</tbody></table>";
 						echo "<div class=\"pagination\" style=\"text-align:center\">";
 						echo "<ul>";
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=1&search=$search\">First</a></li>";
+						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=1&search=$search&problem=$problem\">First</a></li>";
 						if($page==1)
 							echo "<li class=\"disabled\"><a href=\"\">Previous</a></li>";
 						else
-							echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$prepage&search=$search\">Previous</a></li>";
+							echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$prepage&search=$search&problem=$problem\">Previous</a></li>";
 						for($i=$startpage;$i<=$endpage;$i++)
 						{
 							if($i==$page)
-								echo "<li class=\"active\"><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$i&search=$search\">$i</a></li>";
+								echo "<li class=\"active\"><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$i&search=$search&problem=$problem\">$i</a></li>";
 							else
-						  		echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$i&search=$search\">$i</a></li>";
+						  		echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$i&search=$search&problem=$problem\">$i</a></li>";
 						}
 						if($page==$lastpage)
 							echo "<li class=\"disabled\"><a href=\"\">Next</a></li>";
 						else
-							echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$nextpage&search=$search\">Next</a></li>";
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$lastpage&search=$search\">Last</a></li>";
+							echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$nextpage&search=$search&problem=$problem\">Next</a></li>";
+						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$lastpage&search=$search&problem=$problem\">Last</a></li>";
 						echo "</ul>";
 						echo "</div>";
 						echo"</div></div>";
@@ -305,18 +354,29 @@
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
 					</ul>
 					</div>
+					<div class="pull-left" style="width:400px">
+					<input type="button" value="查看公共题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=0'">
+					<input type="button" value="查看私人题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=1'">
+					<?
+						if(isset($_SESSION['administrator']))
+						{
+							echo "<input type=\"button\" value=\"查看隐藏题库\" class=\"mybutton\" onclick=\"window.location.href='?eid=$eid&type=$type&problem=2'\">";
+						}
+					?>
+					</div>
 					<form class="form-search pull-right">
   					<div class="input-append">
   					<input type="hidden" name="eid" value="<?=$eid?>" >
   					<input type="hidden" name="type" value="<?=$type?>" >
   					<input type="hidden" name="page" value="<?=$page?>" >
+  					<input type="hidden" name="problem" value="<?=$problem?>" >
    	 				<input type="text" class="span3 search-query" value="<?=$search?>" name="search" placeholder="查询创建者或知识点">
     				<input type="submit" class="btn" value="Search">
     		 		</div>
 					</form>
 					<table class="table table-hover table-bordered table-striped table-condensed jiadian">
 					<thread>
-					<th width=5%>题目ID</th>
+					<th width=5%>序号</th>
 					<th width=32%>题目描述</th>
 					<th width=10%>创建时间</th>
 					<th width=8%>创建者</th>
@@ -326,12 +386,14 @@
 					</thread>
 					<tbody>
 					<?
-					$sql="SELECT `judge_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_judge` $searchsql ORDER BY `judge_id` DESC $sqladd";
+					$cntjudge=1+($page-1)*$each_page;
+					$sql="SELECT `judge_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_judge` $searchsql $prosql ORDER BY `judge_id` ASC $sqladd";
 					$result = mysql_query($sql) or die(mysql_error());
 					while($row=mysql_fetch_object($result)){
 					echo "<tr>";
-					echo "<td>$row->judge_id</td>";
+					echo "<td>$cntjudge</td>";
 					$question=$row->question;
+					$cntjudge++;
 					echo "<td>$question</td>";
 					echo "<td style=\"font-size:9px\">$row->addtime</td>";
 					echo "<td>$row->creator</td>";
@@ -354,23 +416,23 @@
 					echo "</tbody></table>";
 					echo "<div class=\"pagination\" style=\"text-align:center\">";
 					echo "<ul>";
-					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=1&search=$search\">First</a></li>";
+					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=1&search=$search&problem=$problem\">First</a></li>";
 					if($page==1)
 						echo "<li class=\"disabled\"><a href=\"\">Previous</a></li>";
 					else
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$prepage&search=$search\">Previous</a></li>";
+						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$prepage&search=$search&problem=$problem\">Previous</a></li>";
 					for($i=$startpage;$i<=$endpage;$i++)
 					{
 						if($i==$page)
-							echo "<li class=\"active\"><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$i&search=$search\">$i</a></li>";
+							echo "<li class=\"active\"><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$i&search=$search&problem=$problem\">$i</a></li>";
 						else
-					  		echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$i&search=$search\">$i</a></li>";
+					  		echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$i&search=$search&problem=$problem\">$i</a></li>";
 					}
 					if($page==$lastpage)
 						echo "<li class=\"disabled\"><a href=\"\">Next</a></li>";
 					else
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$nextpage&search=$search\">Next</a></li>";
-					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$lastpage&search=$search\">Last</a></li>";
+						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$nextpage&search=$search&problem=$problem\">Next</a></li>";
+					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$lastpage&search=$search&problem=$problem\">Last</a></li>";
 					echo "</ul>";
 					echo "</div>";
 					echo "</div></div>";
@@ -409,37 +471,57 @@
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
 					</ul>
 					</div>
+					<div class="pull-left" style="width:400px">
+					<input type="button" value="查看公共题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=0'">
+					<input type="button" value="查看私人题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=1'">
+					<?
+						if(isset($_SESSION['administrator']))
+						{
+							echo "<input type=\"button\" value=\"查看隐藏题库\" class=\"mybutton\" onclick=\"window.location.href='?eid=$eid&type=$type&problem=2'\">";
+						}
+					?>
+					</div>
 					<form class="form-search pull-right">
   					<div class="input-append">
   					<input type="hidden" name="eid" value="<?=$eid?>" >
   					<input type="hidden" name="type" value="<?=$type?>" >
   					<input type="hidden" name="page" value="<?=$page?>" >
+  					<input type="hidden" name="problem" value="<?=$problem?>">
    	 				<input type="text" class="span3 search-query" value="<?=$search?>" name="search" placeholder="查询创建者或知识点">
     				<input type="submit" class="btn" value="Search">
     		 		</div>
 					</form>
 					<table class="table table-hover table-bordered table-striped table-condensed jiadian">
 					<thread>
-					<th width=5%>题目ID</th>
-					<th width=32%>题目描述</th>
-					<th width=10%>创建时间</th>
+					<th width=4%>序号</th>
+					<th width=30%>题目描述</th>
+					<th width=8%>创建时间</th>
 					<th width=8%>创建者</th>
 					<th width=8%>知识点</th>
+					<th width=8%>题型</th>
 					<th width=4%>难度</th>
 					<th width=8%>操作</th>
 					</thread>
 					<tbody>
 					<?
-					$sql="SELECT `fill_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_fill` $searchsql ORDER BY `fill_id` DESC $sqladd";
+					$cntfill=1+($page-1)*$each_page;
+					$sql="SELECT `fill_id`,`question`,`addtime`,`creator`,`point`,`easycount`,`kind` FROM `ex_fill` $searchsql $prosql ORDER BY `fill_id` ASC $sqladd";
 					$result = mysql_query($sql) or die(mysql_error());
 					while($row=mysql_fetch_object($result)){
 					echo "<tr>";
-					echo "<td>$row->fill_id</td>";
+					echo "<td>$cntfill</td>";
 					$question=$row->question;
+					$cntfill++;
 					echo "<td>$question</td>";
 					echo "<td style=\"font-size:9px\">$row->addtime</td>";
 					echo "<td>$row->creator</td>";
 					echo "<td>$row->point</td>";
+					if($row->kind==1)
+						echo "<td>基础填空题</td>";
+					else if($row->kind==2)
+						echo "<td>写运行结果</td>";
+					else
+						echo "<td>程序填空题</td>";
 					echo "<td>$row->easycount</td>";
 					//$query="SELECT COUNT(*) FROM `exp_fill` WHERE `exam_id`='$eid' and `fill_id`='$row->fill_id'";
 					$query="SELECT COUNT(*) FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='3' AND `question_id`='$row->fill_id'";
@@ -458,23 +540,23 @@
 					echo "</tbody></table>";
 					echo "<div class=\"pagination\" style=\"text-align:center\">";
 					echo "<ul>";
-					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=1&search=$search\">First</a></li>";
+					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=1&search=$search&problem=$problem\">First</a></li>";
 					if($page==1)
 						echo "<li class=\"disabled\"><a href=\"\">Previous</a></li>";
 					else
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$prepage&search=$search\">Previous</a></li>";
+						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$prepage&search=$search&problem=$problem\">Previous</a></li>";
 					for($i=$startpage;$i<=$endpage;$i++)
 					{
 						if($i==$page)
-							echo "<li class=\"active\"><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$i&search=$search\">$i</a></li>";
+							echo "<li class=\"active\"><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$i&search=$search&problem=$problem\">$i</a></li>";
 						else
-					  		echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$i&search=$search\">$i</a></li>";
+					  		echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$i&search=$search&problem=$problem\">$i</a></li>";
 					}
 					if($page==$lastpage)
 						echo "<li class=\"disabled\"><a href=\"\">Next</a></li>";
 					else
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$nextpage&search=$search\">Next</a></li>";
-					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$lastpage&search=$search\">Last</a></li>";
+						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$nextpage&search=$search&problem=$problem\">Next</a></li>";
+					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$lastpage&search=$search&problem=$problem\">Last</a></li>";
 					echo "</ul>";
 					echo "</div>";
 					echo "</div></div>";
