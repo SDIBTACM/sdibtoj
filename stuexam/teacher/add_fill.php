@@ -17,13 +17,14 @@
 		$easycount=intval($_POST['easycount']);
 		$answernum=intval($_POST['numanswer']);
 		$kind=intval($_POST['kind']);
+		$isprivate=intval($_POST['isprivate']);
 		//$answernum=count($_POST)-5;
 		//important the first is the postkey the second is the fill_des
 		//the third is point the forth is the easycount the fifth is kind
 		$creator=$_SESSION['user_id'];
 		$query="INSERT INTO `ex_fill` 
-		(`question`,`answernum`,`addtime`,`creator`,`point`,`easycount`,`kind`)
-		VALUES('".$question."','$answernum',NOW(),'".$creator."','".$point."','$easycount','$kind')";
+		(`question`,`answernum`,`addtime`,`creator`,`point`,`easycount`,`kind`,`isprivate`)
+		VALUES('".$question."','$answernum',NOW(),'".$creator."','".$point."','$easycount','$kind','$isprivate')";
 		mysql_query($query) or die(mysql_error());
 		$fillid=mysql_insert_id();
 		for($i=1;$i<=$answernum;$i++)
@@ -58,7 +59,6 @@
 	<h2 style="text-align:center">添加填空题</h2>
 	<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" onSubmit="return chkinput(this)">
 		<div class="pull-left span8">
-			<font color=red>*如果要输入'\',请写成'\\',或使用中文引号</font>
 			<label>题目描述:</label>
 			<textarea style="width:490px;height:160px;overflow-x:visible;overflow-y:visible;" 
 			name="fill_des"></textarea>
@@ -69,13 +69,13 @@
 		disabled>若x和n均是int型变量,且x和n的初值均为5,则计算表达式x+=n++后x的值为__(1)__,n的值为__(2)__
 		</textarea>
 		<div class="span8">
-			<label>填空题类型:</label>
+			<label for="kind">填空题类型:</label>
 			<select name="kind" id="kind"  onchange="showspan()">
 				<option value="1">基础填空题</option>
 				<option value="2">写运行结果</option>
 				<option value="3">程序填空</option>
 			</select>
-			<label>知识点:</label>
+			<label for="point">知识点:</label>
 			<select name="point" id="point">
 			<?
 				$sql="SELECT * FROM `ex_point`";
@@ -87,7 +87,7 @@
 				mysql_free_result($result);
 			?>
 			</select>
-			<label>难度系数:</label>
+			<label for="easycount">难度系数:</label>
 			<select name="easycount" id="easycount">
 				<option value="0">0</option>
 				<option value="1">1</option>
@@ -100,7 +100,13 @@
 				<option value="8">8</option>
 				<option value="9">9</option>
 				<option value="10">10</option>
-			</select><br />
+			</select>
+			<label for="isprivate">请选题库类型:</label>
+			<select name="isprivate" id="isprivate" onchange="showmsg()">
+				<option value="0">公共题库</option>
+				<option value="1">私人题库</option>
+				<option value="2">系统隐藏</option>
+			</select><strong><font color=red id="msg"></font></strong><br/>
 			<strong>答案:<font color=red id="warnmsg">(*请确保下面文本框个数与题目中的填空数相同)</font></strong>
 			<input class="btn" type="button" value="添加答案空" onclick="addinput()" />
 			<input class="btn" type="button" value="删除答案空" onclick="delinput()" />
@@ -176,6 +182,15 @@ function showspan()
 		$('#warnmsg').html('(*请确保空数个数与程序在编译器端运行结果的行数一致)');
 	else if($('#kind').val()==3)
 		$('#warnmsg').html('(*请确保下面文本框个数与题目中的填空数相同)');
+}
+function showmsg()
+{
+	if($('#isprivate').val()==0)
+		$('#msg').html('(*公共题库所有人都可见)');
+	else if($('#isprivate').val()==1)
+		$('#msg').html('(*私人题库仅限本人和最高管理员可见)');
+	else if($('#isprivate').val()==2)
+		$('#msg').html('(*系统隐藏选择确认后,仅限最高管理员可以查看和修改，请谨慎选择和查看)');
 }
 $(function(){
 	if($("#left").height()<700)
