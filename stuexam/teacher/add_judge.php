@@ -16,10 +16,11 @@
 		$point=test_input($_POST['point']);
 		$answer=$_POST['answer'];
 		$easycount=intval($_POST['easycount']);
+		$isprivate=intval($_POST['isprivate']);
 		$creator=$_SESSION['user_id'];
 		$sql="INSERT INTO `ex_judge` 
-		(`question`,`answer`,`creator`,`addtime`,`point`,`easycount`)
-		VALUES('".$judge_des."','$answer','$creator',NOW(),'".$point."','$easycount')";
+		(`question`,`answer`,`creator`,`addtime`,`point`,`easycount`,`isprivate`)
+		VALUES('".$judge_des."','$answer','$creator',NOW(),'".$point."','$easycount','$isprivate')";
 		mysql_query($sql) or die(mysql_error());
 		echo "<script>window.location.href=\"./admin_judge.php\";</script>";
 	}
@@ -45,7 +46,6 @@
 	<h2 style="text-align:center">添加判断题</h2>
 	<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" onSubmit="return chkinput(this)">
 		<div class="pull-left span8">
-			<font color=red>*如果要输入'\',请写成'\\',或使用中文引号</font>
 			<label>题目描述:</label>
 			<textarea style="width:250px;height:150px;overflow-x:visible;overflow-y:visible;" name="judge_des"></textarea>
 		</div>
@@ -56,7 +56,7 @@
 			错<input type="radio" name="answer" value="N">&nbsp;
 		</div>
 		<div class="span8">
-			<label>知识点:</label>
+			<label for="point">知识点:</label>
 			<!-- <input type="text" name="point" maxlength="80"> -->
 			<select name="point" id="point">
 			<?
@@ -69,7 +69,7 @@
 				mysql_free_result($result);
 			?>
 			</select>
-			<label>难度系数:</label>
+			<label for="easycount">难度系数:</label>
 			<select name="easycount" id="easycount">
 				<option value="0">0</option>
 				<option value="1">1</option>
@@ -82,7 +82,13 @@
 				<option value="8">8</option>
 				<option value="9">9</option>
 				<option value="10">10</option>
-			</select><br />
+			</select>
+			<label for="isprivate">请选题库类型:</label>
+			<select name="isprivate" id="isprivate" onchange="showmsg()">
+				<option value="0">公共题库</option>
+				<option value="1">私人题库</option>
+				<option value="2">系统隐藏</option>
+			</select><strong><font color=red id="msg"></font></strong><br/>
 			<input type="submit" value="提交" class="mybutton">
 			<input type="reset" value="重置" class="mybutton">
 		</div>
@@ -106,6 +112,15 @@ function chkinput(form){
 	return(false); 
 	}
 	return(true);
+}
+function showmsg()
+{
+	if($('#isprivate').val()==0)
+		$('#msg').html('(*公共题库所有人都可见)');
+	else if($('#isprivate').val()==1)
+		$('#msg').html('(*私人题库仅限本人和最高管理员可见)');
+	else if($('#isprivate').val()==2)
+		$('#msg').html('(*系统隐藏选择确认后,仅限最高管理员可以查看和修改，请谨慎选择和查看)');
 }
 $(function(){
 	if($("#left").height()<700)
