@@ -20,10 +20,13 @@
 		$point=test_input($_POST['point']);
 		$answer=$_POST['answer'];
 		$easycount=intval($_POST['easycount']);
+		$isprivate=intval($_POST['isprivate']);
 		$chooseid=intval($_POST['chooseid']);
-		$prisql="SELECT `creator` FROM `ex_choose` WHERE `choose_id`='$chooseid'";
+		$prisql="SELECT `creator`,`isprivate` FROM `ex_choose` WHERE `choose_id`='$chooseid'";
 		$priresult=mysql_query($prisql) or die(mysql_error());
-		$creator=mysql_result($priresult, 0);
+		$prirow=mysql_fetch_array($priresult);
+		$creator=$prirow['creator'];
+		$private2=$prirow['isprivate'];
 		mysql_free_result($priresult);
 		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
 		{
@@ -32,11 +35,18 @@
         	echo "location='edit_choose.php?id=$chooseid'\n";
         	echo "</script>";
 		}
+		else if($private2==2&&!isset($_SESSION['administrator']))
+		{
+			echo "<script language='javascript'>\n";
+	    	echo "alert(\"You have no privilege to modify it!\");\n";  
+        	echo "location='admin_choose.php'\n";
+        	echo "</script>";
+		}
 		else
 		{
 			$sql="UPDATE `ex_choose` SET `question`='".$choose_des."',`ams`='".$ams."',
-			`bms`='".$bms."',`cms`='".$cms."',`dms`='".$dms."',`answer`='$answer',`point`='".$point."',`easycount`='$easycount' WHERE 
-			`choose_id`='$chooseid'";
+			`bms`='".$bms."',`cms`='".$cms."',`dms`='".$dms."',`answer`='$answer',`point`='".$point."',`easycount`='$easycount',
+			`isprivate`='$isprivate' WHERE `choose_id`='$chooseid'";
 			mysql_query($sql) or die(mysql_error());
 			echo "<script>alert(\"修改成功\");</script>";
 			echo "<script>window.location.href=\"./admin_choose.php\";</script>";
@@ -49,7 +59,7 @@
 			$id=intval($_GET['id']);
 			if(filter_var($id, FILTER_VALIDATE_INT))
 			{
-				$query="SELECT `question`,`ams`,`bms`,`cms`,`dms`,`answer`,`point`,`easycount` FROM `ex_choose` 
+				$query="SELECT `question`,`ams`,`bms`,`cms`,`dms`,`answer`,`creator`,`point`,`easycount`,`isprivate` FROM `ex_choose` 
 				WHERE `choose_id`='$id'";
 				$result=mysql_query($query) or die(mysql_error());
 				$row_cnt=mysql_num_rows($result);
@@ -63,8 +73,27 @@
 					$cms=$row['cms'];
 					$dms=$row['dms'];
 					$answer=$row['answer'];
+					$creator=$row['creator'];
 					$point=$row['point'];
 					$easycount=$row['easycount'];
+					$isprivate=$row['isprivate'];
+					if($isprivate==2&&!isset($_SESSION['administrator']))
+					{
+						echo "<script language='javascript'>\n";
+	    				echo "alert(\"You have no privilege!\");\n";  
+        				echo "location='admin_choose.php'\n";
+        				echo "</script>";
+					}
+					if(!isset($_SESSION['administrator']))
+					{
+						if($isprivate==1&&$creator!=$_SESSION['user_id'])
+						{
+							echo "<script language='javascript'>\n";
+	    					echo "alert(\"You have no privilege!\");\n";  
+        					echo "location='admin_choose.php'\n";
+        					echo "</script>";
+						}
+					}
 				}
 				else
 				{
@@ -151,7 +180,6 @@ function chkinput(form){
 	<h2 style="text-align:center">查看修改选择题</h2>
 	<form method="post" action="<?=$_SERVER['PHP_SELF']?>" onSubmit="return chkinput(this)">
 		<div class="pull-left span4">
-			<font color=red>*如果要输入'\',请写成'\\',或使用中文引号</font>
 			<label>题目描述:</label>
 			<textarea style="width:250px;height:295px;overflow-x:visible;overflow-y:visible;" 
 			name="choose_des"><?=$question?></textarea>
@@ -171,7 +199,7 @@ function chkinput(form){
 		</div>
 		<div class="span8">
 			<input type="hidden" value="<?=$id?>" name="chooseid">
-			<label>知识点:</label>
+			<label for="point">知识点:</label>
 			<select name="point" id="point">
 			<?
 				$sql="SELECT * FROM `ex_point`";
@@ -187,7 +215,7 @@ function chkinput(form){
 			?>
 			</select>
 			<!-- <input type="text" name="point" maxlength="80" value=<?=$point?> > -->
-			<label>难度系数:</label>
+			<label for="easycount">难度系数:</label>
 			<select name="easycount" id="easycount">
 				<option value="0" <?echo $easycount==0?"selected":""?> >0</option>
 				<option value="1" <?echo $easycount==1?"selected":""?> >1</option>
@@ -200,7 +228,13 @@ function chkinput(form){
 				<option value="8" <?echo $easycount==8?"selected":""?> >8</option>
 				<option value="9" <?echo $easycount==9?"selected":""?> >9</option>
 				<option value="10" <?echo $easycount==10?"selected":""?> >10</option>
-			</select><br />
+			</select>
+			<label for="isprivate">请选题库类型:</label>
+			<select name="isprivate" id="isprivate" onchange="showmsg()">
+				<option value="0" <?echo $isprivate==0?"selected":""?> >公共题库</option>
+				<option value="1" <?echo $isprivate==1?"selected":""?> >私人题库</option>
+				<option value="2" <?echo $isprivate==2?"selected":""?> >系统隐藏</option>
+			</select><strong><font color=red id="msg"></font></strong><br/>
 			<input type="submit" value="提交" class="mybutton">
 			<input type="button" value="返回" onclick="javascript:history.go(-1);" class="mybutton">
 		</div>
@@ -208,6 +242,15 @@ function chkinput(form){
 </div>
 </div>
 <script type="text/javascript">
+function showmsg()
+{
+	if($('#isprivate').val()==0)
+		$('#msg').html('(*公共题库所有人都可见)');
+	else if($('#isprivate').val()==1)
+		$('#msg').html('(*私人题库仅限本人和最高管理员可见)');
+	else if($('#isprivate').val()==2)
+		$('#msg').html('(*系统隐藏选择确认后,仅限最高管理员可以查看和修改，请谨慎选择和查看)');
+}
 $(function(){
 	if($("#left").height()<700)
 		$("#left").css("height",700)
