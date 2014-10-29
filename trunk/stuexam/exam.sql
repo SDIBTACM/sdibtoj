@@ -33,6 +33,7 @@ CREATE TABLE `ex_choose` (
 	`addtime` datetime DEFAULT NULL,
 	`creator` varchar(255) DEFAULT NULL,
 	`easycount` tinyint(4) DEFAULT '0',
+	`isprivate` tinyint(4) DEFAULT '0',
 	PRIMARY KEY (`choose_id`)
 )ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -48,6 +49,7 @@ CREATE TABLE `ex_judge` (
 	`addtime` datetime DEFAULT NULL,
 	`creator` varchar(255) DEFAULT NULL,
 	`easycount` tinyint(4) DEFAULT '0',
+	`isprivate` tinyint(4) DEFAULT '0',
 	PRIMARY KEY (`judge_id`)
 )ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -64,6 +66,7 @@ CREATE TABLE `ex_fill` (
 	`creator` varchar(255) DEFAULT NULL,
 	`easycount` tinyint(4) DEFAULT '0',
 	`kind` tinyint(4) DEFAULT '1',
+	`isprivate` tinyint(4) DEFAULT '0',
 	PRIMARY KEY (`fill_id`)
 )ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
