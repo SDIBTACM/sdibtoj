@@ -89,12 +89,13 @@
 		<tbody>
 		<?
 			require_once("../../include/set_get_key.php");
+			$numofjudge=1+($page-1)*$each_page;
 			$key=$_SESSION['getkey'];
-			$sql="SELECT `judge_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_judge` $searchsql ORDER BY `judge_id` DESC $sqladd";
+			$sql="SELECT `judge_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_judge` $searchsql ORDER BY `judge_id` ASC $sqladd";
 			$result = mysql_query($sql) or die(mysql_error());
 			while($row=mysql_fetch_object($result)){
 				echo "<tr>";
-				echo "<td>$row->judge_id</td>";
+				echo "<td>$numofjudge</td>";
 				$question=$row->question;
 				echo "<td>$question</td>";
 				echo "<td style=\"font-size:9px\">$row->addtime</td>";
@@ -104,6 +105,7 @@
 				echo "<td><a href='javascript:suredo(\"delquestion.php?type=2&id=$row->judge_id&getkey=".$key."\",\"确定删除?\")'>删除</a></td>";
 				echo "<td><a href='edit_judge.php?id=$row->judge_id'>编辑</a></td>";
 				echo "</tr>";
+				$numofjudge++;
 			}
 			mysql_free_result($result);
 		?>
