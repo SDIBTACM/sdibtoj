@@ -119,9 +119,14 @@
 			//$myanswer = stripslashes($myanswer);
   			$myanswer = htmlspecialchars($myanswer);
   			$myanswer = mysql_real_escape_string($myanswer);
+
 			$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
 			mysql_query($tempsql) or die(mysql_error());
-			if($myanswer==$row->answer){
+
+			$rightans = trim($row->answer);
+			$rightans = mysql_real_escape_string($rightans);
+
+			if($myanswer==$rightans){
 				if($row->kind==1)
 					$fillsum+=$fillscore;
 				else if($row->kind==2)
