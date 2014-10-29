@@ -24,9 +24,11 @@
 		if(filter_var($type, FILTER_VALIDATE_INT)&&filter_var($id, FILTER_VALIDATE_INT)&&$id>0){
 			if($type==1)//delete choose
 			{
-				$prisql="SELECT `creator` FROM `ex_choose` WHERE `choose_id`='$id'";
+				$prisql="SELECT `creator`,`isprivate` FROM `ex_choose` WHERE `choose_id`='$id'";
 				$priresult=mysql_query($prisql) or die(mysql_error());
-				$creator=mysql_result($priresult, 0);
+				$row=mysql_fetch_array($priresult);
+				$creator=$row['creator'];
+				$isprivate=$row['isprivate'];
 				mysql_free_result($priresult);
 				if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
 				{
@@ -35,6 +37,13 @@
         			echo "history.go(-1);\n";
         			echo "</script>";
 				}
+				else if($isprivate==2&&!isset($_SESSION['administrator']))
+        		{
+        			echo "<script language='javascript'>\n";
+	    			echo "alert(\"You have no privilege to delete it!\");\n";  
+        			echo "location='admin_choose.php'\n";
+        			echo "</script>";
+        		}
 				else
 				{
 					$query="DELETE FROM `ex_choose` WHERE `choose_id`='$id'";
@@ -47,9 +56,11 @@
 			}
 			else if($type==2)//delete judge
 			{
-				$prisql="SELECT `creator` FROM `ex_judge` WHERE `judge_id`='$id'";
+				$prisql="SELECT `creator`,`isprivate` FROM `ex_judge` WHERE `judge_id`='$id'";
 				$priresult=mysql_query($prisql) or die(mysql_error());
-				$creator=mysql_result($priresult, 0);
+				$row=mysql_fetch_array($priresult);
+				$creator=$row['creator'];
+				$isprivate=$row['isprivate'];
 				mysql_free_result($priresult);
 				if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
 				{
@@ -58,6 +69,13 @@
         			echo "history.go(-1);\n";
         			echo "</script>";
 				}
+				else if($isprivate==2&&!isset($_SESSION['administrator']))
+        		{
+        			echo "<script language='javascript'>\n";
+	    			echo "alert(\"You have no privilege to delete it!\");\n";  
+        			echo "location='admin_judge.php'\n";
+        			echo "</script>";
+        		}
 				else
 				{
 					$query="DELETE FROM `ex_judge` WHERE `judge_id`='$id'";
@@ -70,9 +88,11 @@
 			}
 			else if($type==3)//delete fill
 			{
-				$prisql="SELECT `creator` FROM `ex_fill` WHERE `fill_id`='$id'";
+				$prisql="SELECT `creator`,`isprivate` FROM `ex_fill` WHERE `fill_id`='$id'";
 				$priresult=mysql_query($prisql) or die(mysql_error());
-				$creator=mysql_result($priresult, 0);
+				$row=mysql_fetch_array($priresult);
+				$creator=$row['creator'];
+				$isprivate=$row['isprivate'];
 				mysql_free_result($priresult);
 				if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
 				{
@@ -81,6 +101,13 @@
         			echo "history.go(-1);\n";
         			echo "</script>";
 				}
+				else if($isprivate==2&&!isset($_SESSION['administrator']))
+        		{
+        			echo "<script language='javascript'>\n";
+	    			echo "alert(\"You have no privilege to delete it!\");\n";  
+        			echo "location='admin_fill.php'\n";
+        			echo "</script>";
+        		}
 				else
 				{
 					$query="DELETE FROM `ex_fill` WHERE `fill_id`='$id'";
