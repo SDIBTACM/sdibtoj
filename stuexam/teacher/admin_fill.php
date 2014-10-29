@@ -80,30 +80,39 @@
 		<thread>
 			<th width=4%>ID</th>
 			<th width=30%>题目描述</th>
-			<th width=10%>创建时间</th>
+			<th width=8%>创建时间</th>
 			<th width=8%>创建者</th>
 			<th width=8%>知识点</th>
+			<th width=8%>题型</th>
 			<th width=4%>难度</th>
 			<th width=8% colspan="2">操作</th>
 		</thread>
 		<tbody>
 		<?
 			require_once("../../include/set_get_key.php");
+			$numoffill=1+($page-1)*$each_page;
 			$key=$_SESSION['getkey'];
-			$sql="SELECT `fill_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_fill` $searchsql ORDER BY `fill_id` DESC $sqladd";
+			$sql="SELECT `fill_id`,`question`,`addtime`,`creator`,`point`,`easycount`,`kind` FROM `ex_fill` $searchsql ORDER BY `fill_id` ASC $sqladd";
 			$result = mysql_query($sql) or die(mysql_error());
 			while($row=mysql_fetch_object($result)){
 				echo "<tr>";
-				echo "<td>$row->fill_id</td>";
+				echo "<td>$numoffill</td>";
 				$question=$row->question;
 				echo "<td>$question</td>";
 				echo "<td style=\"font-size:9px\">$row->addtime</td>";
 				echo "<td>$row->creator</td>";
 				echo "<td>$row->point</td>";
+				if($row->kind==1)
+					echo "<td>基础填空题</td>";
+				else if($row->kind==2)
+					echo "<td>写运行结果</td>";
+				else
+					echo "<td>程序填空题</td>";
 				echo "<td>$row->easycount</td>";
 				echo "<td><a href='javascript:suredo(\"delquestion.php?type=3&id=$row->fill_id&getkey=".$key."\",\"确定删除?\")'>删除</a></td>";
 				echo "<td><a href='./edit_fill.php?id=$row->fill_id'>编辑</a></td>";
 				echo "</tr>";
+				$numoffill++;
 			}
 			mysql_free_result($result);
 		?>
