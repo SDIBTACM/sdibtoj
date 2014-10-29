@@ -103,6 +103,7 @@
 			考试时间到，未提交试卷的，考试系统将自动提交试卷.</li>
 			<li>采取各种方式抄录试题的按照严重作弊取理.</li>
 			<li>请及时保存答案,防止特殊情况发生答案丢失.刷新界面前,请先保存答案</li>
+			<li>请不要关闭自动打开的网页</li>
 		</ol>
 	</div>
 	</div>
@@ -134,7 +135,7 @@
 		}
 		else{
 			echo "<div class=\"pull-right btn-start\">";
-			echo "<a href=\"./showquestion.php?eid=$eid\">开始考试</a>";
+			echo "<a href=\"../status.php\" onclick=\"window.open('./showquestion.php?eid=$eid')\">开始考试</a>";
 			echo "</div>";
 		}
 	?>
