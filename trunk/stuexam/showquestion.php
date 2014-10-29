@@ -240,7 +240,10 @@ window.onload=GetRTime;
 				$choosesx[]=$row['question_id'];
 			}
 			mysql_free_result($result);
-			$tmpchoose=makesx($choosesx,$numproblem,1,$randnum);
+			if($numproblem!=0)
+				$tmpchoose=makesx($choosesx,$numproblem,1,$randnum);
+			else
+				$tmpchoose="";
 			unset($choosesx);
 			//the end
 
@@ -249,7 +252,10 @@ window.onload=GetRTime;
 			WHERE `exam_id`='$eid' and `ex_choose`.`choose_id`=`exp_choose`.`choose_id` ORDER BY `choose_id`";*/
 			$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms` FROM `ex_choose`,`exp_question` 
 			WHERE `exam_id`='$eid' AND `type`='1' AND `ex_choose`.`choose_id`=`exp_question`.`question_id` ORDER BY field($tmpchoose)";
-			$result1=mysql_query($query1) or die(mysql_error());
+			if(isset($tmpchoose[0]))
+				$result1=mysql_query($query1) or die(mysql_error());
+			else
+				$result1="";
 			while($row1=mysql_fetch_object($result1)){
 				$numofchoose++;
 				$question=$row1->question;
@@ -303,7 +309,10 @@ window.onload=GetRTime;
 				$judgesx[]=$row['question_id'];
 			}
 			mysql_free_result($result);
-			$tmpjudge=makesx($judgesx,$numproblem,2,$randnum);
+			if($numproblem!=0)
+				$tmpjudge=makesx($judgesx,$numproblem,2,$randnum);
+			else
+				$tmpjudge="";
 			unset($judgesx);
 
 			$numofjudge=0;
@@ -311,7 +320,10 @@ window.onload=GetRTime;
 			WHERE `exam_id`='$eid' and `ex_judge`.`judge_id`=`exp_judge`.`judge_id` ORDER BY `judge_id`";*/
 			$query2="SELECT `ex_judge`.`judge_id`,`question` FROM `ex_judge`,`exp_question` 
 			WHERE `exam_id`='$eid' AND `type`='2' AND `ex_judge`.`judge_id`=`exp_question`.`question_id` ORDER BY field($tmpjudge)";
-			$result2=mysql_query($query2) or die(mysql_error());
+			if(isset($tmpjudge[0]))
+				$result2=mysql_query($query2) or die(mysql_error());
+			else
+				$result2="";
 			while($row2=mysql_fetch_object($result2)){
 				$numofjudge++;
 				echo "<tr>";
@@ -355,7 +367,10 @@ window.onload=GetRTime;
 				$fillsx[]=$row['question_id'];
 			}
 			mysql_free_result($result);
-			$tmpfill=makesx($fillsx,$numproblem,3,$randnum);
+			if($numproblem!=0)
+				$tmpfill=makesx($fillsx,$numproblem,3,$randnum);
+			else
+				$tmpfill="";
 			unset($fillsx);
 
 			$fillnum=0;
@@ -363,7 +378,10 @@ window.onload=GetRTime;
 			WHERE `exam_id`='$eid' and `ex_fill`.`fill_id`=`exp_fill`.`fill_id` ORDER BY `fill_id`";*/
 			$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum`,`kind` FROM `ex_fill`,`exp_question` 
 			WHERE `exam_id`='$eid' AND `type`='3' AND `ex_fill`.`fill_id`=`exp_question`.`question_id` ORDER BY field($tmpfill)";
-			$result3=mysql_query($query3) or die(mysql_error());
+			if(isset($tmpfill[0]))
+				$result3=mysql_query($query3) or die(mysql_error());
+			else
+				$result3="";
 			while($row3=mysql_fetch_object($result3)){
 				$fillnum++;
 				echo "<tr>";
