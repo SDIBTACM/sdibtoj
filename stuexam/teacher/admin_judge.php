@@ -6,7 +6,7 @@
 	{
 		$search=mysql_real_escape_string($_GET['search']);
 		if($search!='')
-			$searchsql=" WHERE `creator` like '%$search%' or `point` like '%$search%'";
+			$searchsql=" WHERE (`creator` like '%$search%' or `point` like '%$search%')";
 		else
 			$searchsql="";
 	}
@@ -14,6 +14,42 @@
 	{
 		$search="";
 		$searchsql="";
+	}
+	if(isset($_GET['problem']))
+	{
+		$problem=intval($_GET['problem']);
+		if($problem<0||$problem>2)
+			$problem=0;
+		if(!isset($_SESSION['administrator'])&&$problem==2)
+			$problem=0;
+		if($searchsql=="")
+		{
+			if($problem==0||isset($_SESSION['administrator']))
+				$prosql=" WHERE `isprivate`='$problem'";
+			else
+			{
+				$user=$_SESSION['user_id'];
+				$prosql=" WHERE `isprivate`='$problem' AND `creator` like '$user'";
+			}
+		}
+		else
+		{
+			if($problem==0||isset($_SESSION['administrator']))
+				$prosql=" AND `isprivate`='$problem'";
+			else
+			{
+				$user=$_SESSION['user_id'];
+				$prosql=" AND `isprivate`='$problem' AND `creator` like '$user'";
+			}
+		}
+	}
+	else
+	{
+		$problem=0;
+		if($searchsql=="")
+			$prosql=" WHERE `isprivate`='$problem'";
+		else
+			$prosql=" AND `isprivate`='$problem'";
 	}
 	if(isset($_GET['page']))
 	{
@@ -26,7 +62,7 @@
 	$each_page=15;// each page data num
 	$pagenum=10;//the max of page num
 
-	$sql="SELECT COUNT(*) FROM `ex_judge` $searchsql";
+	$sql="SELECT COUNT(*) FROM `ex_judge` $searchsql $prosql";
 	$result=mysql_query($sql) or die(mysql_error());
 	$total=mysql_result($result, 0);
 	mysql_free_result($result);
@@ -68,10 +104,19 @@
 	<h2 style="text-align:center">判断题库总览</h2>
 	<form action="add_judge.php" method="get" class="pull-left">
 		<input type="submit" value="添加判断题" class="mybutton">
+		<input type="button" value="查看公共题库" class="mybutton" onclick="window.location.href='?problem=0'">
+		<input type="button" value="查看私人题库" class="mybutton" onclick="window.location.href='?problem=1'">
+		<?
+			if(isset($_SESSION['administrator']))
+			{
+				echo "<input type=\"button\" value=\"查看隐藏题库\" class=\"mybutton\" onclick=\"window.location.href='?problem=2'\">";
+			}
+		?>
 	</form>
 	<form class="form-search pull-right">
   		<div class="input-append">
   		<input type="hidden" name="page" value="<?=$page?>" />
+  		<input type="hidden" name="problem" value="<?=$problem?>" />
    	 	<input type="text" class="span3 search-query" value="<?=$search?>" name="search" placeholder="查询创建者或知识点">
     	<input type="submit" class="btn" value="Search">
     	</div>
@@ -91,7 +136,7 @@
 			require_once("../../include/set_get_key.php");
 			$numofjudge=1+($page-1)*$each_page;
 			$key=$_SESSION['getkey'];
-			$sql="SELECT `judge_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_judge` $searchsql ORDER BY `judge_id` ASC $sqladd";
+			$sql="SELECT `judge_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_judge` $searchsql $prosql ORDER BY `judge_id` ASC $sqladd";
 			$result = mysql_query($sql) or die(mysql_error());
 			while($row=mysql_fetch_object($result)){
 				echo "<tr>";
@@ -114,23 +159,23 @@
 	<?
 	echo "<div class=\"pagination\" style=\"text-align:center\">";
 	echo "<ul>";
-	echo "<li><a href=\"admin_judge.php?page=1&search=$search\">First</a></li>";
+	echo "<li><a href=\"admin_judge.php?page=1&search=$search&problem=$problem\">First</a></li>";
 	if($page==1)
 		echo "<li class=\"disabled\"><a href=\"\">Previous</a></li>";
 	else
-		echo "<li><a href=\"admin_judge.php?page=$prepage&search=$search\">Previous</a></li>";
+		echo "<li><a href=\"admin_judge.php?page=$prepage&search=$search&problem=$problem\">Previous</a></li>";
 	for($i=$startpage;$i<=$endpage;$i++)
 	{
 		if($i==$page)
-			echo "<li class=\"active\"><a href=\"admin_judge.php?page=$i&search=$search\">$i</a></li>";
+			echo "<li class=\"active\"><a href=\"admin_judge.php?page=$i&search=$search&problem=$problem\">$i</a></li>";
 		else
-	  		echo "<li><a href=\"admin_judge.php?page=$i&search=$search\">$i</a></li>";
+	  		echo "<li><a href=\"admin_judge.php?page=$i&search=$search&problem=$problem\">$i</a></li>";
 	}
 	if($page==$lastpage)
 		echo "<li class=\"disabled\"><a href=\"\">Next</a></li>";
 	else
-		echo "<li><a href=\"admin_judge.php?page=$nextpage&search=$search\">Next</a></li>";
-	echo "<li><a href=\"admin_judge.php?page=$lastpage&search=$search\">Last</a></li>";
+		echo "<li><a href=\"admin_judge.php?page=$nextpage&search=$search&problem=$problem\">Next</a></li>";
+	echo "<li><a href=\"admin_judge.php?page=$lastpage&search=$search&problem=$problem\">Last</a></li>";
 	echo "</ul>";
 	echo "</div>";
 	?>
