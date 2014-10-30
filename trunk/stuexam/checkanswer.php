@@ -26,6 +26,10 @@
 	$starttimeC=strtotime($start_time);
 	$end_time=$row[1];
 	$endtimeC=strtotime($end_time);
+
+	$start_timeC=strftime("%Y-%m-%d %X",($starttimeC));
+	$end_timeC=strftime("%Y-%m-%d %X",($endtimeC));
+
 	$now=time();
 	mysql_free_result($result);
 	if($now<$starttimeC)
@@ -141,7 +145,7 @@
 	/*$query="SELECT distinct `program_id`,`result` FROM `exp_program`,`solution` WHERE `exam_id`='$eid' AND `result`=4 AND 
 	`user_id`='".$user_id."' AND `exp_program`.`program_id`=`solution`.`problem_id`";*/
 	$query="SELECT distinct `question_id`,`result` FROM `exp_question`,`solution` WHERE `exam_id`='$eid' AND `type`='4' AND `result`='4'  
-	AND `user_id`='".$user_id."' AND `exp_question`.`question_id`=`solution`.`problem_id`";
+	AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `user_id`='".$user_id."' AND `exp_question`.`question_id`=`solution`.`problem_id`";
 	$result=mysql_query($query) or die(mysql_error());
 	$row_cnt=mysql_num_rows($result);
 	$programsum=$row_cnt*$programscore;
