@@ -146,7 +146,9 @@
 // var dTime = new Date("<?=date("Y/m/d H:i:s")?>").getTime()-new Date().getTime();//计算出服务器和客户端的时间差
 var isalert = false;
 var left=<?=$lefttime?>*1000;
+var savetime=(300+<?=$randnum?>%300)*1000;
 var runtimes=0;
+//alert(savetime);
 function GetRTime(){
 	nMS=left-runtimes*1000;
 	// var NowTime = new Date(new Date().getTime()+dTime);
@@ -167,6 +169,12 @@ function GetRTime(){
 		if(nMS>0&&nMS<=1*1000)
 		{
 			$('#exam').submit();
+		}
+		/*如果出现问题，注释掉下面的if语句*/
+		if(nMS%savetime==0&&nMS>savetime)
+		{
+			saveanswer();
+			history.go(0);
 		}
 		runtimes++;
 		setTimeout("GetRTime()",1000);
