@@ -39,6 +39,10 @@
 	$starttimeC=strtotime($start_time);
 	$end_time=$row[1];
 	$endtimeC=strtotime($end_time);
+
+	$start_timeC=strftime("%Y-%m-%d %X",($starttimeC));
+	$end_timeC=strftime("%Y-%m-%d %X",($endtimeC));
+
 	$now=time();
 	mysql_free_result($result);
 	if($now<$starttimeC){
@@ -67,7 +71,7 @@
 	    echo "You have taken part in it"; 
 	    exit(0);
 	}
-	$query="SELECT COUNT(*) FROM `solution` WHERE `problem_id`='$id' AND `user_id`='".$user_id."' AND `result`=4";
+	$query="SELECT COUNT(*) FROM `solution` WHERE `problem_id`='$id' AND `user_id`='".$user_id."' AND `result`=4 AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC'";
 	$result=mysql_query($query) or die(mysql_error());
 	$row_cnt=mysql_result($result, 0);
 	mysql_free_result($result);
@@ -77,7 +81,7 @@
 	}
 	else
 	{
-		$query="SELECT `result` FROM `solution` WHERE `problem_id`='$id' AND `user_id`='".$user_id."' ORDER BY `solution_id` DESC limit 0,1";
+		$query="SELECT `result` FROM `solution` WHERE `problem_id`='$id' AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `user_id`='".$user_id."' ORDER BY `solution_id` DESC limit 0,1";
 		$result=mysql_query($query) or die(mysql_error());
 		$row_cnt=mysql_num_rows($result);
 		$ans=mysql_result($result, 0);
