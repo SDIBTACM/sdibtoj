@@ -77,42 +77,54 @@
 	$programsum=0;
 	$sum=0;
 
+	$cntchoose=0;
+	$tempsql="";
 	$query="DELETE FROM `ex_stuanswer` WHERE `user_id`='$user_id' AND `exam_id`='$eid'";
 	mysql_query($query) or die(mysql_error());
-	/*$query="SELECT `choose_id`,`answer` FROM `ex_choose` WHERE `choose_id` IN
-	(SELECT `choose_id` FROM `exp_choose` WHERE `exam_id`='$eid')";*/
 	$query="SELECT `choose_id`,`answer` FROM `ex_choose` WHERE `choose_id` IN
 	(SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='1')";
 	$result=mysql_query($query) or die(mysql_error());
 	while($row=mysql_fetch_object($result)){
 		if(isset($_POST["xzda$row->choose_id"])){
 			$myanswer=trim($_POST["xzda$row->choose_id"]);
-			$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','1','$row->choose_id','$myanswer')";
-			mysql_query($tempsql) or die(mysql_error());
+			if($cntchoose==0){
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','1','$row->choose_id','$myanswer')";
+				$cntchoose=1;
+			}
+			else
+				$tempsql=$tempsql.",('$user_id','$eid','1','$row->choose_id','$myanswer')";
 			if($myanswer==$row->answer)
 				$choosesum+=$choosescore;
 		}
 	}
+	mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//choose over
-	/*$query="SELECT `judge_id`,`answer` FROM `ex_judge` WHERE `judge_id` IN 
-	(SELECT `judge_id` FROM `exp_judge` WHERE `exam_id`='$eid')";*/
+
+	$cntjudge=0;
+	$tempsql="";
 	$query="SELECT `judge_id`,`answer` FROM `ex_judge` WHERE `judge_id` IN 
 	(SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='2')";
 	$result=mysql_query($query) or die(mysql_error());
 	while($row=mysql_fetch_object($result)){
 		if(isset($_POST["pdda$row->judge_id"])){
 			$myanswer=trim($_POST["pdda$row->judge_id"]);
-			$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','2','$row->judge_id','$myanswer')";
-			mysql_query($tempsql) or die(mysql_error());
+			if($cntjudge==0){
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','2','$row->judge_id','$myanswer')";
+				$cntjudge=1;
+			}
+			else
+				$tempsql=$tempsql.",('$user_id','$eid','2','$row->judge_id','$myanswer')";
 			if($myanswer==$row->answer)
 				$judgesum+=$judgescore;
 		}
 	}
+	mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//judge over
-	/*$query="SELECT `fill_id`,`answer_id`,`answer` FROM `fill_answer` WHERE `fill_id` IN 
-	( SELECT `fill_id` FROM `exp_fill` WHERE `exam_id`='$eid')";*/
+
+	$cntfill=0;
+	$tempsql="";
 	$query="SELECT `fill_answer`.`fill_id`,`answer_id`,`answer`,`answernum`,`kind` FROM `fill_answer`,`ex_fill` WHERE  
 	`fill_answer`.`fill_id`=`ex_fill`.`fill_id` AND `fill_answer`.`fill_id` IN ( SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='3')";
 	$result=mysql_query($query) or die(mysql_error());
@@ -123,9 +135,12 @@
 			//$myanswer = stripslashes($myanswer);
   			$myanswer = htmlspecialchars($myanswer);
   			$myanswer = mysql_real_escape_string($myanswer);
-
-			$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
-			mysql_query($tempsql) or die(mysql_error());
+  			if($cntfill==0){
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
+				$cntfill=1;
+			}
+			else
+				$tempsql=$tempsql.",('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
 
 			$rightans = trim($row->answer);
 			$rightans = mysql_real_escape_string($rightans);
@@ -140,10 +155,10 @@
 			}
 		}
 	}
+	mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//fillover
-	/*$query="SELECT distinct `program_id`,`result` FROM `exp_program`,`solution` WHERE `exam_id`='$eid' AND `result`=4 AND 
-	`user_id`='".$user_id."' AND `exp_program`.`program_id`=`solution`.`problem_id`";*/
+	
 	$query="SELECT distinct `question_id`,`result` FROM `exp_question`,`solution` WHERE `exam_id`='$eid' AND `type`='4' AND `result`='4'  
 	AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `user_id`='".$user_id."' AND `exp_question`.`question_id`=`solution`.`problem_id`";
 	$result=mysql_query($query) or die(mysql_error());
