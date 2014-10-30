@@ -429,7 +429,7 @@ window.onload=GetRTime;
 					echo "</tr>";
 					echo "<tr>";
 					echo "<td><pre><label for=\"code$row4->program_id\">Code here:</label>";
-					echo "<textarea style=\"width:900px;height:480px\" id=\"code$row4->program_id\"></textarea></pre>";
+					echo "<textarea style=\"width:900px;height:480px\" id=\"code$row4->program_id\" name=\"code$row4->program_id\"></textarea></pre>";
 					echo "<select id=\"language$row4->program_id\" class='span3'>
 						  <option value=\"0\">C</option>
 						  <option value=\"1\" selected>C++</option>
@@ -473,7 +473,7 @@ function submitcode(spanid,codeid,languageid,pid,examid)
 	{
 		$.ajax({
 			url:'programsubmit.php',
-			data:'source='+$('#'+codeid).val()+'&language='+$('#'+languageid).val()+'&id='+pid+'&eid='+examid,
+			data:'language='+$('#'+languageid).val()+'&id='+pid+'&eid='+examid+'&source='+encodeURIComponent($('#'+codeid).val()),
 			type:'POST',
 			success:function(data){
 				$('#'+spanid).html(data);
