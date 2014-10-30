@@ -49,6 +49,8 @@
         echo "</script>";
 	}
 	//start
+	$cntchoose=0;
+	$tempsql="";
 	$query="DELETE FROM `ex_stuanswer` WHERE `user_id`='$user_id' AND `exam_id`='$eid'";
 	mysql_query($query) or die(mysql_error());
 	$query="SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='1'";
@@ -56,23 +58,37 @@
 	while($row=mysql_fetch_object($result)){
 		if(isset($_POST["xzda$row->question_id"])){
 			$myanswer=trim($_POST["xzda$row->question_id"]);
-			$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','1','$row->question_id','$myanswer')";
-			mysql_query($tempsql) or die(mysql_error());
+			if($cntchoose==0){
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','1','$row->question_id','$myanswer')";
+				$cntchoose=1;
+			}
+			else
+				$tempsql=$tempsql.",('$user_id','$eid','1','$row->question_id','$myanswer')";
 		}
 	}
+	mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//choose over
+	$cntjudge=0;
+	$tempsql="";
 	$query="SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='2'";
 	$result=mysql_query($query) or die(mysql_error());
 	while($row=mysql_fetch_object($result)){
 		if(isset($_POST["pdda$row->question_id"])){
 			$myanswer=trim($_POST["pdda$row->question_id"]);
-			$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','2','$row->question_id','$myanswer')";
-			mysql_query($tempsql) or die(mysql_error());
+			if($cntjudge==0){
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','2','$row->question_id','$myanswer')";
+				$cntjudge=1;
+			}
+			else
+				$tempsql=$tempsql.",('$user_id','$eid','2','$row->question_id','$myanswer')";
 		}
 	}
+	mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//judge over
+	$cntfill=0;
+	$tempsql="";
 	$query="SELECT `fill_id`,`answer_id` FROM `fill_answer` WHERE `fill_id` IN 
 	( SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='3')";
 	$result=mysql_query($query) or die(mysql_error());
@@ -84,10 +100,15 @@
   			//$myanswer = stripslashes($myanswer);
   			$myanswer = htmlspecialchars($myanswer);
   			$myanswer = mysql_real_escape_string($myanswer);
-			$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
-			mysql_query($tempsql) or die(mysql_error());
+  			if($cntfill==0){
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
+				$cntfill=1;
+			}
+			else
+				$tempsql=$tempsql.",('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
 		}
 	}
+	mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//fillover
 	echo "True";
