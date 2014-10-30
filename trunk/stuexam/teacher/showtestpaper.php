@@ -200,15 +200,15 @@
 					else
 						$myanswer="";
 					if($i==1)
-						echo "<strong>我的答案:答案$i.$myanswer    </strong>";
+						echo "<strong>我的答案:答案($i) $myanswer    </strong>";
 					else
-						echo "<strong>答案$i.$myanswer    </strong>";
+						echo "<strong>答案($i) $myanswer    </strong>";
 				}
 				while($tmprow=mysql_fetch_object($tmpresult)){
 					if($tmprow->answer_id==1)
-						echo "<strong>\n正确答案:答案$tmprow->answer_id.$tmprow->answer    </strong>";
+						echo "<strong>\n正确答案:答案($tmprow->answer_id) $tmprow->answer    </strong>";
 					else
-						echo "<strong>答案$tmprow->answer_id.$tmprow->answer    </strong>";
+						echo "<strong>答案($tmprow->answer_id) $tmprow->answer    </strong>";
 				}
 				mysql_free_result($tmpresult);
 				echo "</pre></td></tr>";
