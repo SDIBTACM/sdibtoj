@@ -51,6 +51,10 @@
         echo "location='./'\n";
         echo "</script>";
 	}
+	if(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))
+	{
+		$randnum=0;
+	}
 	$sql="SELECT `user_id` FROM `ex_student` WHERE `user_id`='".$user_id."' AND `exam_id`='$eid'";
 	$result=mysql_query($sql) or die(mysql_error());
 	$row_cnt=mysql_num_rows($result);
@@ -174,7 +178,7 @@ function GetRTime(){
 		if(nMS%savetime==0&&nMS>savetime)
 		{
 			saveanswer();
-			history.go(0);
+			setTimeout('history.go(0)',5000);
 		}
 		runtimes++;
 		setTimeout("GetRTime()",1000);
