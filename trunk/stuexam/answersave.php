@@ -66,7 +66,8 @@
 				$tempsql=$tempsql.",('$user_id','$eid','1','$row->question_id','$myanswer')";
 		}
 	}
-	mysql_query($tempsql) or die(mysql_error());
+	if(!empty($tempsql))
+		mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//choose over
 	$cntjudge=0;
@@ -84,7 +85,8 @@
 				$tempsql=$tempsql.",('$user_id','$eid','2','$row->question_id','$myanswer')";
 		}
 	}
-	mysql_query($tempsql) or die(mysql_error());
+	if(!empty($tempsql))
+		mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//judge over
 	$cntfill=0;
@@ -108,7 +110,8 @@
 				$tempsql=$tempsql.",('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
 		}
 	}
-	mysql_query($tempsql) or die(mysql_error());
+	if(!empty($tempsql))
+		mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//fillover
 	echo "True";
