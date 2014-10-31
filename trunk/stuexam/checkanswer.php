@@ -97,7 +97,8 @@
 				$choosesum+=$choosescore;
 		}
 	}
-	mysql_query($tempsql) or die(mysql_error());
+	if(!empty($tempsql))
+		mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//choose over
 
@@ -119,7 +120,8 @@
 				$judgesum+=$judgescore;
 		}
 	}
-	mysql_query($tempsql) or die(mysql_error());
+	if(!empty($tempsql))
+		mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//judge over
 
@@ -155,7 +157,8 @@
 			}
 		}
 	}
-	mysql_query($tempsql) or die(mysql_error());
+	if(!empty($tempsql))
+		mysql_query($tempsql) or die(mysql_error());
 	mysql_free_result($result);
 	//fillover
 	
