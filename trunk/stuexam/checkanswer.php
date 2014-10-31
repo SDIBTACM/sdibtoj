@@ -147,7 +147,7 @@
 			$rightans = trim($row->answer);
 			$rightans = mysql_real_escape_string($rightans);
 
-			if($myanswer==$rightans){
+			if($myanswer==$rightans&&strlen($myanswer)==strlen($rightans)){
 				if($row->kind==1)
 					$fillsum+=$fillscore;
 				else if($row->kind==2)
