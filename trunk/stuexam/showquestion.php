@@ -148,7 +148,7 @@ var isalert = false;
 var left=<?=$lefttime?>*1000;
 var savetime=(300+<?=$randnum?>%300)*1000;
 var runtimes=0;
-//alert(savetime);
+
 function GetRTime(){
 	nMS=left-runtimes*1000;
 	// var NowTime = new Date(new Date().getTime()+dTime);
@@ -170,7 +170,7 @@ function GetRTime(){
 		{
 			$('#exam').submit();
 		}
-		/*如果出现问题，注释掉下面的if语句*/
+		//如果出现问题，注释掉下面的if语句
 		if(nMS%savetime==0&&nMS>savetime)
 		{
 			saveanswer();
@@ -258,12 +258,19 @@ window.onload=GetRTime;
 			$numofchoose=0;
 			/*$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms` FROM `ex_choose`,`exp_choose` 
 			WHERE `exam_id`='$eid' and `ex_choose`.`choose_id`=`exp_choose`.`choose_id` ORDER BY `choose_id`";*/
-			$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms` FROM `ex_choose`,`exp_question` 
-			WHERE `exam_id`='$eid' AND `type`='1' AND `ex_choose`.`choose_id`=`exp_question`.`question_id` ORDER BY field($tmpchoose)";
+			
 			if(isset($tmpchoose[0]))
+			{
+				$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms` FROM `ex_choose`,`exp_question` 
+			WHERE `exam_id`='$eid' AND `type`='1' AND `ex_choose`.`choose_id`=`exp_question`.`question_id` ORDER BY field($tmpchoose)";
 				$result1=mysql_query($query1) or die(mysql_error());
+			}
 			else
-				$result1="";
+			{
+				$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms` FROM `ex_choose`,`exp_question` 
+			WHERE `exam_id`='$eid' AND `type`='1' AND `ex_choose`.`choose_id`=`exp_question`.`question_id`";
+				$result1=mysql_query($query1) or die(mysql_error());
+			}
 			while($row1=mysql_fetch_object($result1)){
 				$numofchoose++;
 				$question=$row1->question;
@@ -324,14 +331,19 @@ window.onload=GetRTime;
 			unset($judgesx);
 
 			$numofjudge=0;
-			/*$query2="SELECT `ex_judge`.`judge_id`,`question` FROM `ex_judge`,`exp_judge` 
-			WHERE `exam_id`='$eid' and `ex_judge`.`judge_id`=`exp_judge`.`judge_id` ORDER BY `judge_id`";*/
-			$query2="SELECT `ex_judge`.`judge_id`,`question` FROM `ex_judge`,`exp_question` 
-			WHERE `exam_id`='$eid' AND `type`='2' AND `ex_judge`.`judge_id`=`exp_question`.`question_id` ORDER BY field($tmpjudge)";
+
 			if(isset($tmpjudge[0]))
+			{
+				$query2="SELECT `ex_judge`.`judge_id`,`question` FROM `ex_judge`,`exp_question` 
+			WHERE `exam_id`='$eid' AND `type`='2' AND `ex_judge`.`judge_id`=`exp_question`.`question_id` ORDER BY field($tmpjudge)";
 				$result2=mysql_query($query2) or die(mysql_error());
+			}
 			else
-				$result2="";
+			{
+				$query2="SELECT `ex_judge`.`judge_id`,`question` FROM `ex_judge`,`exp_question` 
+			WHERE `exam_id`='$eid' AND `type`='2' AND `ex_judge`.`judge_id`=`exp_question`.`question_id`";
+				$result2=mysql_query($query2) or die(mysql_error());
+			}
 			while($row2=mysql_fetch_object($result2)){
 				$numofjudge++;
 				echo "<tr>";
@@ -384,12 +396,18 @@ window.onload=GetRTime;
 			$fillnum=0;
 			/*$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum` FROM `ex_fill`,`exp_fill` 
 			WHERE `exam_id`='$eid' and `ex_fill`.`fill_id`=`exp_fill`.`fill_id` ORDER BY `fill_id`";*/
-			$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum`,`kind` FROM `ex_fill`,`exp_question` 
+			
+			if(isset($tmpfill[0])){
+				$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum`,`kind` FROM `ex_fill`,`exp_question` 
 			WHERE `exam_id`='$eid' AND `type`='3' AND `ex_fill`.`fill_id`=`exp_question`.`question_id` ORDER BY field($tmpfill)";
-			if(isset($tmpfill[0]))
 				$result3=mysql_query($query3) or die(mysql_error());
+			}
 			else
-				$result3="";
+			{
+				$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum`,`kind` FROM `ex_fill`,`exp_question` 
+			WHERE `exam_id`='$eid' AND `type`='3' AND `ex_fill`.`fill_id`=`exp_question`.`question_id`";
+				$result3=mysql_query($query3) or die(mysql_error());
+			}
 			while($row3=mysql_fetch_object($result3)){
 				$fillnum++;
 				echo "<tr>";
@@ -406,7 +424,7 @@ window.onload=GetRTime;
 				echo "<tr><td><pre>";
 				for($i=1;$i<=$row3->answernum;$i++)
 				{
-					if(!empty($fillarr[$row3->fill_id][$i])||$fillarr[$row3->fill_id][$i]=="0")
+					if(isset($fillarr[$row3->fill_id][$i])&&(!empty($fillarr[$row3->fill_id][$i])||$fillarr[$row3->fill_id][$i]=="0"))
 						$myanswer=$fillarr[$row3->fill_id][$i];
 					else
 						$myanswer="";
@@ -499,10 +517,10 @@ function saveanswer()
 		data:$('#exam').serialize(),
 		type:'POST',
 		success:function(data){
-			if(data=="True")
-				$('#saveover').html("[已保存]");
-			else
-				$('#saveover').html("保存失败");
+			 if(data=="True")
+			 	$('#saveover').html("[已保存]");
+			 else
+				$('#saveover').html(data);
 		},
 		error:function(){
 			alert('sorry,something error');
