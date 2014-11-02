@@ -29,8 +29,11 @@
 	$endtimeC=strtotime($end_time);
 	$now=time();
 	$creator=$row[2];
+	$priflag=0;
+	if($now>$endtimeC&&isset($_SESSION['contest_creator']))
+		$priflag=1;
 	mysql_free_result($result);
-	if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id'])){
+	if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']||$priflag==1)){
 		if($now<$endtimeC){
 			echo "<h1>Exam is not Over</h1>";
 			exit(0);
@@ -40,7 +43,7 @@
 	$priresult=mysql_query($prisql) or die(mysql_error());
 	$creator=mysql_result($priresult, 0);
 	mysql_free_result($priresult);
-	if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+	if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']||$priflag==1))
 	{
 		echo "<script language='javascript'>\n";
 		echo "alert(\"You have no privilege to see it!\");\n";
