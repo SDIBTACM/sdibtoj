@@ -14,6 +14,12 @@
 		$sql="DELETE FROM `ex_privilege` WHERE `rightstr`='e$eid'";
 		mysql_query($sql) or die(mysql_error());
 		$pieces = explode("\n", trim($_POST['ulist']));
+		if (count($pieces)>0 && strlen($pieces[0])>0)
+		{
+			for ($i=0;$i<count($pieces);$i++){
+				$pieces[$i]=trim($pieces[$i]);
+			}
+		}
 		$pieces = array_unique($pieces);
 		if (count($pieces)>0 && strlen($pieces[0])>0)
 		{
