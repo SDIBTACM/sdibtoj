@@ -42,11 +42,20 @@
 	if(isset($_GET['eid']))
 	{
 		$eid=intval($_GET['eid']);
-		$prisql="SELECT `creator` FROM `exam` WHERE `exam_id`='$eid'";
+		$prisql="SELECT `creator`,`start_time`,`end_time` FROM `exam` WHERE `exam_id`='$eid'";
 		$priresult=mysql_query($prisql) or die(mysql_error());
-		$creator=mysql_result($priresult, 0);
+		$prirow=mysql_fetch_array($priresult);
+		$creator=$prirow['creator'];
+		$start_time=$prirow['start_time'];
+		$end_time=$prirow['end_time'];
+		$start_timeC=strtotime($start_time);
+		$end_timeC=strtotime($end_time);
 		mysql_free_result($priresult);
-		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+		$now=time();
+		$priflag=0;
+		if($now>$end_timeC&&isset($_SESSION['contest_creator']))
+			$priflag=1;
+		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']||$priflag==1))
 		{
 			echo "<script language='javascript'>\n";
 		    echo "alert(\"You have no privilege of this exam\");\n";  
