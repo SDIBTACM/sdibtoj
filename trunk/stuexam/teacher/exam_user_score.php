@@ -123,6 +123,7 @@
 				<table class="table table-hover table-bordered table-striped">
 				<thead>
 				<tr>
+				<th width=5%>Rank</th>
 				<th width=7%>账号</th>
 				<th width=7%>姓名</th>
 				<th width=7%>选择题成绩</th>
@@ -136,8 +137,10 @@
 				</thead>
 				<tbody>
 				<?
+					$rank=1;
 					while($row=mysql_fetch_object($result)){
 						echo "<tr>";
+						echo "<td>$rank</td>";
 						echo "<td>$row->user_id</td>";
 						echo "<td>$row->nick</td>";
 						echo "<td>$row->choosesum</td>";
@@ -145,6 +148,7 @@
 						echo "<td>$row->fillsum</td>";
 						echo "<td>$row->programsum</td>";
 						echo "<td>$row->score</td>";
+						$rank++;
 						if($row->score=="")
 							echo "<td>[未参加考试]</td>";
 						else
