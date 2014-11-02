@@ -100,7 +100,7 @@
 				$now=time();
 				echo "<tr>";
 				echo "<td>$row->exam_id</td>";
-				echo "<td><a href=\"add_exam_problem.php?eid=$row->exam_id&type=5\">$row->title</a></td>";
+				echo "<td><a href=\"exam_user_score.php?eid=$row->exam_id\">$row->title</a></td>";
 				echo "<td style=\"font-size:9px\">$row->start_time</td>";
 				echo "<td style=\"font-size:9px\">$row->end_time</td>";
 				if ($now>$endtime)
