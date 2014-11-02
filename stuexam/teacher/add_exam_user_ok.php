@@ -14,6 +14,7 @@
 		$sql="DELETE FROM `ex_privilege` WHERE `rightstr`='e$eid'";
 		mysql_query($sql) or die(mysql_error());
 		$pieces = explode("\n", trim($_POST['ulist']));
+		$pieces = array_unique($pieces);
 		if (count($pieces)>0 && strlen($pieces[0])>0)
 		{
 			$randnum=rand(1,39916800);
