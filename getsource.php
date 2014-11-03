@@ -39,7 +39,7 @@ if (isset($_SESSION['source_browser'])) $ok=true;
 		if($row)
 			$view_source=$row->source;
 
- if ($ok==true&&!$OJ_VIP_CONTEST){
+ if ($ok==true){
 		$brush=strtolower($language_name[$slanguage]);
 		if ($brush=='pascal') $brush='delphi';
 		if ($brush=='obj-c') $brush='c';
