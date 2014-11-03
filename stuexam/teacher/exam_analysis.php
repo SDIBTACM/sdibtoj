@@ -18,11 +18,18 @@
 	if(isset($_GET['eid']))
 	{
 		$eid=intval($_GET['eid']);
-		$prisql="SELECT `creator` FROM `exam` WHERE `exam_id`='$eid'";
+		$prisql="SELECT `creator`,`end_time` FROM `exam` WHERE `exam_id`='$eid'";
 		$priresult=mysql_query($prisql) or die(mysql_error());
-		$creator=mysql_result($priresult, 0);
+		$prirow=mysql_fetch_array($priresult);
+		$creator=$prirow['creator'];
+		$end_time=$prirow['end_time'];
+		$end_timeC=strtotime($end_time);
+		$now=time();
+		$priflag=0;
+		if($now>$end_timeC&&isset($_SESSION['contest_creator']))
+			$priflag=1;
 		mysql_free_result($priresult);
-		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']||$priflag==1))
 		{
 			echo "<script language='javascript'>\n";
 		    echo "alert(\"You have no privilege of this exam\");\n";  
@@ -33,7 +40,7 @@
 		{
 			if(filter_var($eid, FILTER_VALIDATE_INT)&&$eid>0)
 			{
-				$query="SELECT COUNT(*) FROM `ex_privilege` WHERE `rightstr`='e$eid'";
+				$query="SELECT COUNT(*) FROM `ex_privilege` WHERE `rightstr`='e$eid' $sqladd";
 				$result=mysql_query($query) or die(mysql_error());
 				$totalnum=mysql_result($result, 0);
 				mysql_free_result($result);
@@ -126,27 +133,27 @@
 				</table>
 				<?
 					mysql_free_result($result);
-					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`<60 and `exam_id`='$eid'";
+					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`<60 and `exam_id`='$eid' $sqladd";
 					$result=mysql_query($sql) or die(mysql_error());
 					$fd1=mysql_result($result, 0);
 					mysql_free_result($result);
 
-					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`>=60 and `score`<70 and `exam_id`='$eid'";
+					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`>=60 and `score`<70 and `exam_id`='$eid' $sqladd";
 					$result=mysql_query($sql) or die(mysql_error());
 					$fd2=mysql_result($result, 0);
 					mysql_free_result($result);
 
-					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`>=70 and `score`<80 and `exam_id`='$eid'";
+					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`>=70 and `score`<80 and `exam_id`='$eid' $sqladd";
 					$result=mysql_query($sql) or die(mysql_error());
 					$fd3=mysql_result($result, 0);
 					mysql_free_result($result);
 
-					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`>=80 and `score`<90 and `exam_id`='$eid'";
+					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`>=80 and `score`<90 and `exam_id`='$eid' $sqladd";
 					$result=mysql_query($sql) or die(mysql_error());
 					$fd4=mysql_result($result, 0);
 					mysql_free_result($result);
 
-					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`>=90 and `exam_id`='$eid'";
+					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`>=90 and `exam_id`='$eid' $sqladd";
 					$result=mysql_query($sql) or die(mysql_error());
 					$fd5=mysql_result($result, 0);
 					mysql_free_result($result);
