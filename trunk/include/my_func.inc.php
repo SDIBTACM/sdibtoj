@@ -109,4 +109,29 @@ function isemail($str)
 	else
 		return false;
 }
+function noRefresh()
+{
+       $seconds = '5'; //时间段[秒]
+       $refresh = '4'; //刷新次数
+      //设置监控变量
+       $cur_time = time();
+       if(isset($_SESSION['last_time'])){
+            $_SESSION['refresh_times'] += 1;
+       }else{
+            $_SESSION['refresh_times'] = 1;
+            $_SESSION['last_time'] = $cur_time;
+       }
+//处理监控结果
+     if($cur_time - $_SESSION['last_time'] < $seconds){
+         if($_SESSION['refresh_times'] >= $refresh){
+  //跳转至攻击者服务器地址
+                 return true;
+         }
+     }else{
+     $_SESSION['refresh_times'] = 0;
+     $_SESSION['last_time'] = $cur_time;
+    }
+}
+
+
 ?>
