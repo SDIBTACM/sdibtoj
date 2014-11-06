@@ -8,8 +8,15 @@
 <?
 
 	require_once('./include/db_info.inc.php');
-
+        require_once('./include/my_func.inc.php');
 	
+       if(noRefresh())
+       {
+                echo "刷新太快，休息休息";
+                sleep(10);
+                 exit (0);
+        
+       }
 	function checkcontest($MSG_CONTEST){
 		require_once("include/db_info.inc.php");
 		$sql="SELECT count(*) FROM `contest` WHERE `end_time`>NOW() AND `defunct`='N'";
@@ -106,6 +113,8 @@
 			
 			}
 		?>
+           
+		<th><a href="./stuexam">exam</a></th>
 	</tr>
 </table>
 </center>
@@ -131,3 +140,4 @@ var mark=<?php echo $flag?>;
 if(mark)
   setInterval(function(){blink.color=blink.color=='red'?'white':'red'},500)
 </script>
+
