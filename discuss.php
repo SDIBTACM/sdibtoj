@@ -48,7 +48,7 @@ if ($pid!=null && $pid!=0) echo " >> <a href=\"discuss.php?pid=".$pid."&cid=".$c
 <?}
 $sql = "SELECT `tid`, `title`, `top_level`, `topic`.`status`, `cid`, `pid`, CONVERT(MIN(`reply`.`time`),DATE) `posttime`, MAX(`reply`.`time`) `lastupdate`, `topic`.`author_id`, COUNT(`rid`) `count` FROM `topic`, `reply` WHERE `topic`.`status`!=2 AND `reply`.`status`!=2 AND `tid` = `topic_id`";
 if (array_key_exists("cid",$_REQUEST)&&$_REQUEST['cid']!='') $sql.= " AND ( `cid` = '".mysql_escape_string($_REQUEST['cid'])."'";
-else $sql.=" AND ( ISNULL(`cid`)";
+else $sql.=" AND ( 1 ";
 $sql.=" OR `top_level` = 3 )";
 if (array_key_exists("pid",$_REQUEST)&&$_REQUEST['pid']!=''){
   $sql.=" AND ( `pid` = '".mysql_escape_string($_REQUEST['pid'])."' OR `top_level` >= 2 )";
