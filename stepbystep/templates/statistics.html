@@ -1,0 +1,35 @@
+$def with(count)
+<!DOCTYPE html>
+$:render.header()
+
+<style>
+    body { padding-top: 70px; }
+</style>
+
+        <div class="container bs-docs-container">
+            <div class="row">
+                <table class="table table-bordered table-hover tablesorter table-striped" id="staticsticstable">
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>初级（92题）</th>
+                            <th>中级（103题）</th>
+                            <th>高级（83题）</th>
+                            <th>总计（278题）</th>
+                            <th>Solved</th>
+                            <th>Rank</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        $for cnt in count:
+                            <tr>
+                            <td><a href="http://poj.org/userstatus?user_id=$cnt[-1]" target="_blank">$cnt[0]</a></td>
+                            $for c in cnt[1:-1]:
+                                <td>$c</td>
+                            </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+$:render.footer()
