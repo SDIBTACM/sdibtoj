@@ -494,7 +494,6 @@ window.onload=GetRTime;
 					$programarr[$row['question_id']]=$row['result'];
 				}
 				mysql_free_result($resulttmp);
-				print_r($programarr);
 				$numofprogram=0;
 				
 				$query4="SELECT `question_id` as `program_id`,`title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `exp_question`,`problem` 
@@ -531,6 +530,8 @@ window.onload=GetRTime;
 					}
 					echo "</td></tr>";
 				}
+				mysql_free_result($result4);
+				unset($programarr);
 			?>
 		</table>
 	</div>
