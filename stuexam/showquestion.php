@@ -27,6 +27,8 @@
 	$starttimeC=strtotime($start_time);
 	$end_time=$row[2];
 	$endtimeC=strtotime($end_time);
+	$start_timeC=strftime("%Y-%m-%d %X",($starttimeC));
+	$end_timeC=strftime("%Y-%m-%d %X",($endtimeC));
 	$now=time();
 	$isvip=$row[3];
 	mysql_free_result($result);
@@ -94,16 +96,30 @@
 		array_splice($arr, $offset,1);
 	}
 
-	function makesx($myarr,$num,$flag,$stunum)
+	function makesx($myarr,$start,$finish,$stunum)
 	{
+		$num=$finish-$start+1;
 		$fac=array(1,1,2,6,24,120,720,5040,40320,362880,3628800,39916800);
 		$rightnum=$stunum%$fac[$num];
-		//$stunum>=1 and $stunum<=39916800
-		//$stunum-1>=0 and $stunum-1<=$fac[$num]-1;
-		//$rightsum>=0 and $rightsum<=$fac[$num]-1;
 		$tmp=array();
 		for($i=1;$i<=$num;$i++)
 			$tmp[]=$i;
+		for($i=1;$i<=$num;$i++)
+		{
+			$div=floor($rightnum/$fac[$num-$i]);
+			$rightnum=$rightnum%$fac[$num-$i];
+			$ans[]=$myarr[$tmp[$div]-1+$start];
+			array_remove($tmp,$div);
+		}
+		for($i=$start;$i<=$finish;$i++)
+		{
+			$myarr[$i]=$ans[$i-$start];
+		}
+		return $myarr;
+	}
+
+	function makeproblemsql($flag,$myarr,$num)
+	{
 		$ans=array();
 		if($flag==1)
 			$ans[]="choose_id";
@@ -111,26 +127,13 @@
 			$ans[]="judge_id";
 		else if($flag==3)
 			$ans[]="fill_id";
-
-		for($i=1;$i<=$num;$i++)
+		for($i=0;$i<$num;$i++)
 		{
-			$div=floor($rightnum/$fac[$num-$i]);
-			$rightnum=$rightnum%$fac[$num-$i];
-			$ans[]=$myarr[$tmp[$div]-1];
-			array_remove($tmp,$div);
+			$ans[]=$myarr[$i];
 		}
-		for($i=1;$i<=floor($num/2);$i++)
-		{
-			$t=$ans[$i];
-			$ans[$i]=$ans[$num-$i+1];
-			$ans[$num-$i+1]=$t;
-		}
-		unset($tmp);unset($fac);
-		$tmp=join(",",$ans);
-		unset($ans);
-		return $tmp;
+		$ans=join(",",$ans);
+		return $ans;
 	}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -253,16 +256,28 @@ window.onload=GetRTime;
 			}
 			mysql_free_result($result);
 			if($numproblem!=0)
-				$tmpchoose=makesx($choosesx,$numproblem,1,$randnum);
+			{
+				for($i=0;$i<$numproblem;)
+				{
+					if($i+11<=$numproblem)
+					{
+						$choosesx=makesx($choosesx,$i,$i+10,$randnum);
+						$i=$i+11;
+					}
+					else
+					{
+						$choosesx=makesx($choosesx,$i,$numproblem-1,$randnum);
+						break;
+					}
+				}
+				$tmpchoose=makeproblemsql(1,$choosesx,$numproblem);
+			}
 			else
 				$tmpchoose="";
 			unset($choosesx);
 			//the end
 
 			$numofchoose=0;
-			/*$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms` FROM `ex_choose`,`exp_choose` 
-			WHERE `exam_id`='$eid' and `ex_choose`.`choose_id`=`exp_choose`.`choose_id` ORDER BY `choose_id`";*/
-			
 			if(isset($tmpchoose[0]))
 			{
 				$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms` FROM `ex_choose`,`exp_question` 
@@ -329,7 +344,22 @@ window.onload=GetRTime;
 			}
 			mysql_free_result($result);
 			if($numproblem!=0)
-				$tmpjudge=makesx($judgesx,$numproblem,2,$randnum);
+			{
+				for($i=0;$i<$numproblem;)
+				{
+					if($i+11<=$numproblem)
+					{
+						$judgesx=makesx($judgesx,$i,$i+10,$randnum);
+						$i=$i+11;
+					}
+					else
+					{
+						$judgesx=makesx($judgesx,$i,$numproblem-1,$randnum);
+						break;
+					}
+				}
+				$tmpjudge=makeproblemsql(2,$judgesx,$numproblem);
+			}
 			else
 				$tmpjudge="";
 			unset($judgesx);
@@ -392,14 +422,27 @@ window.onload=GetRTime;
 			}
 			mysql_free_result($result);
 			if($numproblem!=0)
-				$tmpfill=makesx($fillsx,$numproblem,3,$randnum);
+			{	
+				for($i=0;$i<$numproblem;)
+				{
+					if($i+11<=$numproblem)
+					{
+						$fillsx=makesx($fillsx,$i,$i+10,$randnum);
+						$i=$i+11;
+					}
+					else
+					{
+						$fillsx=makesx($fillsx,$i,$numproblem-1,$randnum);
+						break;
+					}
+				}
+				$tmpfill=makeproblemsql(3,$fillsx,$numproblem);
+			}
 			else
 				$tmpfill="";
 			unset($fillsx);
 
 			$fillnum=0;
-			/*$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum` FROM `ex_fill`,`exp_fill` 
-			WHERE `exam_id`='$eid' and `ex_fill`.`fill_id`=`exp_fill`.`fill_id` ORDER BY `fill_id`";*/
 			
 			if(isset($tmpfill[0])){
 				$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum`,`kind` FROM `ex_fill`,`exp_question` 
@@ -412,6 +455,7 @@ window.onload=GetRTime;
 			WHERE `exam_id`='$eid' AND `type`='3' AND `ex_fill`.`fill_id`=`exp_question`.`question_id`";
 				$result3=mysql_query($query3) or die(mysql_error());
 			}
+
 			while($row3=mysql_fetch_object($result3)){
 				$fillnum++;
 				echo "<tr>";
@@ -442,9 +486,17 @@ window.onload=GetRTime;
 			</form>
 			<tr><td><h4>四.程序设计题</h4></td></tr>
 			<?
+				$programarr=array();
+				$querytmp="SELECT distinct `question_id`,`result` FROM `exp_question`,`solution` WHERE `exam_id`='$eid' AND `type`='4'  
+				AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `user_id`='".$user_id."' AND `exp_question`.`question_id`=`solution`.`problem_id`";
+				$resulttmp=mysql_query($querytmp) or die(mysql_error());
+				while($row=mysql_fetch_assoc($resulttmp)){
+					$programarr[$row['question_id']]=$row['result'];
+				}
+				mysql_free_result($resulttmp);
+				print_r($programarr);
 				$numofprogram=0;
-				/*$query4="SELECT `program_id`,`title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `exp_program`,`problem` 
-				WHERE `exam_id`='$eid' AND `program_id`=`problem_id`";*/
+				
 				$query4="SELECT `question_id` as `program_id`,`title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `exp_question`,`problem` 
 				WHERE `exam_id`='$eid' AND `type`='4' AND `question_id`=`problem_id`";
 				$result4=mysql_query($query4) or die(mysql_error());
@@ -458,18 +510,25 @@ window.onload=GetRTime;
 					$row4->output<h4>Sample Input</h4>$row4->sample_input<h4>sample_output</h4>$row4->sample_output</pre></td>";
 					echo "</tr>";
 					echo "<tr>";
-					echo "<td><pre><label for=\"code$row4->program_id\">Code here:</label>";
-					echo "<textarea style=\"width:900px;height:480px\" id=\"code$row4->program_id\" name=\"code$row4->program_id\"></textarea></pre>";
-					echo "<select id=\"language$row4->program_id\" class='span3'>
-						  <option value=\"0\">C</option>
-						  <option value=\"1\" selected>C++</option>
-						  <option value=\"2\">Pascal</option>		
-						  <option value=\"3\">Java</option>
-						  </select>\t";
-					echo "<span class='span3' id='span$row4->program_id'><font color=green size=3px>未提交</font></span>";
-					echo "<span class='span3'><a href=\"javascript:void(0);\" onclick=\"updateresult('span$row4->program_id','$row4->program_id','$eid')\">[点击刷新结果]</a></span>";
-					echo "<input type=\"button\" class=\"btn btn-success pull-right span2\" value=\"提交\"
-					onclick=\"submitcode('span$row4->program_id','code$row4->program_id','language$row4->program_id','$row4->program_id','$eid')\">";
+					if(isset($programarr[$row4->program_id])&&$programarr[$row4->program_id]==4)
+					{
+						echo "<td><pre><font color=red>[此题已正确]</font></pre>";
+					}
+					else
+					{
+						echo "<td><pre><label for=\"code$row4->program_id\">Code here:</label>";
+						echo "<textarea style=\"width:900px;height:480px\" id=\"code$row4->program_id\" name=\"code$row4->program_id\"></textarea></pre>";
+						echo "<select id=\"language$row4->program_id\" class='span3'>
+							  <option value=\"0\">C</option>
+							  <option value=\"1\" selected>C++</option>
+							  <option value=\"2\">Pascal</option>		
+							  <option value=\"3\">Java</option>
+							  </select>\t";
+						echo "<span class='span3' id='span$row4->program_id'><font color=green size=3px>未提交</font></span>";
+						echo "<span class='span3'><a href=\"javascript:void(0);\" onclick=\"updateresult('span$row4->program_id','$row4->program_id','$eid')\">[点击刷新结果]</a></span>";
+						echo "<input type=\"button\" class=\"btn btn-success pull-right span2\" value=\"提交\"
+						onclick=\"submitcode('span$row4->program_id','code$row4->program_id','language$row4->program_id','$row4->program_id','$eid')\">";
+					}
 					echo "</td></tr>";
 				}
 			?>
