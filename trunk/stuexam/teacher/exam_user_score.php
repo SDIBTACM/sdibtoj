@@ -137,8 +137,22 @@
 				</thead>
 				<tbody>
 				<?
+					// $KUserId=array();
+					// $KNick=array();
+					// $KChoosesum=array();
+					// $KJudgesum=array();
+					// $KFillsum=array();
+					// $KProgramsum=array();
+					// $KScore=array();
 					$rank=1;
 					while($row=mysql_fetch_object($result)){
+						// $KUserId[]=$row->user_id;
+						// $KNick[]=$row->nick;
+						// $KChoosesum[]=$row->choosesum;
+						// $KJudgesum[]=$row->judgesum;
+						// $KFillsum[]=$row->fillsum;
+						// $KProgramsum[]=$row->programsum;
+						// $KScore[]=$row->score;
 						echo "<tr>";
 						echo "<td>$rank</td>";
 						echo "<td>$row->user_id</td>";
@@ -149,17 +163,39 @@
 						echo "<td>$row->programsum</td>";
 						echo "<td>$row->score</td>";
 						$rank++;
+
+						$sql = "SELECT COUNT(*) as cnum FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `user_id`='$row->user_id'";
+						$onlineresult=mysql_query($sql) or mysql_error();
+						$isonline=mysql_result($onlineresult, 0);
+
 						if($row->score=="")
-							echo "<td>[未参加考试]</td>";
+						{
+							if($isonline==0)
+								echo "<td><font color=green>[未参加]</font></td>";
+							else
+							{
+								if($now>$end_timeC)
+									echo "<td><font color=blue>[未交卷]</font></td>";
+								else
+									echo "<td><font color=red>[正在考试]</font></td>";
+							}
+						}
 						else
 							echo "<td><a href=\"showtestpaper.php?users=$row->user_id&eid=$eid\">[查看试卷]</a></td>";
 						if($row->score=="")
-							echo "<td>无</td>";
+						{
+							
+							if($isonline&&$now>$end_timeC)
+								echo "<td><a href=\"submit_after_exam.php?users=$row->user_id&eid=$eid\">[提交试卷]</a></td>";
+							else
+								echo "<td>无</td>";
+						}
 						else
 							echo "<td><a href=\"del_user_score.php?users=$row->user_id&eid=$eid\" onclick=\"return suredo('是否要删除该考生成绩,让考生重新参加考试？')\">[删除分数]</a></td>";
 						echo"</tr>";
 					}
 					mysql_free_result($result);
+					//$sql="SELECT COUNT(*) as onlinenum FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `user_id` ";
 				?>
 				</tbody>
 				</table>
