@@ -27,9 +27,9 @@ $:render.header()
                             <tr>
                             <td>$d.user_name</td>
                             <td>$d.grade</td>
-                            <td>$d.sdutoj_solved</td>
-                            <td>$d.poj_solved</td>
-                            <td>$d.hdoj_solved</td>
+                            <td><a href=http://acm.sdibt.edu.cn/JudgeOnline/userinfo.php?user=$d.sdutoj_id>$d.sdutoj_solved</a></td>
+                            <td><a href=http://poj.org/userstatus?user_id=$d.poj_name>$d.poj_solved</a></td>
+                            <td><a href=http://acm.hdu.edu.cn/userstatus.php?user=$d.hdoj_id>$d.hdoj_solved</a></td>
                             $#<td>$d.sdutoj_solved+$d.poj_solved+$d.hdoj_solved</td>
                             <td>$d.sum_solved</td>
                             <td class="cf">$d.cf_rating</td>
