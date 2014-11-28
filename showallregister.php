@@ -66,7 +66,7 @@ require_once("oj-header.php");
 	if ($color) echo "<tr align=center class=oddrow>";
 	else echo "<tr align=center class=evenrow>";
 	echo "<td>$RID</td>";
-	echo "<td>$row->user_id";
+	echo "<td><a href=./userinfo.php?user=$row->user_id>$row->user_id</a>";
         echo "<td>$row->sturealname";
 	if($row->stusex=='M')
 		echo "<td>男";
