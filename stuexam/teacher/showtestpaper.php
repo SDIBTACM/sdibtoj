@@ -196,7 +196,7 @@
 				echo "<tr><td><pre>";
 				for($i=1;$i<=$row3->answernum;$i++)
 				{
-					if(!empty($fillarr[$row3->fill_id][$i])||$fillarr[$row3->fill_id][$i]=="0")
+					if(isset($fillarr[$row3->fill_id][$i])&&!empty($fillarr[$row3->fill_id][$i])||$fillarr[$row3->fill_id][$i]=="0")
 					{
 						$myanswer=$fillarr[$row3->fill_id][$i];
 					}
