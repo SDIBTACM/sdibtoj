@@ -713,7 +713,7 @@ class statistics_all:
     @memorize(3600)
     def GET(self):
         try:
-            sql = 'select user_name,grade,sdutoj_solved,poj_solved,hdoj_solved,cf_rating,tc_rating,bc_rating,"sum_solved" from user where permission = 1 order by grade desc'
+            sql = 'select user_name,grade,sdutoj_id,sdutoj_solved,poj_name,poj_solved,hdoj_id,hdoj_solved,cf_rating,tc_rating,bc_rating,"sum_solved" from user where permission = 1 order by grade desc'
             data = db.query(sql)
             data = list(data)
             for i in data:
