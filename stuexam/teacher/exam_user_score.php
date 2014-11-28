@@ -137,40 +137,51 @@
 				</thead>
 				<tbody>
 				<?
-					// $KUserId=array();
-					// $KNick=array();
-					// $KChoosesum=array();
-					// $KJudgesum=array();
-					// $KFillsum=array();
-					// $KProgramsum=array();
-					// $KScore=array();
-					$rank=1;
+					$KUserId=array();
+					$KNick=array();
+					$KChoosesum=array();
+					$KJudgesum=array();
+					$KFillsum=array();
+					$KProgramsum=array();
+					$KScore=array();
+					$rank=0;
 					while($row=mysql_fetch_object($result)){
-						// $KUserId[]=$row->user_id;
-						// $KNick[]=$row->nick;
-						// $KChoosesum[]=$row->choosesum;
-						// $KJudgesum[]=$row->judgesum;
-						// $KFillsum[]=$row->fillsum;
-						// $KProgramsum[]=$row->programsum;
-						// $KScore[]=$row->score;
-						echo "<tr>";
-						echo "<td>$rank</td>";
-						echo "<td>$row->user_id</td>";
-						echo "<td>$row->nick</td>";
-						echo "<td>$row->choosesum</td>";
-						echo "<td>$row->judgesum</td>";
-						echo "<td>$row->fillsum</td>";
-						echo "<td>$row->programsum</td>";
-						echo "<td>$row->score</td>";
+						$KUserId[$rank]=$row->user_id;
+						$KNick[$rank]=$row->nick;
+						$KChoosesum[$rank]=$row->choosesum;
+						$KJudgesum[$rank]=$row->judgesum;
+						$KFillsum[$rank]=$row->fillsum;
+						$KProgramsum[$rank]=$row->programsum;
+						$KScore[$rank]=$row->score;
 						$rank++;
+					}
+					mysql_free_result($result);
 
-						$sql = "SELECT COUNT(*) as cnum FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `user_id`='$row->user_id'";
-						$onlineresult=mysql_query($sql) or mysql_error();
-						$isonline=mysql_result($onlineresult, 0);
+					$isonline=array();
+					$sql = "SELECT `user_id`,COUNT(`user_id`) as `cnum` FROM `ex_stuanswer` WHERE `exam_id`='$eid' group by `user_id`";
+					$onlineresult=mysql_query($sql) or mysql_error();
+					while($row=mysql_fetch_object($onlineresult))
+					{
+						$isonline[$row->user_id]=$row->cnum;
+					}
+					mysql_free_result($onlineresult);
 
-						if($row->score=="")
+					for($i=0;$i<$rank;$i++)
+					{
+						$t=$i+1;
+						echo "<tr>";
+						echo "<td>$t</td>";
+						echo "<td>$KUserId[$i]</td>";
+						echo "<td>$KNick[$i]</td>";
+						echo "<td>$KChoosesum[$i]</td>";
+						echo "<td>$KJudgesum[$i]</td>";
+						echo "<td>$KFillsum[$i]</td>";
+						echo "<td>$KProgramsum[$i]</td>";
+						echo "<td>$KScore[$i]</td>";
+
+						if($KScore[$i]=="")
 						{
-							if($isonline==0)
+							if(!isset($isonline[$KUserId[$i]]))
 								echo "<td><font color=green>[未参加]</font></td>";
 							else
 							{
@@ -181,21 +192,27 @@
 							}
 						}
 						else
-							echo "<td><a href=\"showtestpaper.php?users=$row->user_id&eid=$eid\">[查看试卷]</a></td>";
-						if($row->score=="")
+							echo "<td><a href=\"showtestpaper.php?users=$KUserId[$i]&eid=$eid\">[查看试卷]</a></td>";
+						if($KScore[$i]=="")
 						{
 							
-							if($isonline&&$now>$end_timeC)
-								echo "<td><a href=\"submit_after_exam.php?users=$row->user_id&eid=$eid\">[提交试卷]</a></td>";
+							if(isset($isonline[$KUserId[$i]])&&$now>$end_timeC)
+								echo "<td><a href=\"submit_after_exam.php?users=$KUserId[$i]&eid=$eid\">[提交试卷]</a></td>";
 							else
 								echo "<td>无</td>";
 						}
 						else
-							echo "<td><a href=\"del_user_score.php?users=$row->user_id&eid=$eid\" onclick=\"return suredo('是否要删除该考生成绩,让考生重新参加考试？')\">[删除分数]</a></td>";
+							echo "<td><a href=\"del_user_score.php?users=$KUserId[$i]&eid=$eid\" onclick=\"return suredo('是否要删除该考生成绩,让考生重新参加考试？')\">[删除分数]</a></td>";
 						echo"</tr>";
 					}
-					mysql_free_result($result);
-					//$sql="SELECT COUNT(*) as onlinenum FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `user_id` ";
+					unset($KUserId);
+					unset($KNick);
+					unset($KChoosesum);
+					unset($KJudgesum);
+					unset($KFillsum);
+					unset($KProgramsum);
+					unset($KScore);
+					unset($isonline);
 				?>
 				</tbody>
 				</table>
