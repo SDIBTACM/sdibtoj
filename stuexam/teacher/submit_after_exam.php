@@ -138,8 +138,8 @@
 			`fill_answer`.`fill_id`=`ex_fill`.`fill_id` AND `fill_answer`.`fill_id` IN ( SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='3')";
 			$result=mysql_query($query) or die(mysql_error());
 			while($row=mysql_fetch_object($result)){
-				if(isset($fillarr[$row->fill_id][$answer_id])&&(!empty($fillarr[$row->fill_id][$answer_id])||$fillarr[$row->fill_id][$answer_id]=="0")){
-					$myanswer = trim($fillarr[$row->fill_id][$answer_id]);
+				if(isset($fillarr[$row->fill_id][$row->answer_id])&&(!empty($fillarr[$row->fill_id][$row->answer_id])||$fillarr[$row->fill_id][$row->answer_id]=="0")){
+					$myanswer = trim($fillarr[$row->fill_id][$row->answer_id]);
 					//$myanswer = stripslashes($myanswer);
 		  			$myanswer = htmlspecialchars($myanswer);
 		  			$myanswer = mysql_real_escape_string($myanswer);
@@ -186,4 +186,3 @@
         echo "</script>";
 	}
 ?>
-
