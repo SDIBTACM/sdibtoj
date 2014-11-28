@@ -177,12 +177,12 @@
 					    <input type="text" name="ehour"   value="<?php echo substr($endtime,11,2)?>" style="width:40px" />时-
 						<input type="text" name="eminute" value="<?php echo substr($endtime,14,2)?>" style="width:40px">分</p>
 						<font color=red>*以下数值只支持整数</font><br/>
-						(1)选择题每题分值:<input type="text" name="xzfs" style="width:50px" value="<?php echo $xzfs;?>" />分;<br/>
-						(2)判断题每题分值:<input type="text" name="pdfs" style="width:50px" value="<?php echo $pdfs;?>" />分;<br/>
-						(3)基础填空题每空分值:<input type="text" name="tkfs" style="width:50px" value="<?php echo $tkfs;?>" />分;<br/>
+						(1)选择题每题分值:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="xzfs" style="width:50px" value="<?php echo $xzfs;?>" />分;<br/>
+						(2)判断题每题分值:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="pdfs" style="width:50px" value="<?php echo $pdfs;?>" />分;<br/>
+						(3)基础填空题每空分值:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="tkfs" style="width:50px" value="<?php echo $tkfs;?>" />分;<br/>
 						(4)写运行结果题每题分值:<input type="text" name="yxjgfs" style="width:50px" value="<?php echo $yxjgfs?>" />分;<br/>
-						(5)程序填空题每题分值:<input type="text" name="cxtkfs" style="width:50px" value="<?php echo $cxtkfs?>" />分;<br/>
-						(6)程序设计题每题分值:<input type="text" name="cxfs" style="width:50px" value="<?php echo $cxfs;?>" />分;<br/>
+						(5)程序填空题每题分值:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="cxtkfs" style="width:50px" value="<?php echo $cxtkfs?>" />分;<br/>
+						(6)程序设计题每题分值:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="cxfs" style="width:50px" value="<?php echo $cxfs;?>" />分;<br/>
 						是否限定一个账号只能在一台机器登陆:<select name="isvip" class="span1">
 						<option value="Y" <?echo $isvip=='Y'?"selected":"" ?> >Yes</option>
 						<option value="N" <?echo $isvip=='N'?"selected":"" ?> >No</option>
