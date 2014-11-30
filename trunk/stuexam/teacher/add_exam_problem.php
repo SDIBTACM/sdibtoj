@@ -140,6 +140,12 @@
 					<li><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 					<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
+					<?
+					if(isset($_SESSION['administrator']))
+					{
+						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
+					}
+					?>
 					</ul>
 					</div>
 					<?
@@ -235,6 +241,12 @@
 					<li><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 					<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
+					<?
+					if(isset($_SESSION['administrator']))
+					{
+						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
+					}
+					?>
 					</ul>
 					</div>
 					<div class="pull-left" style="width:400px">
@@ -352,6 +364,12 @@
 					<li><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 					<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
+					<?
+					if(isset($_SESSION['administrator']))
+					{
+						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
+					}
+					?>
 					</ul>
 					</div>
 					<div class="pull-left" style="width:400px">
@@ -469,6 +487,12 @@
 					<li><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 					<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
+					<?
+					if(isset($_SESSION['administrator']))
+					{
+						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
+					}
+					?>
 					</ul>
 					</div>
 					<div class="pull-left" style="width:400px">
@@ -598,6 +622,12 @@
 					<li><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 					<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
+					<?
+					if(isset($_SESSION['administrator']))
+					{
+						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
+					}
+					?>
 					</ul>
 					</div>
 					<br>
