@@ -16,6 +16,10 @@
 <?
 	if(isset($_GET['eid'])&&isset($_GET['users']))
 	{
+		if(isset($_GET['rjd']))
+			$rejudge=1;
+		else
+			$rejudge=0;
 		$eid=intval(trim($_GET['eid']));
 		$users=trim($_GET['users']);
 		$users=mysql_real_escape_string($users);
@@ -37,29 +41,37 @@
 		$end_timeC=strftime("%Y-%m-%d %X",($endtimeC));
 		$now=time();
 		mysql_free_result($result);
+
+		if($rejudge==0)//if not rejudge
+		{
+			$sql="SELECT COUNT(*) FROM `ex_privilege` WHERE `user_id`='".$users."' AND `rightstr`='e$eid'";
+			$result=mysql_query($sql) or die(mysql_error());
+			$cnt1=mysql_result($result, 0);
+			mysql_free_result($result);
+			if($cnt1==0)
+			{
+				echo "<script language='javascript'>\n";
+				echo "alert(\"Student ID is wrong!\");\n";
+				echo "location.href='./exam_user_score.php?eid=$eid'";
+				echo "</script>";
+			}
+		}
 		if($now<$starttimeC)
 		{
 			echo "<h1>Exam Not Start</h1>";
 			exit(0);
 		}
 
-		$sql = "SELECT COUNT(*) FROM `ex_student` WHERE `exam_id`='$eid' AND `user_id`='$users'";
+		$sql = "SELECT COUNT(*) FROM `ex_student` WHERE `exam_id`='$eid' AND `user_id`='".$users."'";
 		$result = mysql_query($sql) or die(mysql_error());
 		$mark = mysql_result($result,0);
 		mysql_free_result($result);
 
-		if($mark!=0)
-		{
-			echo "<script language='javascript'>\n";
-			echo "alert(\"The student can't submit again!\");\n";
-			echo "history.go(-1);";
-			echo "</script>";
-		}
 		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
 		{
 			echo "<script language='javascript'>\n";
 			echo "alert(\"You have no privilege to do it!\");\n";
-			echo "history.go(-1);";
+			echo "location.href='./exam_user_score.php?eid=$eid'";
 			echo "</script>";
 		}
 		else
@@ -169,12 +181,17 @@
 			mysql_free_result($result);
 			//$program over
 			$sum=$choosesum+$judgesum+$fillsum+$programsum;
-			$sql="INSERT INTO `ex_student` VALUES('".$users."','$eid','$sum','$choosesum','$judgesum','$fillsum','$programsum')";
+			if($mark==0)// if the student has not submitted the paper
+				$sql="INSERT INTO `ex_student` VALUES('".$users."','$eid','$sum','$choosesum','$judgesum','$fillsum','$programsum')";
+			else
+				$sql="UPDATE `ex_student` SET `score`='$sum',`choosesum`='$choosesum',`judgesum`='$judgesum',`fillsum`='$fillsum',`programsum`='$programsum'
+				WHERE `user_id`='".$users."' AND `exam_id`='$eid'";
 			mysql_query($sql) or die(mysql_error());
 
 			//
+			sleep(2);
 			echo "<script language='javascript'>\n";
-        	echo "history.go(-1);\n";
+        	echo "location.href='./exam_user_score.php?eid=$eid'";
         	echo "</script>";
 		}
 	}
