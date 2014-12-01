@@ -81,10 +81,11 @@
 	}
 	else
 	{
-		$query="SELECT `result` FROM `solution` WHERE `problem_id`='$id' AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `user_id`='".$user_id."' ORDER BY `solution_id` DESC limit 0,1";
+		$query="SELECT `result` FROM `solution` WHERE `problem_id`='$id' AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `user_id`='".$user_id."' ORDER BY `solution_id` DESC limit 1";
 		$result=mysql_query($query) or die(mysql_error());
 		$row_cnt=mysql_num_rows($result);
-		$ans=mysql_result($result, 0);
+		$row=mysql_fetch_array($result);
+		$ans=$row['result'];
 		if($row_cnt==0)
 		{
 			echo "<font color=green size=5px>未提交</font>";
