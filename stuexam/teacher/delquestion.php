@@ -48,7 +48,6 @@
 				{
 					$query="DELETE FROM `ex_choose` WHERE `choose_id`='$id'";
 					mysql_query($query) or die(mysql_error());
-					//$query="DELETE FROM `exp_choose` WHERE `choose_id`='$id'";
 					$query="DELETE FROM `exp_question` WHERE `question_id`='$id' AND `type`='1'";
 					mysql_query($query) or die(mysql_error());
 					echo "<script language=javascript>location='admin_choose.php';</script>";
@@ -80,7 +79,6 @@
 				{
 					$query="DELETE FROM `ex_judge` WHERE `judge_id`='$id'";
 					mysql_query($query) or die(mysql_error());
-					//$query="DELETE FROM `exp_judge` WHERE `judge_id`='$id'";
 					$query="DELETE FROM `exp_question` WHERE `question_id`='$id' AND `type`='2'";
 					mysql_query($query) or die(mysql_error());
 					echo "<script language=javascript>location='admin_judge.php';</script>";
@@ -114,7 +112,6 @@
 					mysql_query($query) or die(mysql_error());
 					$query="DELETE FROM `fill_answer` WHERE `fill_id`='$id'";
 					mysql_query($query) or die(mysql_error());
-					//$query="DELETE FROM `exp_fill` WHERE `fill_id`='$id'";
 					$query="DELETE FROM `exp_question` WHERE `question_id`='$id' AND `type`='3'";
 					mysql_query($query) or die(mysql_error());
 					echo "<script language=javascript>location='admin_fill.php';</script>";
@@ -135,12 +132,21 @@
 				}
 				else
 				{
+					//if the exam was deleted
+					//the info of exam was deleted
 					$query="DELETE FROM `exam` WHERE `exam_id`='$id'";
 					mysql_query($query) or die(mysql_error());
-					//$query="DELETE FROM `exp_choose` WHERE `exam_id`='$id'";
+					//the info of question in the exam was deleted
 					$query="DELETE FROM `exp_question` WHERE `exam_id`='$id'";
 					mysql_query($query) or die(mysql_error());
+					//students have privilege were deleted
 					$query="DELETE FROM `ex_privilege` WHERE `rightstr`='e$id'";
+					mysql_query($query) or die(mysql_error());
+					//students' save_answers were deleted
+					$query="DELETE FROM `ex_stuanswer` WHERE `exam_id`='$id'";
+					mysql_query($query) or die(mysql_error());
+					//the scores of students were deleted
+					$query="DELETE FROM `ex_student` WHERE `exam_id`='$id'";
 					mysql_query($query) or die(mysql_error());
 					echo "<script language=javascript>location='./';</script>";
 				}
