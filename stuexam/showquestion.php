@@ -155,7 +155,7 @@
 // var dTime = new Date("<?=date("Y/m/d H:i:s")?>").getTime()-new Date().getTime();//计算出服务器和客户端的时间差
 var isalert = false;
 var left=<?=$lefttime?>*1000;
-var savetime=(300+<?=$randnum?>%300)*1000;
+var savetime=(300+<?=$randnum?>%420)*1000;
 var runtimes=0;
 
 function GetRTime(){
@@ -241,13 +241,6 @@ window.onload=GetRTime;
 			mysql_free_result($result);
 
 			$choosearr = array();
-			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='1' AND `user_id`='".$user_id."'";
-			$result=mysql_query($query) or die(mysql_error());
-			while($row=mysql_fetch_assoc($result)){
-				$choosearr[$row['question_id']]=$row['answer'];
-			}
-			mysql_free_result($result);
-
 			//start to shuffle the data
 			$choosesx=array();
 			$query="SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='1' ORDER BY `question_id`";
@@ -259,6 +252,12 @@ window.onload=GetRTime;
 			mysql_free_result($result);
 			if($numproblem!=0)
 			{
+				$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='1' AND `user_id`='".$user_id."'";
+				$result=mysql_query($query) or die(mysql_error());
+				while($row=mysql_fetch_assoc($result)){
+					$choosearr[$row['question_id']]=$row['answer'];
+				}
+				mysql_free_result($result);
 				for($i=0;$i<$numproblem;)
 				{
 					if($i+11<=$numproblem)
@@ -325,12 +324,6 @@ window.onload=GetRTime;
 		<tr><td><h4>二.判断题</h4></td></tr>
 		<?
 			$judgearr = array();
-			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='2' AND `user_id`='".$user_id."'";
-			$result=mysql_query($query) or die(mysql_error());
-			while($row=mysql_fetch_assoc($result)){
-				$judgearr[$row['question_id']]=$row['answer'];
-			}
-			mysql_free_result($result);
 
 			$judgesx=array();
 			$query="SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='2' ORDER BY `question_id`";
@@ -340,8 +333,15 @@ window.onload=GetRTime;
 				$judgesx[]=$row['question_id'];
 			}
 			mysql_free_result($result);
+
 			if($numproblem!=0)
 			{
+				$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='2' AND `user_id`='".$user_id."'";
+				$result=mysql_query($query) or die(mysql_error());
+				while($row=mysql_fetch_assoc($result)){
+					$judgearr[$row['question_id']]=$row['answer'];
+				}
+				mysql_free_result($result);
 				for($i=0;$i<$numproblem;)
 				{
 					if($i+11<=$numproblem)
@@ -396,13 +396,6 @@ window.onload=GetRTime;
 		<tr><td><h4>三.填空题</h4></td></tr>
 		<?
 			$fillarr=array();
-			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='3' AND `user_id`='".$user_id."'";
-			$result=mysql_query($query) or die(mysql_error());
-			while($row=mysql_fetch_assoc($result)){
-
-				$fillarr[$row['question_id']][$row['answer'][0]]=substr($row['answer'], 1);
-			}
-			mysql_free_result($result);
 
 			$fillsx=array();
 			$query="SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='3' ORDER BY `question_id`";
@@ -412,8 +405,16 @@ window.onload=GetRTime;
 				$fillsx[]=$row['question_id'];
 			}
 			mysql_free_result($result);
+
 			if($numproblem!=0)
 			{	
+				$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='3' AND `user_id`='".$user_id."'";
+				$result=mysql_query($query) or die(mysql_error());
+				while($row=mysql_fetch_assoc($result)){
+
+					$fillarr[$row['question_id']][$row['answer'][0]]=substr($row['answer'], 1);
+				}
+				mysql_free_result($result);
 				for($i=0;$i<$numproblem;)
 				{
 					if($i+11<=$numproblem)
