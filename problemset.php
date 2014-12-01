@@ -64,13 +64,15 @@ if(isset($_GET['search']))
        $filter_sql=" 1  ";
        $search=trim(mysql_real_escape_string($_GET['search']));
        if($search!='')
-          $filter_sql1=" (title like '%$search%' or source like '%$search%')";
+          $filter_sql1=" (title like '%$search%' or source like '%$search%') ";
        else
           $filter_sql1=" 1 ";    
 }
 else
+{
    $filter_sql="  `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
-
+        $filter_sql1=" 1 ";
+}
 if (!isset($_SESSION['administrator'])){
       if(isset($_SESSION['user_id']))	
            $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date` FROM `problem` ".
@@ -79,11 +81,11 @@ if (!isset($_SESSION['administrator'])){
 	) AND";
       else
             $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date` FROM `problem` ".
-           "WHERE `defunct`='N' AND $filter_sql1 AND `problem_id` NOT IN (
+           "WHERE $filter_sql1 and  `defunct`='N'  AND `problem_id` NOT IN (
                 SELECT `problem_id` FROM `contest_problem`,`contest` WHERE   $filter_sql   and contest_problem.contest_id=contest.contest_id and contest.end_time>NOW()
                 )
           AND";
-        //echo $sql10;
+      //  echo $sql10;
        
         $sql=$sql0."  `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
 }
