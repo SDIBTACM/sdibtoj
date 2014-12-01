@@ -73,7 +73,7 @@
 						<input type='hidden' name='rjall' value='1'>
 						<input type='hidden' name='eid' value='<?=$eid?>'>
            				<input type=hidden name="postkey" value="<?=$_SESSION['postkey']?>">
-						<input type=submit value=submit class="btn btn-warning" disabled>
+						<input type=submit value=submit class="btn btn-warning" onclick="return suredo('确定全部重判?')">
 						</form>
 					</li>
 				</ol>
@@ -116,10 +116,38 @@
 				echo "<script>location.href='$url';</script>";
 			}
 		}
-		else if (isset($_POST['rjall']))
+		else if(isset($_POST['rjall']))
 		{
+			require_once("../func.php");
 			$rjall=intval($_POST['rjall']);
 			$eid=intval($_POST['eid']);
+
+			$prisql="SELECT `start_time`,`end_time` FROM `exam` WHERE `exam_id`='$eid'";
+			$priresult=mysql_query($prisql) or die(mysql_error());
+			$prirow=mysql_fetch_array($priresult);
+			$start_time=$prirow['start_time'];
+			$end_time=$prirow['end_time'];
+			$start_timeC=strtotime($start_time);
+			$end_timeC=strtotime($end_time);
+			mysql_free_result($priresult);
+
+			$userlist=array();
+			$numuser=0;
+			$sql="SELECT `user_id` FROM `ex_student` WHERE `exam_id`='$eid'";
+			$result=mysql_query($sql) or die(mysql_error());
+			while($row=mysql_fetch_object($result))
+			{
+				$userlist[$numuser]=$row->user_id;
+				$numuser++;
+			}
+			for($i=0;$i<$numuser;$i++)
+			{
+				rejudgepaper($userlist[$i],$eid,$start_timeC,$end_timeC,1);
+				echo "<h4>...正在重判 $userlist[$i] 的试卷...</h4>";
+			}
+			echo "<script language='javascript'>\n";
+        	echo "location.href='./exam_user_score.php?eid=$eid'";
+        	echo "</script>";
 		}
 	}
 	else
