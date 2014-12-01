@@ -60,19 +60,26 @@ while ($row=mysql_fetch_array($result))
 	$acc_arr[$row[0]]=true;
 }
 if(isset($_GET['search']))
-   $filter_sql=" 1  ";
+{
+       $filter_sql=" 1  ";
+       $search=trim(mysql_real_escape_string($_GET['search']));
+       if($search!='')
+          $filter_sql1=" (title like '%$search%' or source like '%$search%')";
+       else
+          $filter_sql1=" 1 ";    
+}
 else
    $filter_sql="  `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
 
 if (!isset($_SESSION['administrator'])){
       if(isset($_SESSION['user_id']))	
            $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date` FROM `problem` ".
-           "WHERE (`defunct`='N'  or (`author`='".$_SESSION['user_id']."'". ")) AND `problem_id` NOT IN(
+           "WHERE (`defunct`='N'  or (`author`='".$_SESSION['user_id']."'". ")) AND $filter_sql1 AND `problem_id` NOT IN (
 		 SELECT `problem_id` FROM `contest_problem`,`contest` WHERE   $filter_sql   and contest_problem.contest_id=contest.contest_id and contest.end_time>NOW()
 	) AND";
       else
             $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date` FROM `problem` ".
-           "WHERE `defunct`='N' AND `problem_id` NOT IN(
+           "WHERE `defunct`='N' AND $filter_sql1 AND `problem_id` NOT IN (
                 SELECT `problem_id` FROM `contest_problem`,`contest` WHERE   $filter_sql   and contest_problem.contest_id=contest.contest_id and contest.end_time>NOW()
                 )
           AND";
