@@ -72,7 +72,7 @@
     {           
 		$today=date('Y-m-d');
 		$ip1=$_SERVER['REMOTE_ADDR'];
-		$sql="SELECT * FROM `loginlog` WHERE `user_id`='$user_id' AND `time`>='$today' AND ip<>'$ip1' AND 
+		$sql="SELECT `user_id` FROM `loginlog` WHERE `user_id`='".$user_id."' AND `time`>='$today' AND ip<>'$ip1' AND 
 		 `user_id` NOT IN( SELECT `user_id` FROM `privilege` WHERE `rightstr`='administrator' or `rightstr`='contest_creator') ORDER BY `time` DESC limit 0,1";
 		$result=mysql_query($sql) or die(mysql_error());
 		$row_cnt=mysql_num_rows($result);
@@ -115,6 +115,8 @@
 		{
 			$myarr[$i]=$ans[$i-$start];
 		}
+		unset($tmp);
+		unset($fac);
 		return $myarr;
 	}
 
@@ -239,7 +241,7 @@ window.onload=GetRTime;
 			mysql_free_result($result);
 
 			$choosearr = array();
-			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `user_id`='$user_id' AND `exam_id`='$eid' AND `type`='1'";
+			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='1' AND `user_id`='".$user_id."'";
 			$result=mysql_query($query) or die(mysql_error());
 			while($row=mysql_fetch_assoc($result)){
 				$choosearr[$row['question_id']]=$row['answer'];
@@ -278,57 +280,52 @@ window.onload=GetRTime;
 			//the end
 
 			$numofchoose=0;
-			if(isset($tmpchoose[0]))
+			if(isset($tmpchoose[0])&&$numproblem)
 			{
 				$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms` FROM `ex_choose`,`exp_question` 
 			WHERE `exam_id`='$eid' AND `type`='1' AND `ex_choose`.`choose_id`=`exp_question`.`question_id` ORDER BY field($tmpchoose)";
 				$result1=mysql_query($query1) or die(mysql_error());
+				while($row1=mysql_fetch_object($result1))
+				{
+					$numofchoose++;
+					$question=$row1->question;
+					if(isset($choosearr[$row1->choose_id]))
+						$myanswer=$choosearr[$row1->choose_id];
+					else
+						$myanswer="";
+					echo "<tr><td><pre><font color=red>($choosescore 分)</font>$numofchoose.$question</pre></td></tr>";
+					echo "<tr><td><pre>";
+					if($myanswer=='A')
+						echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"A\" checked>";
+					else
+						echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"A\">";
+					echo "(A) $row1->ams\n";
+					if($myanswer=='B')
+						echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"B\" checked>";
+					else
+						echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"B\">";
+					echo "(B) $row1->bms\n";
+					if($myanswer=='C')
+						echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"C\" checked>";
+					else
+						echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"C\">";
+					echo "(C) $row1->cms\n";
+					if($myanswer=='D')
+						echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"D\" checked>";
+					else
+						echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"D\">";
+					echo "(D) $row1->dms</pre></td></tr>";
+					echo "<tr><td><pre>";
+					echo "</pre></td></tr>";
+				}
+				mysql_free_result($result1);
 			}
-			else
-			{
-				$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms` FROM `ex_choose`,`exp_question` 
-			WHERE `exam_id`='$eid' AND `type`='1' AND `ex_choose`.`choose_id`=`exp_question`.`question_id`";
-				$result1=mysql_query($query1) or die(mysql_error());
-			}
-			while($row1=mysql_fetch_object($result1)){
-				$numofchoose++;
-				$question=$row1->question;
-				if(isset($choosearr[$row1->choose_id]))
-					$myanswer=$choosearr[$row1->choose_id];
-				else
-					$myanswer="";
-				echo "<tr><td><pre><font color=red>($choosescore 分)</font>$numofchoose.$question</pre></td></tr>";
-				echo "<tr><td><pre>";
-				if($myanswer=='A')
-					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"A\" checked>";
-				else
-					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"A\">";
-				echo "(A) $row1->ams\n";
-				if($myanswer=='B')
-					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"B\" checked>";
-				else
-					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"B\">";
-				echo "(B) $row1->bms\n";
-				if($myanswer=='C')
-					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"C\" checked>";
-				else
-					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"C\">";
-				echo "(C) $row1->cms\n";
-				if($myanswer=='D')
-					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"D\" checked>";
-				else
-					echo "<input class=\"xzda\" type=\"radio\" name=\"xzda$row1->choose_id\" value=\"D\">";
-				echo "(D) $row1->dms</pre></td></tr>";
-				echo "<tr><td><pre>";
-				echo "</pre></td></tr>";
-			}
-			mysql_free_result($result1);
 			unset($choosearr);
 		?>
 		<tr><td><h4>二.判断题</h4></td></tr>
 		<?
 			$judgearr = array();
-			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `user_id`='$user_id' AND `exam_id`='$eid' AND `type`='2'";
+			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='2' AND `user_id`='".$user_id."'";
 			$result=mysql_query($query) or die(mysql_error());
 			while($row=mysql_fetch_assoc($result)){
 				$judgearr[$row['question_id']]=$row['answer'];
@@ -366,46 +363,40 @@ window.onload=GetRTime;
 
 			$numofjudge=0;
 
-			if(isset($tmpjudge[0]))
+			if(isset($tmpjudge[0])&&$numproblem)
 			{
 				$query2="SELECT `ex_judge`.`judge_id`,`question` FROM `ex_judge`,`exp_question` 
 			WHERE `exam_id`='$eid' AND `type`='2' AND `ex_judge`.`judge_id`=`exp_question`.`question_id` ORDER BY field($tmpjudge)";
 				$result2=mysql_query($query2) or die(mysql_error());
+				while($row2=mysql_fetch_object($result2)){
+					$numofjudge++;
+					echo "<tr>";
+					$question=$row2->question;
+					echo "<td><pre><font color=red>($judgescore 分)</font>$numofjudge.$question";
+					echo "<span class=\"pull-right\">";
+					if(isset($judgearr[$row2->judge_id]))
+						$myanswer=$judgearr[$row2->judge_id];
+					else
+						$myanswer="";
+					if($myanswer=='Y')
+						echo "Ture.<input class=\"pdda\" type=\"radio\" name=\"pdda$row2->judge_id\" value=\"Y\" checked>\t";
+					else
+						echo "Ture.<input class=\"pdda\" type=\"radio\" name=\"pdda$row2->judge_id\" value=\"Y\">\t";
+					if($myanswer=='N')
+						echo "False.<input class=\"pdda\" type=\"radio\" name=\"pdda$row2->judge_id\" value=\"N\" checked>\t</span>";
+					else
+						echo "False.<input class=\"pdda\" type=\"radio\" name=\"pdda$row2->judge_id\" value=\"N\">\t</span>";
+					echo "</pre></td>";
+					echo "</tr>";
+				}
+				mysql_free_result($result2);
 			}
-			else
-			{
-				$query2="SELECT `ex_judge`.`judge_id`,`question` FROM `ex_judge`,`exp_question` 
-			WHERE `exam_id`='$eid' AND `type`='2' AND `ex_judge`.`judge_id`=`exp_question`.`question_id`";
-				$result2=mysql_query($query2) or die(mysql_error());
-			}
-			while($row2=mysql_fetch_object($result2)){
-				$numofjudge++;
-				echo "<tr>";
-				$question=$row2->question;
-				echo "<td><pre><font color=red>($judgescore 分)</font>$numofjudge.$question";
-				echo "<span class=\"pull-right\">";
-				if(isset($judgearr[$row2->judge_id]))
-					$myanswer=$judgearr[$row2->judge_id];
-				else
-					$myanswer="";
-				if($myanswer=='Y')
-					echo "Ture.<input class=\"pdda\" type=\"radio\" name=\"pdda$row2->judge_id\" value=\"Y\" checked>\t";
-				else
-					echo "Ture.<input class=\"pdda\" type=\"radio\" name=\"pdda$row2->judge_id\" value=\"Y\">\t";
-				if($myanswer=='N')
-					echo "False.<input class=\"pdda\" type=\"radio\" name=\"pdda$row2->judge_id\" value=\"N\" checked>\t</span>";
-				else
-					echo "False.<input class=\"pdda\" type=\"radio\" name=\"pdda$row2->judge_id\" value=\"N\">\t</span>";
-				echo "</pre></td>";
-				echo "</tr>";
-			}
-			mysql_free_result($result2);
 			unset($judgearr);
 		?>
 		<tr><td><h4>三.填空题</h4></td></tr>
 		<?
 			$fillarr=array();
-			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `user_id`='$user_id' AND `exam_id`='$eid' AND `type`='3'";
+			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='3' AND `user_id`='".$user_id."'";
 			$result=mysql_query($query) or die(mysql_error());
 			while($row=mysql_fetch_assoc($result)){
 
@@ -444,60 +435,61 @@ window.onload=GetRTime;
 
 			$fillnum=0;
 			
-			if(isset($tmpfill[0])){
+			if(isset($tmpfill[0])&&$numproblem)
+			{
 				$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum`,`kind` FROM `ex_fill`,`exp_question` 
 			WHERE `exam_id`='$eid' AND `type`='3' AND `ex_fill`.`fill_id`=`exp_question`.`question_id` ORDER BY field($tmpfill)";
 				$result3=mysql_query($query3) or die(mysql_error());
-			}
-			else
-			{
-				$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum`,`kind` FROM `ex_fill`,`exp_question` 
-			WHERE `exam_id`='$eid' AND `type`='3' AND `ex_fill`.`fill_id`=`exp_question`.`question_id`";
-				$result3=mysql_query($query3) or die(mysql_error());
-			}
-
-			while($row3=mysql_fetch_object($result3)){
-				$fillnum++;
-				echo "<tr>";
-				$question=$row3->question;
-				if($row3->kind==1)
-					$tmpscore=$fillscore*$row3->answernum;
-				else if($row3->kind==2)
-					$tmpscore=$prgans;
-				else 
-					$tmpscore=$prgfill;
-				echo "<td><pre><font color=red>($tmpscore 分)</font>$fillnum.$question</pre></td>";
-				echo "</tr>";
-				$name=$row3->fill_id."tkda";
-				echo "<tr><td><pre>";
-				for($i=1;$i<=$row3->answernum;$i++)
-				{
-					if(isset($fillarr[$row3->fill_id][$i])&&(!empty($fillarr[$row3->fill_id][$i])||$fillarr[$row3->fill_id][$i]=="0"))
-						$myanswer=$fillarr[$row3->fill_id][$i];
-					else
-						$myanswer="";
-					echo "答案$i.<input type=\"text\" maxlength=\"100\" name=\"$name$i\" value=\"$myanswer\"><br/>";
+			
+				while($row3=mysql_fetch_object($result3)){
+					$fillnum++;
+					echo "<tr>";
+					$question=$row3->question;
+					if($row3->kind==1)
+						$tmpscore=$fillscore*$row3->answernum;
+					else if($row3->kind==2)
+						$tmpscore=$prgans;
+					else 
+						$tmpscore=$prgfill;
+					echo "<td><pre><font color=red>($tmpscore 分)</font>$fillnum.$question</pre></td>";
+					echo "</tr>";
+					$name=$row3->fill_id."tkda";
+					echo "<tr><td><pre>";
+					for($i=1;$i<=$row3->answernum;$i++)
+					{
+						if(isset($fillarr[$row3->fill_id][$i])&&(!empty($fillarr[$row3->fill_id][$i])||$fillarr[$row3->fill_id][$i]=="0"))
+							$myanswer=$fillarr[$row3->fill_id][$i];
+						else
+							$myanswer="";
+						echo "答案$i.<input type=\"text\" maxlength=\"100\" name=\"$name$i\" value=\"$myanswer\"><br/>";
+					}
+					echo "</pre></td></tr>";
 				}
-				echo "</pre></td></tr>";
+				mysql_free_result($result3);
 			}
-			mysql_free_result($result3);
 			unset($fillarr);
 			?>
 			</form>
 			<tr><td><h4>四.程序设计题</h4></td></tr>
 			<?
 				$programarr=array();
-				$querytmp="SELECT distinct `question_id`,`result` FROM `exp_question`,`solution` WHERE `exam_id`='$eid' AND `type`='4'  
-				AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `user_id`='".$user_id."' AND `exp_question`.`question_id`=`solution`.`problem_id`";
+				// $querytmp="SELECT distinct `question_id` FROM `exp_question`,`solution` WHERE `exam_id`='$eid' AND `type`='4'  
+				// AND `result`=4 AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `user_id`='".$user_id."' AND `exp_question`.`question_id`=`solution`.`problem_id`";
+				
+				$querytmp="SELECT `question_id` FROM `exp_question` INNER JOIN `solution` ON `exp_question`.`question_id`=`solution`.`problem_id` 
+				WHERE `result`=4 AND `user_id`='".$user_id."' AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `exam_id`='$eid' AND `type`='4'";
+				
 				$resulttmp=mysql_query($querytmp) or die(mysql_error());
 				while($row=mysql_fetch_assoc($resulttmp)){
-					$programarr[$row['question_id']]=$row['result'];
+					$programarr[$row['question_id']]=1;
 				}
 				mysql_free_result($resulttmp);
 				$numofprogram=0;
 				
-				$query4="SELECT `question_id` as `program_id`,`title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `exp_question`,`problem` 
-				WHERE `exam_id`='$eid' AND `type`='4' AND `question_id`=`problem_id`";
+				// $query4="SELECT `question_id` as `program_id`,`title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `exp_question`,`problem` 
+				// WHERE `exam_id`='$eid' AND `type`='4' AND `question_id`=`problem_id`";
+				$query4="SELECT `question_id` as `program_id`,`title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `exp_question` INNER JOIN `problem` 
+				 ON `question_id`=`problem_id` WHERE `exam_id`='$eid' AND `type`='4'";
 				$result4=mysql_query($query4) or die(mysql_error());
 				while($row4=mysql_fetch_object($result4)){
 					$numofprogram++;
@@ -509,7 +501,7 @@ window.onload=GetRTime;
 					$row4->output<h4>Sample Input</h4>$row4->sample_input<h4>sample_output</h4>$row4->sample_output</pre></td>";
 					echo "</tr>";
 					echo "<tr>";
-					if(isset($programarr[$row4->program_id])&&$programarr[$row4->program_id]==4)
+					if(isset($programarr[$row4->program_id])&&$programarr[$row4->program_id]==1)
 					{
 						echo "<td><pre><font color=red>[此题已正确]</font></pre>";
 					}
