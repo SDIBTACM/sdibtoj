@@ -127,8 +127,10 @@
 			$prirow=mysql_fetch_array($priresult);
 			$start_time=$prirow['start_time'];
 			$end_time=$prirow['end_time'];
-			$start_timeC=strtotime($start_time);
-			$end_timeC=strtotime($end_time);
+			$starttimeC=strtotime($start_time);
+			$endtimeC=strtotime($end_time);
+			$start_timeC=strftime("%Y-%m-%d %X",($starttimeC));
+			$end_timeC=strftime("%Y-%m-%d %X",($endtimeC));
 			mysql_free_result($priresult);
 
 			$userlist=array();
@@ -159,6 +161,11 @@
 	}
 ?>
 <script type="text/javascript">
+function suredo(q){
+	var ret;
+	ret = confirm(q);
+	return ret;
+}
 $(function(){
 	if($("#left").height()<700)
 		$("#left").css("height",700)
