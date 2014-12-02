@@ -473,58 +473,48 @@ window.onload=GetRTime;
 			</form>
 			<tr><td><h4>四.程序设计题</h4></td></tr>
 			<?
-				$programarr=array();
-				// $querytmp="SELECT distinct `question_id` FROM `exp_question`,`solution` WHERE `exam_id`='$eid' AND `type`='4'  
-				// AND `result`=4 AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `user_id`='".$user_id."' AND `exp_question`.`question_id`=`solution`.`problem_id`";
-				
-				$querytmp="SELECT `question_id` FROM `exp_question` INNER JOIN `solution` ON `exp_question`.`question_id`=`solution`.`problem_id` 
-				WHERE `result`=4 AND `user_id`='".$user_id."' AND `in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `exam_id`='$eid' AND `type`='4'";
-				
-				$resulttmp=mysql_query($querytmp) or die(mysql_error());
-				while($row=mysql_fetch_assoc($resulttmp)){
-					$programarr[$row['question_id']]=1;
+				$programsx=array();
+				$query="SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='4'";
+				$result=mysql_query($query) or die(mysql_error());
+				$numproblem=mysql_num_rows($result);
+				while($row=mysql_fetch_object($result))
+				{
+					$programsx[]=$row->question_id;
 				}
-				mysql_free_result($resulttmp);
-				$numofprogram=0;
+				mysql_free_result($result);
 				
-				// $query4="SELECT `question_id` as `program_id`,`title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `exp_question`,`problem` 
-				// WHERE `exam_id`='$eid' AND `type`='4' AND `question_id`=`problem_id`";
-				$query4="SELECT `question_id` as `program_id`,`title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `exp_question` INNER JOIN `problem` 
-				 ON `question_id`=`problem_id` WHERE `exam_id`='$eid' AND `type`='4'";
-				$result4=mysql_query($query4) or die(mysql_error());
-				while($row4=mysql_fetch_object($result4)){
-					$numofprogram++;
-					echo "<tr>";
-					echo "<td><pre><font color=red>($programscore 分)</font><span id=\"whethershow\">$numofprogram.</span><strong>$row4->title</strong></pre></td>";
-					echo "</tr>";
-					echo "<tr>";
-					echo "<td><pre><h4>Description</h4>$row4->description<h4>Input</h4>$row4->input<h4>Output</h4>
-					$row4->output<h4>Sample Input</h4>$row4->sample_input<h4>sample_output</h4>$row4->sample_output</pre></td>";
-					echo "</tr>";
-					echo "<tr>";
-					if(isset($programarr[$row4->program_id])&&$programarr[$row4->program_id]==1)
+				if($numproblem)
+				{
+					for($i=1;$i<=$numproblem;$i++)
 					{
-						echo "<td><pre><font color=red>[此题已正确]</font></pre>";
-					}
-					else
-					{
-						echo "<td><pre><label for=\"code$row4->program_id\">Code here:</label>";
-						echo "<textarea style=\"width:900px;height:480px\" id=\"code$row4->program_id\" name=\"code$row4->program_id\"></textarea></pre>";
-						echo "<select id=\"language$row4->program_id\" class='span3'>
-							  <option value=\"0\">C</option>
-							  <option value=\"1\" selected>C++</option>
-							  <option value=\"2\">Pascal</option>		
-							  <option value=\"3\">Java</option>
-							  </select>\t";
-						echo "<span class='span3' id='span$row4->program_id'><font color=green size=3px>未提交</font></span>";
-						echo "<span class='span3'><a href=\"javascript:void(0);\" onclick=\"updateresult('span$row4->program_id','$row4->program_id','$eid')\">[点击刷新结果]</a></span>";
+						$programid=$programsx[$i-1];
+						echo "<tr><td><pre>";
+						echo "<font color=red>($programscore 分)</font><strong>第 $i 题</strong>\t\t\t\t";
+						echo "<a href=\"javascript:void(0);\" onclick=hide('$programid') id='ahref$programid'><<<\t点击显示题目\t>>></a>";
+						echo "</pre></td></tr>";
+
+						echo "<tr class='hidebar$programid hideall'>";
+						echo "<td id='hideorshow$programid'></td>";
+						echo "</tr>";
+						echo "<input type=hidden id='input$programid' value='0'>";
+						
+						echo "<tr class='hidebar$programid hideall'>";
+						echo "<td><pre><label for=\"code$programid\">Code here:</label>";
+						echo "<textarea style=\"width:900px;height:480px\" id=\"code$programid\" name=\"code$programid\"></textarea></pre>";
+						echo "<select id=\"language$programid\" class='span3'>
+							<option value=\"0\">C</option>
+							<option value=\"1\" selected>C++</option>
+							<option value=\"2\">Pascal</option>		
+							<option value=\"3\">Java</option>
+							</select>\t";
+						echo "<span class='span3' id='span$programid'><font color=green size=3px>未提交</font></span>";
+						echo "<span class='span3'><a href=\"javascript:void(0);\" onclick=\"updateresult('span$programid','$programid','$eid')\">[点击刷新结果]</a></span>";
 						echo "<input type=\"button\" class=\"btn btn-success pull-right span2\" value=\"提交\"
-						onclick=\"submitcode('span$row4->program_id','code$row4->program_id','language$row4->program_id','$row4->program_id','$eid')\">";
+							onclick=\"submitcode('span$programid','code$programid','language$programid','$programid','$eid')\">";
+						echo "</td></tr>";
 					}
-					echo "</td></tr>";
 				}
-				mysql_free_result($result4);
-				unset($programarr);
+				unset($programsx);
 			?>
 		</table>
 	</div>
@@ -536,9 +526,7 @@ function suredo(q){
 	return ret;
 }
 $(function(){
-	var x=<?=$numofprogram?>;
-	if(x==1)
-		$('#whethershow').html("");
+	$('tr.hideall').hide();
 });
 </script>
 <script language="javascript">
@@ -562,7 +550,7 @@ function submitcode(spanid,codeid,languageid,pid,examid)
 				$('#'+spanid).html(data);
 			},
 			error:function(){
-				alert('sorry,something error');
+				alert('something error when you submit');
 			}
 		});
 	}
@@ -580,9 +568,52 @@ function saveanswer()
 				$('#saveover').html(data);
 		},
 		error:function(){
-			alert('sorry,something error');
+			alert('something error when you save');
 		}
 	});
+}
+function hide(programid)
+{
+	var mark=parseInt($('#input'+programid).val());
+	if(mark==0)
+	{
+		$.ajax({
+			url:'programsubmit.php',
+			data:'programid='+programid,
+			type:'POST',
+			success:function(data)
+			{
+				if($('.hidebar'+programid).is(":visible"))
+				{
+					$('.hidebar'+programid).hide();
+					$('#ahref'+programid).html("<<<\t点击显示题目\t>>>");
+				}
+				else
+				{
+					$('.hidebar'+programid).show();
+					$('#hideorshow'+programid).html(data);
+					$('#ahref'+programid).html(">>>\t点击隐藏题目\t<<<");
+				}
+			},
+			error:function(){
+				alert('something error when show problem');
+			}
+		});
+		$('#input'+programid).val('1');
+	}
+	else
+	{
+		if($('.hidebar'+programid).is(":visible"))
+		{
+			$('.hidebar'+programid).hide();
+			$('#ahref'+programid).html("<<<\t点击显示题目\t>>>");
+		}
+		else
+		{
+			$('.hidebar'+programid).show();
+			$('#ahref'+programid).html(">>>\t点击隐藏题目\t<<<");
+		}
+	}
 }
 </script>
 </html>
