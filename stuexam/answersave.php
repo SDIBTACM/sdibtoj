@@ -51,23 +51,26 @@
 	//start
 	$cntchoose=0;
 	$tempsql="";
-	$query="DELETE FROM `ex_stuanswer` WHERE `user_id`='$user_id' AND `exam_id`='$eid'";
-	mysql_query($query) or die(mysql_error());
+	// $query="DELETE FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `user_id`='".$user_id."'";
+	// mysql_query($query) or die(mysql_error());
 	$query="SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='1'";
 	$result=mysql_query($query) or die(mysql_error());
 	while($row=mysql_fetch_object($result)){
 		if(isset($_POST["xzda$row->question_id"])){
 			$myanswer=trim($_POST["xzda$row->question_id"]);
 			if($cntchoose==0){
-				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','1','$row->question_id','$myanswer')";
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','1','$row->question_id','1','$myanswer')";
 				$cntchoose=1;
 			}
 			else
-				$tempsql=$tempsql.",('$user_id','$eid','1','$row->question_id','$myanswer')";
+				$tempsql=$tempsql.",('$user_id','$eid','1','$row->question_id','1','$myanswer')";
 		}
 	}
 	if(!empty($tempsql))
+	{
+		$tempsql=$tempsql." on duplicate key update `answer`=values(`answer`)";
 		mysql_query($tempsql) or die(mysql_error());
+	}
 	mysql_free_result($result);
 	//choose over
 	$cntjudge=0;
@@ -78,15 +81,18 @@
 		if(isset($_POST["pdda$row->question_id"])){
 			$myanswer=trim($_POST["pdda$row->question_id"]);
 			if($cntjudge==0){
-				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','2','$row->question_id','$myanswer')";
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','2','$row->question_id','1','$myanswer')";
 				$cntjudge=1;
 			}
 			else
-				$tempsql=$tempsql.",('$user_id','$eid','2','$row->question_id','$myanswer')";
+				$tempsql=$tempsql.",('$user_id','$eid','2','$row->question_id','1','$myanswer')";
 		}
 	}
 	if(!empty($tempsql))
+	{
+		$tempsql=$tempsql." on duplicate key update `answer`=values(`answer`)";
 		mysql_query($tempsql) or die(mysql_error());
+	}
 	mysql_free_result($result);
 	//judge over
 	$cntfill=0;
@@ -97,21 +103,24 @@
 	while($row=mysql_fetch_object($result)){
 		$name=$row->fill_id."tkda";
 		$myanswer = $_POST["$name$row->answer_id"];
-		if(isset($_POST["$name$row->answer_id"])&&(!empty($myanswer)||$myanswer=="0")){
+		if(isset($_POST["$name$row->answer_id"])){
   			$myanswer = trim($myanswer);
   			//$myanswer = stripslashes($myanswer);
   			$myanswer = htmlspecialchars($myanswer);
   			$myanswer = mysql_real_escape_string($myanswer);
   			if($cntfill==0){
-				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id','$myanswer')";
 				$cntfill=1;
 			}
 			else
-				$tempsql=$tempsql.",('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
+				$tempsql=$tempsql.",('$user_id','$eid','3','$row->fill_id','$row->answer_id','$myanswer')";
 		}
 	}
 	if(!empty($tempsql))
+	{
+		$tempsql=$tempsql." on duplicate key update `answer`=values(`answer`)";
 		mysql_query($tempsql) or die(mysql_error());
+	}
 	mysql_free_result($result);
 	//fillover
 	echo "True";
