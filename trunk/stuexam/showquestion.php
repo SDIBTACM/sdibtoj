@@ -13,15 +13,15 @@
 	require_once("../include/db_info.inc.php");
 	$eid=intval(trim($_GET['eid']));
 	$user_id=$_SESSION['user_id'];
-	$sql ="SELECT `title`,`start_time`,`end_time`,`isvip` FROM `exam` WHERE `exam_id`='$eid'";
+	$sql ="SELECT `title`,`start_time`,`end_time`,`isvip`,`visible` FROM `exam` WHERE `exam_id`='$eid'";
 	$result=mysql_query($sql) or die(mysql_error());
 	$cnt = mysql_num_rows($result);
-	if($cnt==0)
+	$row=mysql_fetch_array($result);
+	if($cnt==0||$row['visible']=='N')
 	{
 		echo "No Such Exam";
 		exit(0);
 	}
-	$row=mysql_fetch_array($result);
 	$title=$row[0];
 	$start_time=$row[1];
 	$starttimeC=strtotime($start_time);
