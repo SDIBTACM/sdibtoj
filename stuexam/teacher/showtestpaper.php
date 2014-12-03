@@ -167,11 +167,11 @@
 		<?
 			$fillarr=array();
 			$anstmp=array();
-			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `user_id`='".$users."' AND `exam_id`='$eid' AND `type`='3'";
+			$query="SELECT `question_id`,`answer_id`,`answer` FROM `ex_stuanswer` WHERE `user_id`='".$users."' AND `exam_id`='$eid' AND `type`='3'";
 			$result=mysql_query($query) or die(mysql_error());
 			while($row=mysql_fetch_assoc($result)){
 
-				$fillarr[$row['question_id']][$row['answer'][0]]=substr($row['answer'], 1);
+				$fillarr[$row['question_id']][$row['answer_id']]=$row['answer'];
 			}
 			mysql_free_result($result);
 			$fillnum=0;
