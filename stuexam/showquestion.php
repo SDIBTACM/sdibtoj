@@ -408,11 +408,11 @@ window.onload=GetRTime;
 
 			if($numproblem!=0)
 			{	
-				$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='3' AND `user_id`='".$user_id."'";
+				$query="SELECT `question_id`,`answer_id`,`answer` FROM `ex_stuanswer` WHERE `exam_id`='$eid' AND `type`='3' AND `user_id`='".$user_id."'";
 				$result=mysql_query($query) or die(mysql_error());
 				while($row=mysql_fetch_assoc($result)){
 
-					$fillarr[$row['question_id']][$row['answer'][0]]=substr($row['answer'], 1);
+					$fillarr[$row['question_id']][$row['answer_id']]=$row['answer'];
 				}
 				mysql_free_result($result);
 				for($i=0;$i<$numproblem;)
