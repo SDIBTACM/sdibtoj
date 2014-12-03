@@ -134,20 +134,20 @@
 				{
 					//if the exam was deleted
 					//the info of exam was deleted
-					$query="DELETE FROM `exam` WHERE `exam_id`='$id'";
+					$query="UPDATE `exam` SET `visible`='N' WHERE `exam_id`='$id'";
 					mysql_query($query) or die(mysql_error());
-					//the info of question in the exam was deleted
-					$query="DELETE FROM `exp_question` WHERE `exam_id`='$id'";
-					mysql_query($query) or die(mysql_error());
-					//students have privilege were deleted
-					$query="DELETE FROM `ex_privilege` WHERE `rightstr`='e$id'";
-					mysql_query($query) or die(mysql_error());
-					//students' save_answers were deleted
-					$query="DELETE FROM `ex_stuanswer` WHERE `exam_id`='$id'";
-					mysql_query($query) or die(mysql_error());
-					//the scores of students were deleted
-					$query="DELETE FROM `ex_student` WHERE `exam_id`='$id'";
-					mysql_query($query) or die(mysql_error());
+					// //the info of question in the exam was deleted
+					// $query="DELETE FROM `exp_question` WHERE `exam_id`='$id'";
+					// mysql_query($query) or die(mysql_error());
+					// //students have privilege were deleted
+					// $query="DELETE FROM `ex_privilege` WHERE `rightstr`='e$id'";
+					// mysql_query($query) or die(mysql_error());
+					// //students' save_answers were deleted
+					// $query="DELETE FROM `ex_stuanswer` WHERE `exam_id`='$id'";
+					// mysql_query($query) or die(mysql_error());
+					// //the scores of students were deleted
+					// $query="DELETE FROM `ex_student` WHERE `exam_id`='$id'";
+					// mysql_query($query) or die(mysql_error());
 					echo "<script language=javascript>location='./';</script>";
 				}
 			}
