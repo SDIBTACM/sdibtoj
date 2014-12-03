@@ -50,7 +50,7 @@
 		</thead>
 		<tbody>
 		<?
-			$sql="SELECT `exam_id`,`title`,`start_time`,`end_time`,`creator` from `exam` ORDER BY `exam_id` DESC $sqladd";
+			$sql="SELECT `exam_id`,`title`,`start_time`,`end_time`,`creator` from `exam` WHERE `visible`='Y' ORDER BY `exam_id` DESC $sqladd";
 			$result = mysql_query($sql) or die(mysql_error());
 			while($row=mysql_fetch_object($result)){
 				$starttime=strtotime($row->start_time);
