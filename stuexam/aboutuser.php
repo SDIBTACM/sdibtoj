@@ -46,7 +46,7 @@
 		</thread>
 		<?
 			$query="SELECT `title`,`exam`.`exam_id`,`score`,`choosesum`,`judgesum`,`fillsum`,`programsum` FROM `exam`,`ex_student` WHERE `ex_student`.`user_id`='".$user_id."'
-			 AND `ex_student`.`exam_id`=`exam`.`exam_id` ORDER BY `exam`.`exam_id` DESC";
+			 AND `exam`.`visible`='Y' AND `ex_student`.`exam_id`=`exam`.`exam_id` ORDER BY `exam`.`exam_id` DESC";
 			 $numexam=1;
 			 $result=mysql_query($query) or die(mysql_error());
 			 $row_cnt=mysql_num_rows($result);
