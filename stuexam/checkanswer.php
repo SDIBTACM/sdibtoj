@@ -79,8 +79,8 @@
 
 	$cntchoose=0;
 	$tempsql="";
-	$query="DELETE FROM `ex_stuanswer` WHERE `user_id`='$user_id' AND `exam_id`='$eid'";
-	mysql_query($query) or die(mysql_error());
+	// $query="DELETE FROM `ex_stuanswer` WHERE `user_id`='$user_id' AND `exam_id`='$eid'";
+	// mysql_query($query) or die(mysql_error());
 	$query="SELECT `choose_id`,`answer` FROM `ex_choose` WHERE `choose_id` IN
 	(SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='1')";
 	$result=mysql_query($query) or die(mysql_error());
@@ -88,17 +88,20 @@
 		if(isset($_POST["xzda$row->choose_id"])){
 			$myanswer=trim($_POST["xzda$row->choose_id"]);
 			if($cntchoose==0){
-				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','1','$row->choose_id','$myanswer')";
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','1','$row->choose_id','1','$myanswer')";
 				$cntchoose=1;
 			}
 			else
-				$tempsql=$tempsql.",('$user_id','$eid','1','$row->choose_id','$myanswer')";
+				$tempsql=$tempsql.",('$user_id','$eid','1','$row->choose_id','1','$myanswer')";
 			if($myanswer==$row->answer)
 				$choosesum+=$choosescore;
 		}
 	}
 	if(!empty($tempsql))
+	{
+		$tempsql=$tempsql." on duplicate key update `answer`=values(`answer`)";
 		mysql_query($tempsql) or die(mysql_error());
+	}
 	mysql_free_result($result);
 	//choose over
 
@@ -111,17 +114,20 @@
 		if(isset($_POST["pdda$row->judge_id"])){
 			$myanswer=trim($_POST["pdda$row->judge_id"]);
 			if($cntjudge==0){
-				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','2','$row->judge_id','$myanswer')";
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','2','$row->judge_id','1','$myanswer')";
 				$cntjudge=1;
 			}
 			else
-				$tempsql=$tempsql.",('$user_id','$eid','2','$row->judge_id','$myanswer')";
+				$tempsql=$tempsql.",('$user_id','$eid','2','$row->judge_id','1','$myanswer')";
 			if($myanswer==$row->answer)
 				$judgesum+=$judgescore;
 		}
 	}
 	if(!empty($tempsql))
+	{
+		$tempsql=$tempsql." on duplicate key update `answer`=values(`answer`)";
 		mysql_query($tempsql) or die(mysql_error());
+	}
 	mysql_free_result($result);
 	//judge over
 
@@ -138,11 +144,11 @@
   			$myanswer = htmlspecialchars($myanswer);
   			$myanswer = mysql_real_escape_string($myanswer);
   			if($cntfill==0){
-				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
+				$tempsql="INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$row->fill_id','$row->answer_id','$myanswer')";
 				$cntfill=1;
 			}
 			else
-				$tempsql=$tempsql.",('$user_id','$eid','3','$row->fill_id','$row->answer_id$myanswer')";
+				$tempsql=$tempsql.",('$user_id','$eid','3','$row->fill_id','$row->answer_id','$myanswer')";
 
 			$rightans = trim($row->answer);
 			$rightans = mysql_real_escape_string($rightans);
@@ -158,7 +164,10 @@
 		}
 	}
 	if(!empty($tempsql))
+	{
+		$tempsql=$tempsql." on duplicate key update `answer`=values(`answer`)";
 		mysql_query($tempsql) or die(mysql_error());
+	}
 	mysql_free_result($result);
 	//fillover
 	
@@ -167,6 +176,7 @@
 	$result=mysql_query($query) or die(mysql_error());
 	$row_cnt=mysql_num_rows($result);
 	$programsum=$row_cnt*$programscore;
+	mysql_free_result($result);
 	//$program over
 	$sum=$choosesum+$judgesum+$fillsum+$programsum;
 	$sql="INSERT INTO `ex_student` VALUES('".$user_id."','$eid','$sum','$choosesum','$judgesum','$fillsum','$programsum')";
