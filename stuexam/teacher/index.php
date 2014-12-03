@@ -8,14 +8,14 @@
 		if(get_magic_quotes_gpc())
 			$search=stripslashes($search);
 		if($search!='')
-			$searchsql=" WHERE `creator` like '%$search%' or `title` like '%$search%'";
+			$searchsql=" WHERE `visible`='Y' AND `creator` like '%$search%' or `title` like '%$search%'";
 		else
-			$searchsql="";
+			$searchsql=" WHERE `visible`='Y'";
 	}
 	else
 	{
 		$search="";
-		$searchsql="";
+		$searchsql=" WHERE `visible`='Y'";
 	}
 	if(isset($_GET['page']))
 	{
