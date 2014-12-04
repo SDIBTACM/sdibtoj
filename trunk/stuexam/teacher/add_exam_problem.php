@@ -79,7 +79,7 @@
 					}
 					else
 						$page=1;
-					$each_page=15;// each page data num
+					$each_page=20;// each page data num
 					$pagenum=10;//the max of page num
 					if($type==1)
 						$sql="SELECT COUNT(*) FROM `ex_choose` $searchsql $prosql";
@@ -289,12 +289,11 @@
 						echo "<td>$cntchoose</td>";
 						$question=$row->question;
 						$cntchoose++;
-						echo "<td>$question</td>";
+						echo "<td><a href='edit_choose.php?id=$row->choose_id'>$question</a></td>";
 						echo "<td style=\"font-size:9px\">$row->addtime</td>";
 						echo "<td>$row->creator</td>";
 						echo "<td>$row->point</td>";
 						echo "<td>$row->easycount</td>";
-						//$query="SELECT COUNT(*) FROM `exp_choose` WHERE `exam_id`='$eid' and `choose_id`='$row->choose_id'";
 						$query="SELECT COUNT(*) FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='1' AND `question_id`='$row->choose_id'";
 						$myresult=mysql_query($query) or die(mysql_error());
 						$myrow=mysql_fetch_array($myresult);
@@ -412,7 +411,7 @@
 					echo "<td>$cntjudge</td>";
 					$question=$row->question;
 					$cntjudge++;
-					echo "<td>$question</td>";
+					echo "<td><a href='edit_judge.php?id=$row->judge_id'>$question</a></td>";
 					echo "<td style=\"font-size:9px\">$row->addtime</td>";
 					echo "<td>$row->creator</td>";
 					echo "<td>$row->point</td>";
@@ -536,7 +535,7 @@
 					echo "<td>$cntfill</td>";
 					$question=$row->question;
 					$cntfill++;
-					echo "<td>$question</td>";
+					echo "<td><a href='edit_fill.php?id=$row->fill_id'>$question</a></td>";
 					echo "<td style=\"font-size:9px\">$row->addtime</td>";
 					echo "<td>$row->creator</td>";
 					echo "<td>$row->point</td>";
@@ -635,26 +634,18 @@
 					<tr><td><h5>一.选择题</h5></td></tr>
 					<?
 						$numofchoose=0;
-						/*$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms`,`answer` FROM `ex_choose`,`exp_choose` 
-						WHERE `exam_id`='$eid' and `ex_choose`.`choose_id`=`exp_choose`.`choose_id` ORDER BY `choose_id`";*/
 						$query1="SELECT `ex_choose`.`choose_id`,`question`,`ams`,`bms`,`cms`,`dms`,`answer` FROM `ex_choose`,`exp_question` 
 						WHERE `exam_id`='$eid' AND `type`='1' AND `ex_choose`.`choose_id`=`exp_question`.`question_id` ORDER BY `choose_id`";
 						$result1=mysql_query($query1) or die(mysql_error());
 						while($row1=mysql_fetch_object($result1)){
 							$numofchoose++;
 							$question="<pre>".$row1->question."</pre>";
-							//$question=nl2br(htmlspecialchars($row1->question));
-							//$question=str_replace("<br />", "<br/>&nbsp;&nbsp;&nbsp;",$question);
-							echo "<tr><td>$numofchoose.&nbsp;&nbsp;$question";
+							echo "<tr><td>$numofchoose $question";
 							echo "<a href=\"del_exam_problem.php?eid=$eid&type=1&qid=$row1->choose_id\">[去除该题]</a>
 							<font color=red>答案:$row1->answer</font></td></tr>";
 							echo "<tr><td>(A) $row1->ams</td></tr>";
-							//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-							//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 							echo "<tr><td>(B) $row1->bms</td></tr>";
 							echo "<tr><td>(C) $row1->cms</td></tr>";
-							//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-							//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 							echo "<tr><td>(D) $row1->dms</td></tr>";
 						}
 						mysql_free_result($result1);
@@ -662,8 +653,6 @@
 					<tr><td><h5>二.判断题</h5></td></tr>
 					<?
 						$numofjudge=0;
-						/*$query2="SELECT `ex_judge`.`judge_id`,`question`,`answer` FROM `ex_judge`,`exp_judge` 
-						WHERE `exam_id`='$eid' and `ex_judge`.`judge_id`=`exp_judge`.`judge_id` ORDER BY `judge_id`";*/
 						$query2="SELECT `ex_judge`.`judge_id`,`question`,`answer` FROM `ex_judge`,`exp_question` 
 						WHERE `exam_id`='$eid' AND `type`='2' AND `ex_judge`.`judge_id`=`exp_question`.`question_id` ORDER BY `judge_id`";
 						$result2=mysql_query($query2) or die(mysql_error());
@@ -671,9 +660,7 @@
 							$numofjudge++;
 							echo "<tr>";
 							$question="<pre>".$row2->question."</pre>";
-							//$question=nl2br(htmlspecialchars($row2->question));
-							//$question=str_replace("<br />", "<br/>&nbsp;&nbsp;&nbsp;",$question);
-							echo "<td>$numofjudge.&nbsp;&nbsp;$question";
+							echo "<tr><td>$numofchoose $question";
 							echo "<a href=\"del_exam_problem.php?eid=$eid&type=2&qid=$row2->judge_id\">[去除该题]</a>
 							<font color=red>答案:$row2->answer</font></td>";
 							echo "</tr>";
@@ -686,8 +673,6 @@
 						$numofprgans=0;
 						$numofprgfill=0;
 						$fillnum=0;
-						/*$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum` FROM `ex_fill`,`exp_fill` 
-						WHERE `exam_id`='$eid' and `ex_fill`.`fill_id`=`exp_fill`.`fill_id` ORDER BY `fill_id`";*/
 						$query3="SELECT `ex_fill`.`fill_id`,`question`,`answernum`,`kind` FROM `ex_fill`,`exp_question` 
 						WHERE `exam_id`='$eid' AND `type`='3' AND `ex_fill`.`fill_id`=`exp_question`.`question_id` ORDER BY `fill_id`";
 						$result3=mysql_query($query3) or die(mysql_error());
@@ -695,9 +680,7 @@
 							$fillnum++;
 							echo "<tr>";
 							$question="<pre>".$row3->question."</pre>";
-							//$question=nl2br(htmlspecialchars($row3->question));
-							//$question=str_replace("<br />", "<br/>&nbsp;&nbsp;&nbsp;",$question);
-							echo "<td>$fillnum.&nbsp;&nbsp;$question";
+							echo "<tr><td>$numofchoose $question";
 							echo "<a href=\"del_exam_problem.php?eid=$eid&type=3&qid=$row3->fill_id\">[去除该题]</a></td>";
 							echo "</tr>";
 							if($row3->kind==1)
