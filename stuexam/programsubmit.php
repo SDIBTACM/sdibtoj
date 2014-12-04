@@ -5,16 +5,31 @@
 		echo "<a href='../loginpage.php'>Please Login First!</a>";
 		exit(0);
 	}
-	if(isset($_POST['programid']))
+	if(isset($_POST['programid'])&&isset($_POST['start'])&&isset($_POST['end']))
 	{
 		require_once("../include/db_info.inc.php");
 		$programid=intval($_POST['programid']);
-		$query="SELECT `title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `problem` WHERE `problem_id`=$programid";
-		$result=mysql_query($query) or die(mysql_error());
-		$row=mysql_fetch_object($result);
-		$url="<pre><h3 align=center>$row->title</h3><h4>Description</h4>$row->description<h4>Input</h4>$row->input<h4>Output</h4>$row->output<h4>Sample Input</h4>$row->sample_input<h4>sample_output</h4>$row->sample_output</pre>";
+		$start_timeC=$_POST['start'];
+		$end_timeC=$_POST['end'];
+		$user_id=mysql_real_escape_string($_SESSION['user_id']);
+		$sql="SELECT `result` FROM `solution` WHERE `problem_id`='$programid' AND `result`='4' AND 
+		`in_date`>'$start_timeC' AND `in_date`<'$end_timeC' AND `user_id`='".$user_id."' limit 1";
+		$result=mysql_query($sql) or die(mysql_error());
+		$row_cnt=mysql_num_rows($result);
 		mysql_free_result($result);
-		echo $url;
+		if($row_cnt)
+		{
+			echo "1";
+		}
+		else
+		{
+			$query="SELECT `title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `problem` WHERE `problem_id`=$programid";
+			$result=mysql_query($query) or die(mysql_error());
+			$row=mysql_fetch_object($result);
+			$url="<pre><h3 align=center>$row->title</h3><h4>Description</h4>$row->description<h4>Input</h4>$row->input<h4>Output</h4>$row->output<h4>Sample Input</h4>$row->sample_input<h4>sample_output</h4>$row->sample_output</pre>";
+			mysql_free_result($result);
+			echo $url;
+		}
 	}
 	else
 	{
