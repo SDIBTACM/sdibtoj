@@ -68,25 +68,28 @@
         echo "location='./'\n";
         echo "</script>";
 	}
-	if($isvip=='Y')
-    {           
-		$today=date('Y-m-d');
-		$ip1=$_SERVER['REMOTE_ADDR'];
-		$sql="SELECT `user_id` FROM `loginlog` WHERE `user_id`='".$user_id."' AND `time`>='$today' AND ip<>'$ip1' AND 
-		 `user_id` NOT IN( SELECT `user_id` FROM `privilege` WHERE `rightstr`='administrator' or `rightstr`='contest_creator') ORDER BY `time` DESC limit 0,1";
-		$result=mysql_query($sql) or die(mysql_error());
-		$row_cnt=mysql_num_rows($result);
-		if($row_cnt>0)
-		{  
-			$row=mysql_fetch_row($result);
+	if($OJ_VIP_CONTEST==false)
+	{
+		if($isvip=='Y')
+	    {           
+			$today=date('Y-m-d');
+			$ip1=$_SERVER['REMOTE_ADDR'];
+			$sql="SELECT `user_id` FROM `loginlog` WHERE `user_id`='".$user_id."' AND `time`>='$today' AND ip<>'$ip1' AND 
+			 `user_id` NOT IN( SELECT `user_id` FROM `privilege` WHERE `rightstr`='administrator' or `rightstr`='contest_creator') ORDER BY `time` DESC limit 0,1";
+			$result=mysql_query($sql) or die(mysql_error());
+			$row_cnt=mysql_num_rows($result);
+			if($row_cnt>0)
+			{  
+				$row=mysql_fetch_row($result);
+				mysql_free_result($result);
+				echo "<script language='javascript'>\n";
+				echo "alert('Do not login in diff machine,Please Contact administrator');\n";  
+				echo "history.go(-1);\n";
+				echo "</script>";
+				exit(0);
+			}
 			mysql_free_result($result);
-			echo "<script language='javascript'>\n";
-			echo "alert('Do not login in diff machine,Please Contact administrator');\n";  
-			echo "history.go(-1);\n";
-			echo "</script>";
-			exit(0);
 		}
-		mysql_free_result($result);
 	}
 	$lefttime=$endtimeC-time();
 ?>
@@ -493,12 +496,13 @@ window.onload=GetRTime;
 						echo "<a href=\"javascript:void(0);\" onclick=hide('$programid') id='ahref$programid'><<<\t点击显示题目\t>>></a>";
 						echo "</pre></td></tr>";
 
-						echo "<tr class='hidebar$programid hideall'>";
+						echo "<tr class='hideprogram$programid hideall'>";
 						echo "<td id='hideorshow$programid'></td>";
 						echo "</tr>";
 						echo "<input type=hidden id='input$programid' value='0'>";
-						
-						echo "<tr class='hidebar$programid hideall'>";
+						echo "<input type=hidden id='acflag$programid' value='0'>";
+
+						echo "<tr class='hidecode$programid hideall'>";
 						echo "<td><pre><label for=\"code$programid\">Code here:</label>";
 						echo "<textarea style=\"width:900px;height:480px\" id=\"code$programid\" name=\"code$programid\"></textarea></pre>";
 						echo "<select id=\"language$programid\" class='span3'>
@@ -575,24 +579,49 @@ function saveanswer()
 function hide(programid)
 {
 	var mark=parseInt($('#input'+programid).val());
+	var acflag=parseInt($('#acflag'+programid).val());
+	var startC=encodeURIComponent('<?=$start_timeC?>');
+	var endC=encodeURIComponent('<?=$end_timeC?>');
 	if(mark==0)
 	{
 		$.ajax({
 			url:'programsubmit.php',
-			data:'programid='+programid,
+			data:'programid='+programid+'&start='+startC+'&end='+endC,
 			type:'POST',
 			success:function(data)
 			{
-				if($('.hidebar'+programid).is(":visible"))
+				if(data=='1')
 				{
-					$('.hidebar'+programid).hide();
-					$('#ahref'+programid).html("<<<\t点击显示题目\t>>>");
+					$('#acflag'+programid).val('1');
+					if($('.hideprogram'+programid).is(":visible"))
+					{
+						$('.hidecode'+programid).hide();
+						$('.hideprogram'+programid).hide();
+						$('#ahref'+programid).html("<<<\t点击显示题目\t>>>");
+					}
+					else
+					{
+						$('.hideprogram'+programid).show();
+						$('.hidecode'+programid).hide();
+						$('#hideorshow'+programid).html("<pre><font color=red>[此题已正确]</font></pre>");
+						$('#ahref'+programid).html(">>>\t点击隐藏题目\t<<<");
+					}
 				}
 				else
 				{
-					$('.hidebar'+programid).show();
-					$('#hideorshow'+programid).html(data);
-					$('#ahref'+programid).html(">>>\t点击隐藏题目\t<<<");
+					if($('.hidecode'+programid).is(":visible"))
+					{
+						$('.hidecode'+programid).hide();
+						$('.hideprogram'+programid).hide();
+						$('#ahref'+programid).html("<<<\t点击显示题目\t>>>");
+					}
+					else
+					{
+						$('#hideorshow'+programid).html(data);
+						$('.hideprogram'+programid).show();
+						$('.hidecode'+programid).show();
+						$('#ahref'+programid).html(">>>\t点击隐藏题目\t<<<");
+					}
 				}
 			},
 			error:function(){
@@ -603,14 +632,17 @@ function hide(programid)
 	}
 	else
 	{
-		if($('.hidebar'+programid).is(":visible"))
+		if($('.hideprogram'+programid).is(":visible"))
 		{
-			$('.hidebar'+programid).hide();
+			$('.hidecode'+programid).hide();
+			$('.hideprogram'+programid).hide();
 			$('#ahref'+programid).html("<<<\t点击显示题目\t>>>");
 		}
 		else
 		{
-			$('.hidebar'+programid).show();
+			if(acflag==0)
+				$('.hidecode'+programid).show();
+			$('.hideprogram'+programid).show();
 			$('#ahref'+programid).html(">>>\t点击隐藏题目\t<<<");
 		}
 	}
