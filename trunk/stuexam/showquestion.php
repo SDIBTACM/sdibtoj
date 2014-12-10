@@ -202,7 +202,7 @@ window.onload=GetRTime;
   		font-size: 16px;
 	}
 </style>
-<body onselectstart="return false" class="nocopy">
+<body oncontextmenu="return false" onselectstart="return false" class="nocopy">
 	<div class="jumbotron">
   		<div class="container" align="center" style="color:white">
   			<h1>程序设计考试系统</h1>
@@ -557,6 +557,16 @@ $("body").keydown(function(event){
 		alert("当前设置不允许使用F5刷新键");
 		return false;
 	  }
+	if((event.ctrlKey)&&(event.keyCode==83)){
+		event.returnValue=false;
+		alert("当前设置不允许使用Ctrl+S键");
+		return false;
+	}
+	if(event.keyCode==123){
+		event.returnValue=false;
+		alert("当前设置不允许使用F12键");
+		return false;
+	}
 });
 function submitcode(spanid,codeid,languageid,pid,examid)
 {
