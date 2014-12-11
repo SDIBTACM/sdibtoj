@@ -37,21 +37,12 @@ if(isset($_GET['search'])){
       $sql="select  `problem_id`,`title`,`in_date`,`defunct`,`author` FROM `problem` where (author like '%$search%' or title like '%$search%' or source like '%$search%') order by `problem_id` desc  ";
       }
 }
-else if (isset($_SESSION['administrator']))
+else
 
 {
     $sql="select `problem_id`,`title`,`in_date`,`defunct`,`author` FROM `problem` where problem_id>=$pstart and problem_id<=$pend order by `problem_id` desc";
 
  }
-else 
-{
-    $sql="select `problem_id`,`title`,`in_date`,`defunct`,`author` FROM `problem` where problem_id>=$pstart and problem_id<=$pend AND `problem_id` NOT IN(
-                SELECT `problem_id` FROM `contest_problem` WHERE `contest_id` IN (
-                        SELECT `contest_id` FROM `contest` WHERE `end_time`>NOW()
-                )) order by `problem_id` desc";
-
-
-}
 //echo $sql;
 $result=mysql_query($sql) or die(mysql_error());
 echo "<center><table width=90% border=1>";
@@ -91,3 +82,4 @@ echo "<tr><td width='90%' colspan='4'><form>$MSG_SEARCH<input type='text' name='
 echo "</table></center>";
 require("../oj-footer.php");
 ?>
+
