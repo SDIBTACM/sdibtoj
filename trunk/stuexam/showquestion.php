@@ -162,7 +162,7 @@ function GetRTime(){
 	// var NowTime = new Date(new Date().getTime()+dTime);
 	//var nMS=EndTime-NowTime;
 	if(nMS>0){
-		var nH=Math.floor(nMS/(1000*60*60)) % 24; 
+		var nH=Math.floor(nMS/(1000*60*60)); 
 		var nM=Math.floor(nMS/(1000*60)) % 60;
 		var nS=Math.floor(nMS/1000) % 60;
 		document.getElementById("RemainH").innerHTML=(nH>=10?nH:"0"+nH);
