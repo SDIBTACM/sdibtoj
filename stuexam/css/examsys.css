@@ -38,9 +38,6 @@
   height: auto;
   padding-bottom: 170px;
 }
-#examtime{
-  /*padding-bottom: 170px;*/
-}
 .mainpage{
   background-image: url('../image/bggg.png');
   width: 100%;
@@ -54,7 +51,7 @@
 }
 
 .mainpage h5 {
-  font:bold 40px "微软雅黑","黑体";
+  font:bold 40px "Courier New","微软雅黑","黑体";
   padding-top: 13%;
   text-align: center;
 }
@@ -74,28 +71,34 @@
 
 .inforright li{
     line-height: 26px;
-    font-family: "宋体";
+    font-family: "Courier New","宋体";
     text-align: left;
 }
 .btn-start{
   width:180px;
   height: 22px;
-  background-color: rgb(34, 216, 85);
+  background-color: transparent;
+  border:2px solid #06F26A;
   margin-top: 5em;
   margin-right: 4em;
   padding: 18px 26px;
+  text-align: center;
+  line-height: 22px;
 }
 
 .btn-start a{
-  color: white;
+  color: #06F26A;
   font-size: 23px;
   font-weight: bold;
-  text-align: center;
-  padding-left: 1.7em;
+  padding: 0;
   text-decoration: none;
 }
 .btn-start:hover{
-  background-color: gray;
+  background-color: #06F26A;
+}
+
+.btn-start:hover a{
+  color: #fff;
 }
 
 .learn-more {
@@ -110,7 +113,7 @@
 }
 
 .learn-more h3 {
-  font-family: 'Shift', sans-serif;
+  font-family: "Courier New",'Shift', sans-serif;
   font-size: 18px;
   font-weight: bold;
   color:#CCC;
@@ -184,7 +187,7 @@
         text-overflow: ellipsis;
 }
 .myfont{
-  font-family: Verdana,"Courier New",Georgia,"Time New Roman";
+  font-family: "Courier New",Georgia,"Time New Roman",Verdana;
 }
 .jiacu pre{
   font-size: 14px;
