@@ -134,8 +134,8 @@
 		}
 		else{
 			echo "<div class=\"pull-right btn-start\">";
-			//echo "<a href=\"../status.php\" onclick=\"window.open('./showquestion.php?eid=$eid')\">开始考试</a>";
 			echo "<a href=\"./showquestion.php?eid=$eid\")>开始考试</a>";
+			// echo "<a href=\"./index.htm\")>开始考试</a>";
 			echo "</div>";
 		}
 	?>

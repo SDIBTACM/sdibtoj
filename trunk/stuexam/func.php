@@ -1,4 +1,4 @@
-<?
+<?php
 function rejudgepaper($users,$eid,$start_timeC,$end_timeC,$mark)
 {
 			$sql="SELECT `choosescore`,`judgescore`,`fillscore`,`prgans`,`prgfill`,`programscore` FROM `exam` WHERE `exam_id`='$eid'";

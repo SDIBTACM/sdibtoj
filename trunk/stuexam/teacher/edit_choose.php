@@ -1,55 +1,38 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
-	function test_input($data){
-		$data = trim($data);
-  		//$data = stripslashes($data);
-  		$data = htmlspecialchars($data);
-  		$data = mysql_real_escape_string($data);
-  		return $data;
-	}
+<?php
 	if(isset($_POST['choose_des']))
 	{
 		require_once("../../include/check_post_key.php");
-		$choose_des=test_input($_POST['choose_des']);
-		$ams=test_input($_POST['ams']);
-		$bms=test_input($_POST['bms']);
-		$cms=test_input($_POST['cms']);
-		$dms=test_input($_POST['dms']);
-		$point=test_input($_POST['point']);
-		$answer=$_POST['answer'];
-		$easycount=intval($_POST['easycount']);
-		$isprivate=intval($_POST['isprivate']);
+		$arr['question']=test_input($_POST['choose_des']);
+		$arr['ams']=test_input($_POST['ams']);
+		$arr['bms']=test_input($_POST['bms']);
+		$arr['cms']=test_input($_POST['cms']);
+		$arr['dms']=test_input($_POST['dms']);
+		$arr['point']=test_input($_POST['point']);
+		$arr['answer']=$_POST['answer'];
+		$arr['easycount']=intval($_POST['easycount']);
+		$arr['isprivate']=intval($_POST['isprivate']);
 		$chooseid=intval($_POST['chooseid']);
+		
 		$prisql="SELECT `creator`,`isprivate` FROM `ex_choose` WHERE `choose_id`='$chooseid'";
-		$priresult=mysql_query($prisql) or die(mysql_error());
-		$prirow=mysql_fetch_array($priresult);
+		$prirow=fetchOne($prisql);
 		$creator=$prirow['creator'];
 		$private2=$prirow['isprivate'];
-		mysql_free_result($priresult);
-		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+		if(checkAdmin(4,$creator))
 		{
-			echo "<script language='javascript'>\n";
-	    	echo "alert(\"You have no privilege to modify it!\");\n";  
-        	echo "location='edit_choose.php?id=$chooseid'\n";
-        	echo "</script>";
+			alertmsg("You have no privilege to modify it!","edit_choose.php?id={$chooseid}",0);
 		}
-		else if($private2==2&&!isset($_SESSION['administrator']))
+		else if($private2==2&&!checkAdmin(1))
 		{
-			echo "<script language='javascript'>\n";
-	    	echo "alert(\"You have no privilege to modify it!\");\n";  
-        	echo "location='admin_choose.php'\n";
-        	echo "</script>";
+			alertmsg("You have no privilege to modify it!","admin_choose.php",0);
 		}
 		else
 		{
-			$sql="UPDATE `ex_choose` SET `question`='".$choose_des."',`ams`='".$ams."',
-			`bms`='".$bms."',`cms`='".$cms."',`dms`='".$dms."',`answer`='$answer',`point`='".$point."',`easycount`='$easycount',
-			`isprivate`='$isprivate' WHERE `choose_id`='$chooseid'";
-			mysql_query($sql) or die(mysql_error());
-			echo "<script>alert(\"修改成功\");</script>";
-			echo "<script>window.location.href=\"./admin_choose.php\";</script>";
+			Update('ex_choose',$arr,"choose_id={$chooseid}");
+			alertmsg("修改成功","admin_choose.php",0);
+			unset($arr);
 		}
 	}
 	else
@@ -61,12 +44,9 @@
 			{
 				$query="SELECT `question`,`ams`,`bms`,`cms`,`dms`,`answer`,`creator`,`point`,`easycount`,`isprivate` FROM `ex_choose` 
 				WHERE `choose_id`='$id'";
-				$result=mysql_query($query) or die(mysql_error());
-				$row_cnt=mysql_num_rows($result);
-				if($row_cnt)
+				$row=fetchOne($query);
+				if($row)
 				{
-					$row=mysql_fetch_array($result);
-					mysql_free_result($result);
 					$question=$row['question'];
 					$ams=$row['ams'];
 					$bms=$row['bms'];
@@ -77,49 +57,29 @@
 					$point=$row['point'];
 					$easycount=$row['easycount'];
 					$isprivate=$row['isprivate'];
-					if($isprivate==2&&!isset($_SESSION['administrator']))
+					if($isprivate==2&&!checkAdmin(1))
 					{
-						echo "<script language='javascript'>\n";
-	    				echo "alert(\"You have no privilege!\");\n";  
-        				echo "location='admin_choose.php'\n";
-        				echo "</script>";
+						alertmsg("You have no privilege!","admin_fill.php",0);
 					}
-					if(!isset($_SESSION['administrator']))
+					if(!checkAdmin(1))
 					{
 						if($isprivate==1&&$creator!=$_SESSION['user_id'])
 						{
-							echo "<script language='javascript'>\n";
-	    					echo "alert(\"You have no privilege!\");\n";  
-        					echo "location='admin_choose.php'\n";
-        					echo "</script>";
+							alertmsg("You have no privilege!","admin_choose.php",0);
 						}
 					}
 				}
-				else
-				{
-					mysql_free_result($result);
-					echo "<script language='javascript'>\n";
-	    			echo "alert(\"No such problem\");\n";  
-        			echo "history.go(-1);\n";
-        			echo "</script>";
+				else{
+					alertmsg("No such problem");
 				}
 			}
-			else
-			{
-				echo "<script language='javascript'>\n";
-	    		echo "alert(\"Invaild data\");\n";  
-        		echo "history.go(-1);\n";
-        		echo "</script>";
+			else{
+				alertmsg("Invaild data");
 			}
 		}
-		else
-		{
-			echo "<script language='javascript'>\n";
-	    	echo "alert(\"Invaild path\");\n";  
-        	echo "history.go(-1);\n";
-        	echo "</script>";
+		else{
+			alertmsg("Invaild path");
 		}
-	}
 ?>
 <script language="javascript">
 function chkinput(form){
@@ -167,11 +127,11 @@ function chkinput(form){
 	<li class="active"><a href="admin_choose.php">选择题管理</a></li>
 	<li class=""><a href="admin_judge.php">判断题管理</a></li>
 	<li class=""><a href="admin_fill.php">填空题管理</a></li>
-	<?
-	if(isset($_SESSION['administrator']))
-	{
-		echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
-	}
+	<?php
+		if(checkAdmin(1))
+		{
+			echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
+		}
 	?>
 	<li><a href="../">退出管理页面</a></li>
 </ul>
@@ -201,7 +161,7 @@ function chkinput(form){
 			<input type="hidden" value="<?=$id?>" name="chooseid">
 			<label for="point">知识点:</label>
 			<select name="point" id="point">
-			<?
+			<?php
 				$sql="SELECT * FROM `ex_point`";
 				$result=mysql_query($sql) or die(mysql_error());
 				while($row=mysql_fetch_object($result))
@@ -214,7 +174,6 @@ function chkinput(form){
 				mysql_free_result($result);
 			?>
 			</select>
-			<!-- <input type="text" name="point" maxlength="80" value=<?=$point?> > -->
 			<label for="easycount">难度系数:</label>
 			<select name="easycount" id="easycount">
 				<option value="0" <?echo $easycount==0?"selected":""?> >0</option>
@@ -262,6 +221,7 @@ $(function(){
 	}
 });
 </script>
-<?
+<?php
+}
 	require_once("./teacher-footer.php");
 ?>

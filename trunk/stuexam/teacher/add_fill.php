@@ -1,40 +1,29 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
-	function test_input($data){
-		$data = trim($data);
-  		//$data = stripslashes($data);
-  		$data = htmlspecialchars($data);
-  		$data = mysql_real_escape_string($data);
-  		return $data;
-	}
+<?php
 	if(isset($_POST['fill_des']))
 	{
 		require_once("../../include/check_post_key.php");
-		$question=test_input($_POST['fill_des']);
-		$point=test_input($_POST['point']);
-		$easycount=intval($_POST['easycount']);
-		$answernum=intval($_POST['numanswer']);
-		$kind=intval($_POST['kind']);
-		$isprivate=intval($_POST['isprivate']);
-		//$answernum=count($_POST)-5;
-		//important the first is the postkey the second is the fill_des
-		//the third is point the forth is the easycount the fifth is kind
-		$creator=$_SESSION['user_id'];
-		$query="INSERT INTO `ex_fill` 
-		(`question`,`answernum`,`addtime`,`creator`,`point`,`easycount`,`kind`,`isprivate`)
-		VALUES('".$question."','$answernum',NOW(),'".$creator."','".$point."','$easycount','$kind','$isprivate')";
-		mysql_query($query) or die(mysql_error());
-		$fillid=mysql_insert_id();
-		for($i=1;$i<=$answernum;$i++)
+		$arr['question']=test_input($_POST['fill_des']);
+		$arr['point']=test_input($_POST['point']);
+		$arr['easycount']=intval($_POST['easycount']);
+		$arr['answernum']=intval($_POST['numanswer']);
+		$arr['kind']=intval($_POST['kind']);
+		$arr['isprivate']=intval($_POST['isprivate']);
+		$arr['addtime']=date('Y-m-d H:m:i');
+		$arr['creator']=$_SESSION['user_id'];
+
+		$fillid=Insert('ex_fill',$arr);
+		for($i=1;$i<=$arr['answernum'];$i++)
 		{
 			$answer=test_input($_POST["answer$i"]);
-			$query="INSERT INTO `fill_answer` 
-			(`fill_id`,`answer_id`,`answer`) 
-			VALUES('$fillid','$i','".$answer."')";
-			mysql_query($query) or die(mysql_error());
+			$arr2['fill_id']=$fillid;
+			$arr2['answer_id']=$i;
+			$arr2['answer']=$answer;
+			Insert('fill_answer',$arr2);
 		}
+		unset($arr);unset($arr2);
 		echo "<script>window.location.href=\"./admin_fill.php\";</script>";
 	}
 	else{
@@ -46,11 +35,10 @@
 	<li class=""><a href="admin_choose.php">选择题管理</a></li>
 	<li class=""><a href="admin_judge.php">判断题管理</a></li>
 	<li class="active"><a href="admin_fill.php">填空题管理</a></li>
-	<?
-	if(isset($_SESSION['administrator']))
-	{
-		echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
-	}
+	<?php
+		if(checkAdmin(1)){
+			echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
+		}
 	?>
 	<li><a href="../">退出管理页面</a></li>
 </ul>
@@ -77,7 +65,7 @@
 			</select>
 			<label for="point">知识点:</label>
 			<select name="point" id="point">
-			<?
+			<?php
 				$sql="SELECT * FROM `ex_point`";
 				$result=mysql_query($sql) or die(mysql_error());
 				while($row=mysql_fetch_object($result))
@@ -209,7 +197,7 @@ $(function(){
 		$('#warnmsg').html('(*请确保下面文本框个数与题目中的填空数相同)');
 });
 </script>
-<?
+<?php
 }
 	require_once("./teacher-footer.php");
 ?>

@@ -1,7 +1,7 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
+<?php
 	if(isset($_GET['search']))
 	{
 		$search=mysql_real_escape_string($_GET['search']);
@@ -57,9 +57,8 @@
 	<li class=""><a href="admin_choose.php">选择题管理</a></li>
 	<li class=""><a href="admin_judge.php">判断题管理</a></li>
 	<li class=""><a href="admin_fill.php">填空题管理</a></li>
-	<?
-		if(isset($_SESSION['administrator']))
-		{
+	<?php
+		if(checkAdmin(1)){
 			echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
 		}
 	?>
@@ -89,7 +88,7 @@
 			<th width=10% colspan="2">操作</th>
 		</thread>
 		<tbody>
-		<?
+		<?php
 			require_once("../../include/set_get_key.php");
 			$key=$_SESSION['getkey'];
 			$sql="SELECT `exam_id`,`title`,`start_time`,`end_time`,`creator` FROM `exam` $searchsql ORDER BY `exam_id` DESC $sqladd";
@@ -161,6 +160,6 @@ $(function(){
 	}
 });
 </script>
-<?
+<?php
 	require_once("./teacher-footer.php");
 ?>

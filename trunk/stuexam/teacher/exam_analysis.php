@@ -1,7 +1,7 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
+<?php
 	if(isset($_GET['student']))
 	{
 		$student=mysql_real_escape_string($_GET['student']);
@@ -19,8 +19,7 @@
 	{
 		$eid=intval($_GET['eid']);
 		$prisql="SELECT `creator`,`end_time` FROM `exam` WHERE `exam_id`='$eid'";
-		$priresult=mysql_query($prisql) or die(mysql_error());
-		$prirow=mysql_fetch_array($priresult);
+		$prirow=fetchOne($prisql);
 		$creator=$prirow['creator'];
 		$end_time=$prirow['end_time'];
 		$end_timeC=strtotime($end_time);
@@ -28,22 +27,17 @@
 		$priflag=0;
 		if($now>$end_timeC&&isset($_SESSION['contest_creator']))
 			$priflag=1;
-		mysql_free_result($priresult);
 		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']||$priflag==1))
 		{
-			echo "<script language='javascript'>\n";
-		    echo "alert(\"You have no privilege of this exam\");\n";  
-			echo "location='./'";
-		    echo "</script>";
+			alertmsg("You have no privilege of this exam","./",0);
 		}
 		else
 		{
 			if(filter_var($eid, FILTER_VALIDATE_INT)&&$eid>0)
 			{
-				$query="SELECT COUNT(*) FROM `ex_privilege` WHERE `rightstr`='e$eid' $sqladd";
-				$result=mysql_query($query) or die(mysql_error());
-				$totalnum=mysql_result($result, 0);
-				mysql_free_result($result);
+				$query="SELECT COUNT(*) as numc FROM `ex_privilege` WHERE `rightstr`='e$eid' $sqladd";
+				$numrow=fetchOne($query);
+				$totalnum=$numrow['numc'];
 
 				$query="SELECT COUNT(*) as `realnum`,MAX(`choosesum`) as `choosemax`,MAX(`judgesum`) as `judgemax`,MAX(`fillsum`) as `fillmax`,
 				MAX(`programsum`) as `programmax`,MIN(`choosesum`) as `choosemin`,MIN(`judgesum`) as `judgemin`,MIN(`fillsum`) as `fillmin`,
@@ -61,9 +55,8 @@
 				<li><a href="admin_choose.php">选择题管理</a></li>
 				<li><a href="admin_judge.php">判断题管理</a></li>
 				<li><a href="admin_fill.php">填空题管理</a></li>
-				<?
-					if(isset($_SESSION['administrator']))
-					{
+				<?php
+					if(checkAdmin(1)){
 						echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
 					}
 					?>
@@ -83,9 +76,8 @@
 				<li><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 				<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 				<li class="active"><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
-				<?
-					if(isset($_SESSION['administrator']))
-					{
+				<?php
+					if(checkAdmin(1)){
 						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
 					}
 				?>
@@ -137,7 +129,7 @@
 						<td><?=$row['scoreavg']?></td>
 					</tr>
 				</table>
-				<?
+				<?php
 					mysql_free_result($result);
 					$sql="SELECT COUNT(*) FROM `ex_student` WHERE `score`<60 and `exam_id`='$eid' $sqladd";
 					$result=mysql_query($sql) or die(mysql_error());
@@ -185,23 +177,15 @@
 				</table>
 				</div>
 				</div>
-			<?
+			<?php
 			}
-			else
-			{
-				echo "<script language='javascript'>\n";
-				echo "alert(\"Invaild data\");\n";  
-				echo "history.go(-1);\n";
-				echo "</script>";
+			else{
+				alertmsg("Invaild data");
 			}
 		}
 	}
-	else
-	{
-		echo "<script language='javascript'>\n";
-		echo "alert(\"Invaild path\");\n";  
-		echo "history.go(-1);\n";
-		echo "</script>";
+	else{
+		alertmsg("Invaild path");
 	}
 ?>
 <script type="text/javascript">
@@ -216,6 +200,6 @@ $(function(){
 	}
 });
 </script>
-<?
+<?php
 	require_once("./teacher-footer.php");
 ?>

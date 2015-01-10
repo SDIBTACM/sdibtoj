@@ -1,55 +1,36 @@
-<?
+<?php
 	@session_start();
-	if(!isset($_SESSION['user_id']))
-	{
-		echo "<a href='/JudgeOnline/loginpage.php'>Please Login First!</a>";
-		exit(0);
-	}
-	if (!(isset($_SESSION['administrator'])
-		||isset($_SESSION['contest_creator']))){
-	echo "You have no privilege";
-	echo "<a href='/JudgeOnline/loginpage.php'>Please Login First!</a>";
-	exit(1);
-	}
-	require_once("../../include/db_info.inc.php");
+	require_once("myinc.inc.php");
+	checkuserid();
+	checkAdmin(2);
 ?>
-<?
+<?php
 	if(isset($_GET['eid'])&&isset($_GET['users']))
 	{
 		$eid=intval(trim($_GET['eid']));
 		$users=trim($_GET['users']);
 		$users=mysql_real_escape_string($users);
 		$sql="SELECT `creator` FROM `exam` WHERE `exam_id`='$eid'";
-		$result=mysql_query($sql) or die(mysql_error());
-		$cnt = mysql_num_rows($result);
-		if($cnt==0)
+		$row = fetchOne($sql);
+		if(!$row)
 		{
 			echo "No Such Exam";
 			exit(0);
 		}
-		$creator=mysql_result($result, 0);
-		mysql_free_result($result);
-		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+		$creator=$row['creator'];
+		if(checkAdmin(4,$creator))
 		{
-			echo "<script language='javascript'>\n";
-			echo "alert(\"You have no privilege to do it!\");\n";
-			echo "history.go(-1);";
-			echo "</script>";
+			alertmsg("You have no privilege to do it!");
 		}
 		else
 		{
-			$sql="DELETE FROM `ex_student` WHERE `user_id`='".$users."' AND `exam_id`='$eid'";
-			mysql_query($sql) or die(mysql_error());
+			Delete('ex_student',"user_id='{$users}' and exam_id='{$eid}'");
 			echo "<script language='javascript'>\n";
-        	echo "history.go(-1);\n";
-        	echo "</script>";
+			echo "history.go(-1);\n";
+			echo "</script>";
 		}
 	}
-	else
-	{
-		echo "<script language='javascript'>\n";
-	    echo "alert(\"Invaild path\");\n";  
-        echo "history.go(-1);\n";
-        echo "</script>";
+	else{
+		alertmsg("Invaild path");
 	}
 ?>

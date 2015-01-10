@@ -1,11 +1,7 @@
 <?
 	@session_start();
-	if (!(isset($_SESSION['administrator'])
-		||isset($_SESSION['contest_creator']))){
-	echo "<a href='/JudgeOnline/loginpage.php'>Please Login First!</a>";
-	exit(1);
-	}
-	require_once("../../include/db_info.inc.php");
+	require_once("myinc.inc.php");
+	checkAdmin(2);
 	if(isset($_GET['eid'])&&isset($_GET['quesid'])&&isset($_GET['type'])&&isset($_GET['sid']))
 	{
 		$eid=intval($_GET['eid']);
@@ -15,7 +11,7 @@
 		$priresult=mysql_query($prisql) or die(mysql_error());
 		$creator=mysql_result($priresult, 0);
 		mysql_free_result($priresult);
-		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+		if(checkAdmin(4,$creator))
 		{
 			echo "No privilege";
 		}
@@ -40,8 +36,7 @@
 			echo "已添加";
 		}
 	}
-	else
-	{
+	else{
 		echo "Invaild path";
 	}
 ?>

@@ -1,13 +1,7 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
-	function test_input($data){
-		$data = trim($data);
-  		$data = stripslashes($data);
-  		$data = mysql_real_escape_string($data);
-  		return $data;
-	}
+<?php
 	if(isset($_POST['eid']))
 	{
 		require_once("../../include/check_post_key.php");
@@ -15,26 +9,18 @@
 		$eid=intval($_POST['eid']);
 		//the first is the postkey the second is the hidden eid
 		
-		//$sql="DELETE FROM `exp_program` WHERE `exam_id`='$eid'";
-		$sql="DELETE FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='4'";
-		mysql_query($sql) or die(mysql_error());
+		Delete('exp_question',"exam_id={$eid} and type=4");
 		for($i=1;$i<=$questionnum;$i++)
 		{
 			$programid=test_input($_POST["question$i"]);
-			if(!is_numeric($programid))
-			{
-				echo "<script>alert(\"题号有错误\");";
-				echo "history.go(-1);";
-				echo "</script>";
+			if(!is_numeric($programid)){
+				alertmsg("Wrong Problem ID");
 			}
 			else
 			{
 				$programid=intval($programid);
-				//$query="INSERT INTO `exp_program` VALUES('$eid','$programid')";
-				$query="INSERT INTO `exp_question` VALUES('4','$eid','$programid')";
-				mysql_query($query) or die(mysql_error());
-				$query="UPDATE `problem` SET `defunct`='Y' WHERE `problem_id`='$programid'";
-				mysql_query($query) or die(mysql_error());
+				Insert('exp_question',array("type"=>"4","exam_id"=>"{$eid}","question_id"=>"{$programid}"));
+				Update('problem',array("defunct"=>"Y"),"problem_id={$programid}");
 			}
 		}
 		echo "<script>window.location.href=\"add_program.php?eid=$eid&type=4\";</script>";
@@ -46,15 +32,11 @@
 			$type=intval($_GET['type']);
 			$eid=intval($_GET['eid']);
 			$prisql="SELECT `creator` FROM `exam` WHERE `exam_id`='$eid'";
-			$priresult=mysql_query($prisql) or die(mysql_error());
-			$creator=mysql_result($priresult, 0);
-			mysql_free_result($priresult);
-			if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+			$row=fetchOne($prisql);
+			$creator=$row['creator'];
+			if(checkAdmin(4,$creator))
 			{
-				echo "<script language='javascript'>\n";
-			    echo "alert(\"You have no privilege of this exam\");\n";  
-		        echo "location='./'";
-		        echo "</script>";
+				alertmsg("You have no privilege of this exam","./",0);
 			}
 			else
 			{
@@ -63,10 +45,9 @@
 					if($type==4)//add program
 					{
 						//$sql="SELECT COUNT(*) FROM `exp_program` WHERE `exam_id`='$eid'";
-						$sql="SELECT COUNT(*) FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='4'";
-						$result=mysql_query($sql) or die(mysql_error());
-						$answernumC=mysql_result($result, 0);
-						mysql_free_result($result);
+						$sql="SELECT COUNT(*) as `numC` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='4'";
+						$row=fetchOne($sql);
+						$answernumC=$row['numC'];
 						?>
 						<div>
 						<div class="leftmenu pull-left" id="left">
@@ -75,11 +56,10 @@
 						<li><a href="admin_choose.php">选择题管理</a></li>
 						<li><a href="admin_judge.php">判断题管理</a></li>
 						<li><a href="admin_fill.php">填空题管理</a></li>
-						<?
-						if(isset($_SESSION['administrator']))
-						{
-							echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
-						}
+						<?php
+							if(checkAdmin(1)){
+								echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
+							}
 						?>
 						<li><a href="../">退出管理页面</a></li>
 						</ul>
@@ -97,9 +77,8 @@
 						<li><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 						<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 						<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
-						<?
-							if(isset($_SESSION['administrator']))
-							{
+						<?php
+							if(checkAdmin(1)){
 								echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
 							}
 						?>
@@ -115,10 +94,9 @@
 						<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])?>" onSubmit="return chkinput(this)">
 							<p><strong>题号:</strong></p>
 							<div class="span4" id="Content">
-							<?
+							<?php
 								if($answernumC)
 								{
-									//$query="SELECT `program_id` FROM `exp_program` WHERE `exam_id`='$eid' ORDER BY `program_id`";
 									$query="SELECT `question_id` as `program_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='4' ORDER BY `question_id`";
 									$result=mysql_query($query) or die(mysql_error());
 									$cnt=0;
@@ -142,29 +120,17 @@
 						</div>
 						<?
 					}
-					else
-					{
-						echo "<script language='javascript'>\n";
-			    		echo "alert(\"Invaild type\");\n";  
-		        		echo "history.go(-1);\n";
-		        		echo "</script>";
+					else{
+						alertmsg("Invaild type");
 					}
 				}
-				else
-				{
-					echo "<script language='javascript'>\n";
-			    	echo "alert(\"Invaild data\");\n";  
-		        	echo "history.go(-1);\n";
-		        	echo "</script>";
+				else{
+					alertmsg("Invaild data");
 				}
 			}
 		}
-		else
-		{
-			echo "<script language='javascript'>\n";
-		    echo "alert(\"Invaild path\");\n";  
-	        echo "history.go(-1);\n";
-	        echo "</script>";
+		else{
+			alertmsg("Invaild path");
 		}
 	}
 ?>
@@ -184,7 +150,7 @@ function chkinput(form)
 }
 
 var cont=document.getElementById("Content");
-var num_question=<?=$answernumC?>;
+var num_question=<?php if(isset($answernumC)) echo $answernumC?>;
 function addinput()
 {
 	if(num_question<8)
@@ -226,6 +192,6 @@ $(function(){
 	}
 });
 </script>
-<?
+<?php
 	require_once("./teacher-footer.php");
 ?>
