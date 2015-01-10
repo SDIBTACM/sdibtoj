@@ -1,18 +1,8 @@
-<?
+<?php
 	@session_start();
-	if(!isset($_SESSION['user_id']))
-	{
-		echo "<a href='/JudgeOnline/loginpage.php'>Please Login First!</a>";
-		exit(0);
-	}
-	if (!(isset($_SESSION['administrator'])
-		||isset($_SESSION['contest_creator'])
-		||isset($_SESSION['problem_editor']))){
-	echo "You have no privilege";
-	echo "<a href='/JudgeOnline/loginpage.php'>Please Login First!</a>";
-	exit(1);
-	}
-	require_once("../../include/db_info.inc.php");
+	require_once("myinc.inc.php");
+	checkuserid();
+	checkAdmin(3);
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -1,19 +1,15 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 	if(isset($_GET['type'])&&isset($_GET['eid']))
 	{
 		$type=intval($_GET['type']);
 		$eid=intval($_GET['eid']);
 		$prisql="SELECT `creator` FROM `exam` WHERE `exam_id`='$eid'";
-		$priresult=mysql_query($prisql) or die(mysql_error());
-		$creator=mysql_result($priresult, 0);
-		mysql_free_result($priresult);
-		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+		$prirow=fetchOne($prisql);
+		$creator=$prirow['creator'];
+		if(checkAdmin(4,$creator))
 		{
-			echo "<script language='javascript'>\n";
-		    echo "alert(\"You have no privilege of this exam\");\n";  
-	        echo "location='./'";
-	        echo "</script>";
+			alertmsg("You have no privilege of this exam","./",0);
 		}
 		else
 		{
@@ -35,11 +31,11 @@
 				$problem=intval($_GET['problem']);
 				if($problem<0||$problem>2)
 					$problem=0;
-				if(!isset($_SESSION['administrator'])&&$problem==2)
+				if(!checkAdmin(1)&&$problem==2)
 					$problem=0;
 				if($searchsql=="")
 				{
-					if($problem==0||isset($_SESSION['administrator']))
+					if($problem==0||checkAdmin(1))
 						$prosql=" WHERE `isprivate`='$problem'";
 					else
 					{
@@ -49,7 +45,7 @@
 				}
 				else
 				{
-					if($problem==0||isset($_SESSION['administrator']))
+					if($problem==0||checkAdmin(1))
 						$prosql=" AND `isprivate`='$problem'";
 					else
 					{
@@ -82,14 +78,13 @@
 					$each_page=20;// each page data num
 					$pagenum=10;//the max of page num
 					if($type==1)
-						$sql="SELECT COUNT(*) FROM `ex_choose` $searchsql $prosql";
+						$sql="SELECT COUNT(*) as `numc` FROM `ex_choose` $searchsql $prosql";
 					else if($type==2)
-						$sql="SELECT COUNT(*) FROM `ex_judge` $searchsql $prosql";
+						$sql="SELECT COUNT(*) as `numc` FROM `ex_judge` $searchsql $prosql";
 					else if($type==3)
-						$sql="SELECT COUNT(*) FROM `ex_fill` $searchsql $prosql";
-					$result=mysql_query($sql) or die(mysql_error());
-					$total=mysql_result($result, 0);
-					mysql_free_result($result);
+						$sql="SELECT COUNT(*) as `numc` FROM `ex_fill` $searchsql $prosql";
+					$rowc=fetchOne($sql);
+					$total=$rowc['numc'];
 
 					$totalpage=ceil($total/$each_page);
 					if($totalpage==0)	$totalpage=1;
@@ -118,11 +113,10 @@
 					<li><a href="admin_choose.php">选择题管理</a></li>
 					<li><a href="admin_judge.php">判断题管理</a></li>
 					<li><a href="admin_fill.php">填空题管理</a></li>
-					<?
-					if(isset($_SESSION['administrator']))
-					{
-						echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
-					}
+					<?php
+						if(checkAdmin(1)){
+							echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
+						}
 					?>
 					<li><a href="../">退出管理页面</a></li>
 					</ul>
@@ -140,15 +134,14 @@
 					<li><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 					<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
-					<?
-					if(isset($_SESSION['administrator']))
-					{
-						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
-					}
+					<?php
+						if(checkAdmin(1)){
+							echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
+						}
 					?>
 					</ul>
 					</div>
-					<?
+					<?php
 					$query="SELECT * FROM `exam` WHERE `exam_id`='$eid'";
 					$result=mysql_query($query) or die(mysql_error());
 					$row_cnt=mysql_num_rows($result);
@@ -201,7 +194,7 @@
 						</div>
 						</div>
 						</div>
-					<?
+					<?php
 					}
 					else
 					{
@@ -220,10 +213,9 @@
 					<li><a href="admin_judge.php">判断题管理</a></li>
 					<li><a href="admin_fill.php">填空题管理</a></li>
 					<?
-					if(isset($_SESSION['administrator']))
-					{
-						echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
-					}
+						if(checkAdmin(1)){
+							echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
+						}
 					?>
 					<li><a href="../">退出管理页面</a></li>
 					</ul>
@@ -242,10 +234,9 @@
 					<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
 					<?
-					if(isset($_SESSION['administrator']))
-					{
-						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
-					}
+						if(checkAdmin(1)){
+							echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
+						}
 					?>
 					</ul>
 					</div>
@@ -253,8 +244,7 @@
 					<input type="button" value="查看公共题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=0'">
 					<input type="button" value="查看私人题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=1'">
 					<?
-						if(isset($_SESSION['administrator']))
-						{
+						if(checkAdmin(1)){
 							echo "<input type=\"button\" value=\"查看隐藏题库\" class=\"mybutton\" onclick=\"window.location.href='?eid=$eid&type=$type&problem=2'\">";
 						}
 					?>
@@ -280,7 +270,7 @@
 					<th width=8%>操作</th>
 					</thread>
 					<tbody>
-					<?
+					<?php
 						$cntchoose=1+($page-1)*$each_page;
 						$sql="SELECT `choose_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_choose` $searchsql $prosql ORDER BY `choose_id` ASC $sqladd";
 						$result = mysql_query($sql) or die(mysql_error());
@@ -341,11 +331,10 @@
 					<li><a href="admin_choose.php">选择题管理</a></li>
 					<li><a href="admin_judge.php">判断题管理</a></li>
 					<li><a href="admin_fill.php">填空题管理</a></li>
-					<?
-					if(isset($_SESSION['administrator']))
-					{
-						echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
-					}
+					<?php
+						if(checkAdmin(1)){
+							echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
+						}
 					?>
 					<li><a href="../">退出管理页面</a></li>
 					</ul>
@@ -364,10 +353,9 @@
 					<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
 					<?
-					if(isset($_SESSION['administrator']))
-					{
-						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
-					}
+						if(checkAdmin(1)){
+							echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
+						}
 					?>
 					</ul>
 					</div>
@@ -375,8 +363,7 @@
 					<input type="button" value="查看公共题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=0'">
 					<input type="button" value="查看私人题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=1'">
 					<?
-						if(isset($_SESSION['administrator']))
-						{
+						if(checkAdmin(1)){
 							echo "<input type=\"button\" value=\"查看隐藏题库\" class=\"mybutton\" onclick=\"window.location.href='?eid=$eid&type=$type&problem=2'\">";
 						}
 					?>
@@ -465,10 +452,10 @@
 					<li><a href="admin_judge.php">判断题管理</a></li>
 					<li><a href="admin_fill.php">填空题管理</a></li>
 					<?
-					if(isset($_SESSION['administrator']))
-					{
-						echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
-					}
+						if(checkAdmin(1))
+						{
+							echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
+						}
 					?>
 					<li><a href="../">退出管理页面</a></li>
 					</ul>
@@ -487,7 +474,7 @@
 					<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
 					<?
-					if(isset($_SESSION['administrator']))
+					if(checkAdmin(1))
 					{
 						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
 					}
@@ -498,7 +485,7 @@
 					<input type="button" value="查看公共题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=0'">
 					<input type="button" value="查看私人题库" class="mybutton" onclick="window.location.href='?eid=<?=$eid?>&type=<?=$type?>&problem=1'">
 					<?
-						if(isset($_SESSION['administrator']))
+						if(checkAdmin(1))
 						{
 							echo "<input type=\"button\" value=\"查看隐藏题库\" class=\"mybutton\" onclick=\"window.location.href='?eid=$eid&type=$type&problem=2'\">";
 						}
@@ -595,10 +582,9 @@
 					<li><a href="admin_judge.php">判断题管理</a></li>
 					<li><a href="admin_fill.php">填空题管理</a></li>
 					<?
-					if(isset($_SESSION['administrator']))
-					{
-						echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
-					}
+						if(checkAdmin(1)){
+							echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
+						}
 					?>
 					<li><a href="../">退出管理页面</a></li>
 					</ul>
@@ -622,8 +608,7 @@
 					<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 					<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
 					<?
-					if(isset($_SESSION['administrator']))
-					{
+					if(checkAdmin(1)){
 						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
 					}
 					?>
@@ -640,7 +625,7 @@
 						while($row1=mysql_fetch_object($result1)){
 							$numofchoose++;
 							$question="<pre>".$row1->question."</pre>";
-							echo "<tr><td>$numofchoose $question";
+							echo "<tr><td>$numofchoose.$question";
 							echo "<a href=\"del_exam_problem.php?eid=$eid&type=1&qid=$row1->choose_id\">[去除该题]</a>
 							<font color=red>答案:$row1->answer</font></td></tr>";
 							echo "<tr><td>(A) $row1->ams</td></tr>";
@@ -651,7 +636,7 @@
 						mysql_free_result($result1);
 					?>
 					<tr><td><h5>二.判断题</h5></td></tr>
-					<?
+					<?php
 						$numofjudge=0;
 						$query2="SELECT `ex_judge`.`judge_id`,`question`,`answer` FROM `ex_judge`,`exp_question` 
 						WHERE `exam_id`='$eid' AND `type`='2' AND `ex_judge`.`judge_id`=`exp_question`.`question_id` ORDER BY `judge_id`";
@@ -660,7 +645,7 @@
 							$numofjudge++;
 							echo "<tr>";
 							$question="<pre>".$row2->question."</pre>";
-							echo "<tr><td>$numofchoose $question";
+							echo "<tr><td>$numofjudge.$question";
 							echo "<a href=\"del_exam_problem.php?eid=$eid&type=2&qid=$row2->judge_id\">[去除该题]</a>
 							<font color=red>答案:$row2->answer</font></td>";
 							echo "</tr>";
@@ -668,7 +653,7 @@
 						mysql_free_result($result2);
 					?>
 					<tr><td><h5>三.填空题</h5></td></tr>
-					<?
+					<?php
 						$numoffill=0;
 						$numofprgans=0;
 						$numofprgfill=0;
@@ -680,7 +665,7 @@
 							$fillnum++;
 							echo "<tr>";
 							$question="<pre>".$row3->question."</pre>";
-							echo "<tr><td>$numofchoose $question";
+							echo "<tr><td>$fillnum.$question";
 							echo "<a href=\"del_exam_problem.php?eid=$eid&type=3&qid=$row3->fill_id\">[去除该题]</a></td>";
 							echo "</tr>";
 							if($row3->kind==1)
@@ -698,7 +683,7 @@
 						mysql_free_result($result3);
 					?>
 					<tr><td><h5>四.程序设计题</h5></td></tr>
-					<?
+					<?php
 						$numofprogram=0;
 						/*$query4="SELECT `program_id`,`title`,`description` FROM `exp_program`,`problem` WHERE `exam_id`='$eid' AND `program_id`=`problem_id`";*/
 						$query4="SELECT `question_id` as `program_id`,`title`,`description` FROM `exp_question`,`problem` 
@@ -715,7 +700,7 @@
 						}
 					?>
 					</table>
-					<?
+					<?php
 						$querymain="SELECT `choosescore`,`judgescore`,`fillscore`,`prgans`,`prgfill`,`programscore` 
 						FROM `exam` WHERE `exam_id`='$eid'";
 						$resultmain=mysql_query($querymain) or die(mysql_error());
@@ -789,28 +774,17 @@
 					</div>
 					<?
 				}
-				else
-				{
-					echo "<script language='javascript'>\n";
-		    		echo "alert(\"Invaild type\");\n";  
-	        		echo "history.go(-1);\n";
-	        		echo "</script>";
+				else{
+					alertmsg("Invaild type");
 				}
 			}
-			else
-			{
-				echo "<script language='javascript'>\n";
-		    	echo "alert(\"Invaild data\");\n";  
-	        	echo "history.go(-1);\n";
-	        	echo "</script>";
+			else{
+				alertmsg("Invaild data");
 			}
 		}
 	}
 	else{
-		echo "<script language='javascript'>\n";
-	    echo "alert(\"Invaild path\");\n";  
-        echo "history.go(-1);\n";
-        echo "</script>";
+		alertmsg("Invaild path");
 	}
 ?>
 <script src="../css/questionadd.js"></script>
@@ -847,6 +821,6 @@ $(function(){
 		$('#whethershow').html("");
 });
 </script>
-<?
+<?php
 	require_once("./teacher-footer.php");
 ?>

@@ -1,7 +1,7 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
+<?php
 	if(isset($_GET['student']))
 	{
 		$student=mysql_real_escape_string($_GET['student']);
@@ -43,24 +43,19 @@
 	{
 		$eid=intval($_GET['eid']);
 		$prisql="SELECT `creator`,`start_time`,`end_time` FROM `exam` WHERE `exam_id`='$eid'";
-		$priresult=mysql_query($prisql) or die(mysql_error());
-		$prirow=mysql_fetch_array($priresult);
+		$prirow=fetchOne($prisql);
 		$creator=$prirow['creator'];
 		$start_time=$prirow['start_time'];
 		$end_time=$prirow['end_time'];
 		$start_timeC=strtotime($start_time);
 		$end_timeC=strtotime($end_time);
-		mysql_free_result($priresult);
 		$now=time();
 		$priflag=0;
 		if($now>$end_timeC&&isset($_SESSION['contest_creator']))
 			$priflag=1;
-		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']||$priflag==1))
+		if(checkAdmin(5,$creator,$priflag))
 		{
-			echo "<script language='javascript'>\n";
-		    echo "alert(\"You have no privilege of this exam\");\n";  
-			echo "location='./'";
-		    echo "</script>";
+			alertmsg("You have no privilege of this exam","./",0);
 		}
 		else
 		{
@@ -79,12 +74,11 @@
 				<li><a href="admin_choose.php">选择题管理</a></li>
 				<li><a href="admin_judge.php">判断题管理</a></li>
 				<li><a href="admin_fill.php">填空题管理</a></li>
-				<?
-					if(isset($_SESSION['administrator']))
-					{
+				<?php
+					if(checkAdmin(1)){
 						echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
 					}
-					?>
+				?>
 				<li><a href="../">退出管理页面</a></li>
 				</ul>
 				</div>
@@ -101,9 +95,8 @@
 				<li><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 				<li class="active"><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 				<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
-				<?
-					if(isset($_SESSION['administrator']))
-					{
+				<?php
+					if(checkAdmin(1)){
 						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
 					}
 				?>
@@ -164,11 +157,11 @@
 					mysql_free_result($result);
 
 					$isonline=array();
-					$sql = "SELECT `user_id`,COUNT(`user_id`) as `cnum` FROM `ex_stuanswer` WHERE `exam_id`='$eid' group by `user_id`";
+					$sql = "SELECT distinct `user_id` FROM `ex_stuanswer` WHERE `exam_id`='$eid'";
 					$onlineresult=mysql_query($sql) or mysql_error();
 					while($row=mysql_fetch_object($onlineresult))
 					{
-						$isonline[$row->user_id]=$row->cnum;
+						$isonline[$row->user_id]=1;
 					}
 					mysql_free_result($onlineresult);
 
@@ -224,23 +217,15 @@
 				</table>
 				</div>
 				</div>
-			<?
+			<?php
 			}
-			else
-			{
-				echo "<script language='javascript'>\n";
-				echo "alert(\"Invaild data\");\n";  
-				echo "history.go(-1);\n";
-				echo "</script>";
+			else{
+				alertmsg("Invaild data");
 			}
 		}
 	}
-	else
-	{
-		echo "<script language='javascript'>\n";
-		echo "alert(\"Invaild path\");\n";  
-		echo "history.go(-1);\n";
-		echo "</script>";
+	else{
+		alertmsg("Invaild path");
 	}
 ?>
 <script type="text/javascript">
@@ -260,6 +245,6 @@ $(function(){
 	}
 });
 </script>
-<?
+<?php
 	require_once("./teacher-footer.php");
 ?>

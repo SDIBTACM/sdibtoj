@@ -1,23 +1,13 @@
-<?	
+<?php
 	@session_start();
-	if(!isset($_SESSION['user_id']))
-	{
-		echo "<a href='/JudgeOnline/loginpage.php'>Please Login First!</a>";
-		exit(0);
-	}
-	if (!(isset($_SESSION['administrator'])
-		||isset($_SESSION['contest_creator'])
-		||isset($_SESSION['problem_editor']))){
-	echo "You have no privilege";
-	echo "<a href='/JudgeOnline/loginpage.php'>Please Login First!</a>";
-	exit(1);
-	}
-	require_once("../../include/db_info.inc.php");
+	require_once("myinc.inc.php");
+	checkuserid();
+	checkAdmin(3);
 	if(!isset($_GET['getkey']))
 		exit(1);
 	require_once("../../include/check_get_key.php");
 ?>
-<?
+<?php
 	if(isset($_GET['type'])&&isset($_GET['id'])){
 		$type=intval($_GET['type']);
 		$id=intval($_GET['id']);
@@ -25,117 +15,84 @@
 			if($type==1)//delete choose
 			{
 				$prisql="SELECT `creator`,`isprivate` FROM `ex_choose` WHERE `choose_id`='$id'";
-				$priresult=mysql_query($prisql) or die(mysql_error());
-				$row=mysql_fetch_array($priresult);
+				$row=fetchOne($prisql);
 				$creator=$row['creator'];
 				$isprivate=$row['isprivate'];
-				mysql_free_result($priresult);
-				if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+				if(checkAdmin(4,$creator))
 				{
-					echo "<script language='javascript'>\n";
-	    			echo "alert(\"You have no privilege to delete it!\");\n";  
-        			echo "history.go(-1);\n";
-        			echo "</script>";
+					alertmsg("You have no privilege to delete it!");
 				}
-				else if($isprivate==2&&!isset($_SESSION['administrator']))
-        		{
-        			echo "<script language='javascript'>\n";
-	    			echo "alert(\"You have no privilege to delete it!\");\n";  
-        			echo "location='admin_choose.php'\n";
-        			echo "</script>";
-        		}
+				else if($isprivate==2&&!checkAdmin(1))
+				{
+					alertmsg("You have no privilege to delete it!","admin_choose.php",0);
+				}
 				else
 				{
-					$query="DELETE FROM `ex_choose` WHERE `choose_id`='$id'";
-					mysql_query($query) or die(mysql_error());
-					$query="DELETE FROM `exp_question` WHERE `question_id`='$id' AND `type`='1'";
-					mysql_query($query) or die(mysql_error());
+					Delete('ex_choose',"choose_id={$id}");
+					Delete('exp_question',"question_id={$id} and type=1");
+					Delete('ex_stuanswer',"question_id={$id} and type=1");
 					echo "<script language=javascript>location='admin_choose.php';</script>";
 				}
 			}
 			else if($type==2)//delete judge
 			{
 				$prisql="SELECT `creator`,`isprivate` FROM `ex_judge` WHERE `judge_id`='$id'";
-				$priresult=mysql_query($prisql) or die(mysql_error());
-				$row=mysql_fetch_array($priresult);
+				$row=fetchOne($prisql);
 				$creator=$row['creator'];
 				$isprivate=$row['isprivate'];
-				mysql_free_result($priresult);
-				if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+				if(checkAdmin(4,$creator))
 				{
-					echo "<script language='javascript'>\n";
-	    			echo "alert(\"You have no privilege to delete it!\");\n";  
-        			echo "history.go(-1);\n";
-        			echo "</script>";
+					alertmsg("You have no privilege to delete it!");
 				}
-				else if($isprivate==2&&!isset($_SESSION['administrator']))
-        		{
-        			echo "<script language='javascript'>\n";
-	    			echo "alert(\"You have no privilege to delete it!\");\n";  
-        			echo "location='admin_judge.php'\n";
-        			echo "</script>";
-        		}
+				else if($isprivate==2&&!checkAdmin(1))
+				{
+					alertmsg("You have no privilege to delete it!","admin_judge.php",0);
+				}
 				else
 				{
-					$query="DELETE FROM `ex_judge` WHERE `judge_id`='$id'";
-					mysql_query($query) or die(mysql_error());
-					$query="DELETE FROM `exp_question` WHERE `question_id`='$id' AND `type`='2'";
-					mysql_query($query) or die(mysql_error());
+					Delete('ex_judge',"judge_id={$id}");
+					Delete('exp_question',"question_id={$id} and type=2");
+					Delete('ex_stuanswer',"question_id={$id} and type=2");
 					echo "<script language=javascript>location='admin_judge.php';</script>";
 				}
 			}
 			else if($type==3)//delete fill
 			{
 				$prisql="SELECT `creator`,`isprivate` FROM `ex_fill` WHERE `fill_id`='$id'";
-				$priresult=mysql_query($prisql) or die(mysql_error());
-				$row=mysql_fetch_array($priresult);
+				$row=fetchOne($prisql);
 				$creator=$row['creator'];
 				$isprivate=$row['isprivate'];
-				mysql_free_result($priresult);
-				if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+				if(checkAdmin(4,$creator))
 				{
-					echo "<script language='javascript'>\n";
-	    			echo "alert(\"You have no privilege to delete it!\");\n";  
-        			echo "history.go(-1);\n";
-        			echo "</script>";
+					alertmsg("You have no privilege to delete it!");
 				}
-				else if($isprivate==2&&!isset($_SESSION['administrator']))
-        		{
-        			echo "<script language='javascript'>\n";
-	    			echo "alert(\"You have no privilege to delete it!\");\n";  
-        			echo "location='admin_fill.php'\n";
-        			echo "</script>";
-        		}
+				else if($isprivate==2&&!checkAdmin(1))
+				{
+					alertmsg("You have no privilege to delete it!","admin_fill.php",0);
+				}
 				else
 				{
-					$query="DELETE FROM `ex_fill` WHERE `fill_id`='$id'";
-					mysql_query($query) or die(mysql_error());
-					$query="DELETE FROM `fill_answer` WHERE `fill_id`='$id'";
-					mysql_query($query) or die(mysql_error());
-					$query="DELETE FROM `exp_question` WHERE `question_id`='$id' AND `type`='3'";
-					mysql_query($query) or die(mysql_error());
+					Delete('ex_fill',"fill_id={$id}");
+					Delete('fill_answer',"fill_id={$id}");
+					Delete('exp_question',"question_id={$id} and type=3");
+					Delete('ex_stuanswer',"question_id={$id} and type=3");
 					echo "<script language=javascript>location='admin_fill.php';</script>";
 				}
 			}
 			else if($type==9)//delete exam
 			{
 				$prisql="SELECT `creator` FROM `exam` WHERE `exam_id`='$id'";
-				$priresult=mysql_query($prisql) or die(mysql_error());
-				$creator=mysql_result($priresult,0);
-				mysql_free_result($priresult);
-				if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+				$row=fetchOne($prisql);
+				$creator=$row['creator'];
+				if(checkAdmin(4,$creator))
 				{
-					echo "<script language='javascript'>\n";
-	    			echo "alert(\"You have no privilege to delete it!\");\n";  
-        			echo "history.go(-1);\n";
-        			echo "</script>";
+					alertmsg("You have no privilege to delete it!");
 				}
 				else
 				{
 					//if the exam was deleted
 					//the info of exam was deleted
-					$query="UPDATE `exam` SET `visible`='N' WHERE `exam_id`='$id'";
-					mysql_query($query) or die(mysql_error());
+					Update('exam',array("visible"=>"N"),"exam_id={$id}");
 					// //the info of question in the exam was deleted
 					// $query="DELETE FROM `exp_question` WHERE `exam_id`='$id'";
 					// mysql_query($query) or die(mysql_error());
@@ -151,26 +108,15 @@
 					echo "<script language=javascript>location='./';</script>";
 				}
 			}
-			else
-			{
-				echo "<script language='javascript'>\n";
-	    		echo "alert(\"Invaild type\");\n";  
-        		echo "history.go(-1);\n";
-        		echo "</script>";
+			else{
+				alertmsg("Invaild type");
 			}
 		}
-		else
-		{
-			echo "<script language='javascript'>\n";
-	    	echo "alert(\"Invaild data\");\n";  
-        	echo "history.go(-1);\n";
-        	echo "</script>";
+		else{
+			alertmsg("Invaild data");
 		}
 	}
 	else{
-		echo "<script language='javascript'>\n";
-	    echo "alert(\"Invaild path\");\n";  
-        echo "history.go(-1);\n";
-        echo "</script>";
+		alertmsg("Invaild path");
 	}
 ?>

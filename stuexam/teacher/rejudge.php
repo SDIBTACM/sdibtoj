@@ -1,16 +1,13 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
+<?php
 	if(isset($_GET['eid']))
 	{
 		$eid=intval($_GET['eid']);
-		if(!isset($_SESSION['administrator']))
+		if(!checkAdmin(1))
 		{
-			echo "<script language='javascript'>\n";
-		    echo "alert(\"You have no privilege of rejudging\");\n";  
-			echo "location='./'";
-		    echo "</script>";
+			alertmsg("You have no privilege of rejudging","./",0);
 		}
 		else
 		{
@@ -25,9 +22,8 @@
 				<li><a href="admin_choose.php">选择题管理</a></li>
 				<li><a href="admin_judge.php">判断题管理</a></li>
 				<li><a href="admin_fill.php">填空题管理</a></li>
-				<?
-					if(isset($_SESSION['administrator']))
-					{
+				<?php
+					if(checkAdmin(1)){
 						echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
 					}
 				?>
@@ -47,9 +43,8 @@
 				<li><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 				<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 				<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
-				<?
-					if(isset($_SESSION['administrator']))
-					{
+				<?php
+					if(checkAdmin(1)){
 						echo "<li class=\"active\"><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
 					}
 				?>
@@ -79,14 +74,10 @@
 				</ol>
 				</div>
 				</div>
-			<?
+			<?php
 			}
-			else
-			{
-				echo "<script language='javascript'>\n";
-			    echo "alert(\"Invaild data\");\n";  
-		        echo "history.go(-1);\n";
-		        echo "</script>";
+			else{
+				alertmsg("Invaild data");
 			}
 		}
 	}
@@ -104,10 +95,7 @@
 			mysql_free_result($result);
 			if($cnt1==0)
 			{
-				echo "<script language='javascript'>\n";
-				echo "alert(\"Student ID is wrong!\");\n";
-				echo "location.href='./rejudge.php?eid=$eid'";
-				echo "</script>";
+				alertmsg("Student ID is Wrong!","rejudge.php?eid={$eid}",0);
 			}
 			else
 			{
@@ -116,22 +104,20 @@
 				echo "<script>location.href='$url';</script>";
 			}
 		}
-		else if(isset($_POST['rjall']))
+		else if(isset($_POST['rjall'])&&isset($_POST['eid']))
 		{
 			require_once("../func.php");
 			$rjall=intval($_POST['rjall']);
 			$eid=intval($_POST['eid']);
 
 			$prisql="SELECT `start_time`,`end_time` FROM `exam` WHERE `exam_id`='$eid'";
-			$priresult=mysql_query($prisql) or die(mysql_error());
-			$prirow=mysql_fetch_array($priresult);
+			$prirow=fetchOne($prisql);
 			$start_time=$prirow['start_time'];
 			$end_time=$prirow['end_time'];
 			$starttimeC=strtotime($start_time);
 			$endtimeC=strtotime($end_time);
 			$start_timeC=strftime("%Y-%m-%d %X",($starttimeC));
 			$end_timeC=strftime("%Y-%m-%d %X",($endtimeC));
-			mysql_free_result($priresult);
 
 			$userlist=array();
 			$numuser=0;
@@ -152,12 +138,8 @@
         	echo "</script>";
 		}
 	}
-	else
-	{
-		echo "<script language='javascript'>\n";
-		echo "alert(\"Invaild path\");\n";  
-	    echo "history.go(-1);\n";
-	    echo "</script>";
+	else{
+		alertmsg("Invaild path");
 	}
 ?>
 <script type="text/javascript">
@@ -177,6 +159,6 @@ $(function(){
 	}
 });
 </script>
-<?
+<?php
 	require_once("./teacher-footer.php");
 ?>

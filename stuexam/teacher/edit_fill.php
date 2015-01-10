@@ -1,65 +1,42 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
-	function test_input($data){
-		$data = trim($data);
-  		//$data = stripslashes($data);
-  		$data = htmlspecialchars($data);
-  		$data = mysql_real_escape_string($data);
-  		return $data;
-	}
+<?php
 	if(isset($_POST['fill_des']))
 	{
 		require_once("../../include/check_post_key.php");
-		$question=test_input($_POST['fill_des']);
-		$point=test_input($_POST['point']);
-		$easycount=intval($_POST['easycount']);
-		$answernum=intval($_POST['numanswer']);
-		$kind=intval($_POST['kind']);
-		$isprivate=intval($_POST['isprivate']);
-		//$answernum=count($_POST)-6;
-		//important the first is the postkey the second is the fill_des 
-		//the third is the hidden fillid
-		//the forth is the point the fifth is the easycount the sixth is kind
+		$arr['question']=test_input($_POST['fill_des']);
+		$arr['point']=test_input($_POST['point']);
+		$arr['easycount']=intval($_POST['easycount']);
+		$arr['answernum']=intval($_POST['numanswer']);
+		$arr['kind']=intval($_POST['kind']);
+		$arr['isprivate']=intval($_POST['isprivate']);
 		$fillid=intval($_POST['fillid']);
+
 		$prisql="SELECT `creator`,`isprivate` FROM `ex_fill` WHERE `fill_id`='$fillid'";
-		$priresult=mysql_query($prisql) or die(mysql_error());
-		$prirow=mysql_fetch_array($priresult);
+		$prirow=fetchOne($prisql);
 		$creator=$prirow['creator'];
 		$private2=$prirow['isprivate'];
-		mysql_free_result($priresult);
-		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+
+		if(checkAdmin(4,$creator))
 		{
-			echo "<script language='javascript'>\n";
-	    	echo "alert(\"You have no privilege to modify it!\");\n";  
-        	echo "location='edit_fill.php?id=$fillid'\n";
-        	echo "</script>";
+			alertmsg("You have no privilege to modify it!","edit_fill.php?id={$fillid}",0);
 		}
-		else if($private2==2&&!isset($_SESSION['administrator']))
+		else if($private2==2&&!checkAdmin(1))
 		{
-			echo "<script language='javascript'>\n";
-	    	echo "alert(\"You have no privilege to modify it!\");\n";  
-        	echo "location='admin_fill.php'\n";
-        	echo "</script>";
+			alertmsg("You have no privilege to modify it!","admin_fill.php",0);
 		}
 		else
 		{
-			$query="UPDATE `ex_fill` SET `question`='".$question."',`answernum`='$answernum',`point`='".$point."',`easycount`='$easycount',
-			`kind`='$kind',`isprivate`='$isprivate' WHERE `fill_id`='$fillid'";
-			mysql_query($query) or die(mysql_error());
-			$query="DELETE FROM `fill_answer` WHERE `fill_id`='$fillid'";
-			mysql_query($query) or die(mysql_error());
-			for($i=1;$i<=$answernum;$i++)
+			Update('ex_fill',$arr,"fill_id={$fillid}");
+			Delete('fill_answer',"fill_id={$fillid}");
+			for($i=1;$i<=$arr['answernum'];$i++)
 			{
 				$answer=test_input($_POST["answer$i"]);
-				$query="INSERT INTO `fill_answer` 
-				(`fill_id`,`answer_id`,`answer`) 
-				VALUES('$fillid','$i','".$answer."')";
-				mysql_query($query) or die(mysql_error());
+				Insert('fill_answer',array("fill_id"=>"{$fillid}","answer_id"=>"{$i}","answer"=>"{$answer}"));
 			}
-			echo "<script>alert(\"修改成功\");</script>";
-			echo "<script>window.location.href=\"./admin_fill.php\";</script>";
+			alertmsg("修改成功","admin_fill.php",0);
+			unset($arr);
 		}
 	}
 	else
@@ -71,12 +48,9 @@
 			{
 				$query="SELECT `question`,`answernum`,`point`,`creator`,`easycount`,`kind`,`isprivate` FROM `ex_fill` 
 				WHERE `fill_id`='$id'";
-				$result=mysql_query($query) or die(mysql_error());
-				$row_cnt=mysql_num_rows($result);
-				if($row_cnt)
+				$row=fetchOne($query);
+				if($row)
 				{
-					$row=mysql_fetch_array($result);
-					mysql_free_result($result);
 					$question=$row['question'];
 					$answernumC=$row['answernum'];
 					$point=$row['point'];
@@ -84,47 +58,28 @@
 					$easycount=$row['easycount'];
 					$kind=$row['kind'];
 					$isprivate=$row['isprivate'];
-					if($isprivate==2&&!isset($_SESSION['administrator']))
+					if($isprivate==2&&!checkAdmin(1))
 					{
-						echo "<script language='javascript'>\n";
-	    				echo "alert(\"You have no privilege!\");\n";  
-        				echo "location='admin_fill.php'\n";
-        				echo "</script>";
+						alertmsg("You have no privilege!","admin_fill.php",0);
 					}
-					if(!isset($_SESSION['administrator']))
+					if(!checkAdmin(1))
 					{
 						if($isprivate==1&&$creator!=$_SESSION['user_id'])
 						{
-							echo "<script language='javascript'>\n";
-	    					echo "alert(\"You have no privilege!\");\n";  
-        					echo "location='admin_fill.php'\n";
-        					echo "</script>";
+							alertmsg("You have no privilege!","admin_fill.php",0);
 						}
 					}
 				}
-				else
-				{
-					mysql_free_result($result);
-					echo "<script language='javascript'>\n";
-	    			echo "alert(\"No such problem\");\n";  
-        			echo "history.go(-1);\n";
-        			echo "</script>";
+				else{
+					alertmsg("No such problem");
 				}
 			}
-			else
-			{
-				echo "<script language='javascript'>\n";
-	    		echo "alert(\"Invaild data\");\n";  
-        		echo "history.go(-1);\n";
-        		echo "</script>";
+			else{
+				alertmsg("Invaild data");
 			}
 		}
-		else
-		{
-			echo "<script language='javascript'>\n";
-	    	echo "alert(\"Invaild path\");\n";  
-        	echo "history.go(-1);\n";
-        	echo "</script>";
+		else{
+			alertmsg("Invaild path");
 		}
 ?>
 <div>
@@ -134,11 +89,10 @@
 	<li class=""><a href="admin_choose.php">选择题管理</a></li>
 	<li class=""><a href="admin_judge.php">判断题管理</a></li>
 	<li class="active"><a href="admin_fill.php">填空题管理</a></li>
-	<?
-	if(isset($_SESSION['administrator']))
-	{
-		echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
-	}
+	<?php
+		if(checkAdmin(1)){
+			echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
+		}
 	?>
 	<li><a href="../">退出管理页面</a></li>
 </ul>
@@ -204,7 +158,7 @@
 		</div>
 		<input type="hidden" name="numanswer" id="numanswer" value="<?=$answernumC?>">
 		<div class="span4" id="Content">
-		<?
+		<?php
 			if($answernumC)
 			{
 				$query="SELECT `answer_id`,`answer` FROM `fill_answer` WHERE `fill_id`='$id' ORDER BY `answer_id`";
@@ -228,7 +182,7 @@
 </div>
 <script type="text/javascript">
 var cont=document.getElementById("Content");
-var num_answer=<?=$answernumC?>;
+var num_answer=<?php if(isset($answernumC)) echo $answernumC; else echo 0;?>;
 function addinput()
 {
 	if(num_answer<8)
@@ -314,7 +268,8 @@ $(function(){
 		$('#warnmsg').html('(*请确保下面文本框个数与题目中的填空数相同)');
 });
 </script>
-<?
+<?php
 }
 	require_once("./teacher-footer.php");
 ?>
+

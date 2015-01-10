@@ -1,20 +1,16 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
+<?php
 	if(isset($_GET['eid']))
 	{
 		$eid=intval($_GET['eid']);
 		$prisql="SELECT `creator` FROM `exam` WHERE `exam_id`='$eid'";
-		$priresult=mysql_query($prisql) or die(mysql_error());
-		$creator=mysql_result($priresult, 0);
-		mysql_free_result($priresult);
-		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+		$row=fetchOne($prisql);
+		$creator=$row['creator'];
+		if(checkAdmin(4,$creator))
 		{
-			echo "<script language='javascript'>\n";
-		    echo "alert(\"You have no privilege of this exam\");\n";  
-			echo "location='./'";
-		    echo "</script>";
+			alertmsg("You have no privilege of this exam","./",0);
 		}
 		else
 		{
@@ -37,9 +33,8 @@
 				<li><a href="admin_choose.php">选择题管理</a></li>
 				<li><a href="admin_judge.php">判断题管理</a></li>
 				<li><a href="admin_fill.php">填空题管理</a></li>
-				<?
-					if(isset($_SESSION['administrator']))
-					{
+				<?php
+					if(checkAdmin(1)){
 						echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
 					}
 				?>
@@ -59,9 +54,8 @@
 				<li class="active"><a href="add_exam_user.php?eid=<?=$eid?>">添加考生</a></li>
 				<li><a href="exam_user_score.php?eid=<?=$eid?>">考生成绩</a></li>
 				<li><a href="exam_analysis.php?eid=<?=$eid?>">考试分析</a></li>
-				<?
-					if(isset($_SESSION['administrator']))
-					{
+				<?php
+					if(checkAdmin(1)){
 						echo "<li><a href=\"rejudge.php?eid=$eid\">Rejudge</a></li>";
 					}
 				?>
@@ -80,23 +74,15 @@
 				</form>
 				</div>
 				</div>
-			<?
+			<?php
 			}
-			else
-			{
-				echo "<script language='javascript'>\n";
-			    echo "alert(\"Invaild data\");\n";  
-		        echo "history.go(-1);\n";
-		        echo "</script>";
+			else{
+				alertmsg("Invaild data");
 			}
 		}
 	}
-	else
-	{
-		echo "<script language='javascript'>\n";
-		echo "alert(\"Invaild path\");\n";  
-	    echo "history.go(-1);\n";
-	    echo "</script>";
+	else{
+		alertmsg("Invaild path");
 	}
 ?>
 <script type="text/javascript">
@@ -111,6 +97,6 @@ $(function(){
 	}
 });
 </script>
-<?
+<?php
 	require_once("./teacher-footer.php");
 ?>

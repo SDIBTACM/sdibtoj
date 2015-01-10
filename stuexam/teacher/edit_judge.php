@@ -1,49 +1,34 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
-	function test_input($data){
-		$data = trim($data);
-  		//$data = stripslashes($data);
-  		$data = htmlspecialchars($data);
-  		$data = mysql_real_escape_string($data);
-  		return $data;
-	}
+<?php
 	if(isset($_POST['judge_des']))
 	{
 		require_once("../../include/check_post_key.php");
-		$judge_des=test_input($_POST['judge_des']);
-		$answer=$_POST['answer'];
-		$point=test_input($_POST['point']);
+		$arr['question']=test_input($_POST['judge_des']);
+		$arr['answer']=$_POST['answer'];
+		$arr['point']=test_input($_POST['point']);
 		$judgeid=intval($_POST['judgeid']);
-		$easycount=intval($_POST['easycount']);
-		$isprivate=intval($_POST['isprivate']);
+		$arr['easycount']=intval($_POST['easycount']);
+		$arr['isprivate']=intval($_POST['isprivate']);
+
 		$prisql="SELECT `creator`,`isprivate` FROM `ex_judge` WHERE `judge_id`='$judgeid'";
-		$priresult=mysql_query($prisql) or die(mysql_error());
-		$prirow=mysql_fetch_array($priresult);
+		$prirow=fetchOne($prisql);
 		$creator=$prirow['creator'];
 		$private2=$prirow['isprivate'];
-		mysql_free_result($priresult);
-		if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']))
+		if(checkAdmin(4,$creator))
 		{
-			echo "<script language='javascript'>\n";
-	    	echo "alert(\"You have no privilege to modify it!\");\n";  
-        	echo "location='edit_judge.php?id=$judgeid'\n";
-        	echo "</script>";
+			alertmsg("You have no privilege to modify it!","edit_judge.php?id={$judgeid}",0);
 		}
-		else if($private2==2&&!isset($_SESSION['administrator']))
+		else if($private2==2&&!checkAdmin(1))
 		{
-			echo "<script language='javascript'>\n";
-	    	echo "alert(\"You have no privilege to modify it!\");\n";  
-        	echo "location='admin_judge.php'\n";
-        	echo "</script>";
+			alertmsg("You have no privilege to modify it!","admin_judge.php",0);
 		}
 		else
 		{
-			$sql="UPDATE `ex_judge` SET `question`='".$judge_des."',`answer`='$answer',`point`='".$point."',`easycount`='$easycount',`isprivate`='$isprivate' WHERE `judge_id`='$judgeid'";
-			mysql_query($sql) or die(mysql_error());
-			echo "<script>alert(\"修改成功\");</script>";
-			echo "<script>window.location.href=\"./admin_judge.php\";</script>";
+			Update('ex_judge',$arr,"judge_id={$judgeid}");
+			unset($arr);
+			alertmsg("修改成功","admin_judge.php",0);
 		}
 	}
 	else
@@ -55,59 +40,37 @@
 			{
 				$query="SELECT `question`,`answer`,`creator`,`point`,`easycount`,`isprivate` FROM `ex_judge` 
 				WHERE `judge_id`='$id'";
-				$result=mysql_query($query) or die(mysql_error());
-				$row_cnt=mysql_num_rows($result);
-				if($row_cnt)
+				$row=fetchOne($query);
+				if($row)
 				{
-					$row=mysql_fetch_array($result);
-					mysql_free_result($result);
 					$question=$row['question'];
 					$answer=$row['answer'];
 					$creator=$row['creator'];
 					$point=$row['point'];
 					$easycount=$row['easycount'];
 					$isprivate=$row['isprivate'];
-					if($isprivate==2&&!isset($_SESSION['administrator']))
+					if($isprivate==2&&!checkAdmin(1))
 					{
-						echo "<script language='javascript'>\n";
-	    				echo "alert(\"You have no privilege!\");\n";  
-        				echo "location='admin_judge.php'\n";
-        				echo "</script>";
+						alertmsg("You have no privilege!","admin_judge.php",0);
 					}
-					if(!isset($_SESSION['administrator']))
+					if(!checkAdmin(1))
 					{
 						if($isprivate==1&&$creator!=$_SESSION['user_id'])
 						{
-							echo "<script language='javascript'>\n";
-	    					echo "alert(\"You have no privilege!\");\n";  
-        					echo "location='admin_judge.php'\n";
-        					echo "</script>";
+							alertmsg("You have no privilege!","admin_judge.php",0);
 						}
 					}
 				}
-				else
-				{
-					mysql_free_result($result);
-					echo "<script language='javascript'>\n";
-	    			echo "alert(\"No such problem\");\n";  
-        			echo "history.go(-1);\n";
-        			echo "</script>";
+				else{
+					alertmsg("No such problem");
 				}
 			}
-			else
-			{
-				echo "<script language='javascript'>\n";
-	    		echo "alert(\"Invaild data\");\n";  
-        		echo "history.go(-1);\n";
-        		echo "</script>";
+			else{
+				alertmsg("Invaild data");
 			}
 		}
-		else
-		{
-			echo "<script language='javascript'>\n";
-	    	echo "alert(\"Invaild path\");\n";  
-        	echo "history.go(-1);\n";
-        	echo "</script>";
+		else{
+			alertmsg("Invaild path");
 		}
 ?>
 <script language="javascript">
@@ -136,9 +99,8 @@ function chkinput(form){
 	<li class=""><a href="admin_choose.php">选择题管理</a></li>
 	<li class="active"><a href="admin_judge.php">判断题管理</a></li>
 	<li class=""><a href="admin_fill.php">填空题管理</a></li>
-	<?
-		if(isset($_SESSION['administrator']))
-		{
+	<?php
+		if(checkAdmin(1)){
 			echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
 		}
 	?>
@@ -163,7 +125,7 @@ function chkinput(form){
 			<input type="hidden" value="<?=$id?>" name="judgeid">
 			<label for="point">知识点:</label>
 			<select name="point" id="point">
-			<?
+			<?php
 				$sql="SELECT * FROM `ex_point`";
 				$result=mysql_query($sql) or die(mysql_error());
 				while($row=mysql_fetch_object($result))
@@ -223,7 +185,7 @@ $(function(){
 	}
 });
 </script>
-<?
+<?php
 }
 	require_once("./teacher-footer.php");
 ?>

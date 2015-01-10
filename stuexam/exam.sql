@@ -14,6 +14,7 @@ CREATE TABLE `exam` (
   	`prgfill` tinyint(4) DEFAULT '5',
   	`programscore` tinyint(4) DEFAULT '10',
   	`isvip` char(1) DEFAULT 'Y',
+  	`visible` char(1) DEFAULT 'Y',
 	PRIMARY KEY (`exam_id`)
 )ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -100,9 +101,10 @@ DROP TABLE IF EXISTS `ex_privilege`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ex_privilege` (
-   `user_id` char(20) NOT NULL DEFAULT '',
+  `user_id` char(20) NOT NULL DEFAULT '',
   `rightstr` char(30) NOT NULL DEFAULT '',
-  `randnum` int(11) DEFAULT NULL
+  `randnum` int(11) DEFAULT NULL,
+  PRIMARY KEY (`user_id`,`rightstr`)
 )ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -124,7 +126,9 @@ CREATE TABLE `ex_stuanswer` (
 	`exam_id` int(11) NOT NULL,
 	`type` tinyint(4) NOT NULL,
 	`question_id` int(11) NOT NULL,
-	`answer` varchar(255) DEFAULT NULL
+	`answer_id` tinyint(4) NOT NULL DEFAULT '1',
+	`answer` varchar(255) DEFAULT NULL,
+	PRIMARY KEY (`exam_id`,`user_id`,`type`,`question_id`,`answer_id`)
 )ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

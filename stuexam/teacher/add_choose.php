@@ -1,31 +1,23 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
-<?
-	function test_input($data){
-		$data = trim($data);
-  		//$data = stripslashes($data);
-  		$data = htmlspecialchars($data);
-  		$data = mysql_real_escape_string($data);
-  		return $data;
-	}
+<?php
 	if(isset($_POST['choose_des']))
 	{
 		require_once("../../include/check_post_key.php");
-		$choose_des=test_input($_POST['choose_des']);
-		$ams=test_input($_POST['ams']);
-		$bms=test_input($_POST['bms']);
-		$cms=test_input($_POST['cms']);
-		$dms=test_input($_POST['dms']);
-		$point=test_input($_POST['point']);
-		$easycount=intval($_POST['easycount']);
-		$isprivate=intval($_POST['isprivate']);
-		$answer=$_POST['answer'];
-		$creator=$_SESSION['user_id'];
-		$sql="INSERT INTO `ex_choose` 
-		(`question`,`ams`,`bms`,`cms`,`dms`,`answer`,`creator`,`addtime`,`point`,`easycount`,`isprivate`)
-		VALUES('".$choose_des."','".$ams."','".$bms."','".$cms."','".$dms."','$answer','".$creator."',NOW(),'".$point."','$easycount','$isprivate')";
-		mysql_query($sql) or die(mysql_error());
+		$arr['question']=test_input($_POST['choose_des']);
+		$arr['ams']=test_input($_POST['ams']);
+		$arr['bms']=test_input($_POST['bms']);
+		$arr['cms']=test_input($_POST['cms']);
+		$arr['dms']=test_input($_POST['dms']);
+		$arr['answer']=$_POST['answer'];
+		$arr['creator']=$_SESSION['user_id'];
+		$arr['point']=test_input($_POST['point']);
+		$arr['addtime']=date('Y-m-d H:m:i');
+		$arr['easycount']=intval($_POST['easycount']);
+		$arr['isprivate']=intval($_POST['isprivate']);
+		$ans = Insert('ex_choose',$arr);
+		unset($arr);
 		echo "<script>window.location.href=\"./admin_choose.php\";</script>";
 	}
 ?>
@@ -36,11 +28,10 @@
 	<li class="active"><a href="admin_choose.php">选择题管理</a></li>
 	<li class=""><a href="admin_judge.php">判断题管理</a></li>
 	<li class=""><a href="admin_fill.php">填空题管理</a></li>
-	<?
-	if(isset($_SESSION['administrator']))
-	{
-		echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
-	}
+	<?php
+		if(checkAdmin(1)){
+			echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
+		}
 	?>
 	<li><a href="../">退出管理页面</a></li>
 </ul>
@@ -68,9 +59,8 @@
 		</div>
 		<div class="span8">
 			<label for="point">知识点:</label>
-			<!-- <input type="text" name="point" maxlength="80"> -->
 			<select name="point" id="point">
-			<?
+			<?php
 				$sql="SELECT * FROM `ex_point`";
 				$result=mysql_query($sql) or die(mysql_error());
 				while($row=mysql_fetch_object($result))
@@ -108,41 +98,24 @@
 </div>
 <script language="javascript">
 function chkinput(form){
-	if(form.choose_des.value==""){
-	alert("请输入题目描述");
-	form.choose_des.focus();
-	return(false); 
+	for(var i=0,len=form.length;i<len;i++){
+		if(form[i].value=="")
+		{
+			alert("请输入完整");
+			form[i].focus();
+			return false;
+		}
 	}
-	if(form.ams.value==""){
-	alert("请输入A选项!");
-	form.ams.focus();
-	return(false); 
+	var d = document.getElementsByName('answer'),x=0;
+	for(var i=0,len=d.length;i<len;i++){
+		if(d[i].checked)
+			x++;
 	}
-	if(form.bms.value==""){
-	alert("请输入B选项!");
-	form.bms.focus();
-	return(false); 
-	}
-	if(form.cms.value==""){
-	alert("请输入C选项!");
-	form.cms.focus();
-	return(false); 
-	}
-	if(form.dms.value==""){
-	alert("请输入D选项!");
-	form.dms.focus();
-	return(false); 
-	}
-	if(form.answer.value==""){
-	alert("请输入答案!");
-	return(false); 
-	if(form.point.value==""){
-		alert("请输入知识点");
-		form.point.focus();
+	if(x==0){
+		alert("请输入完整");
 		return false;
 	}
-	}
-	return(true);
+	return true;
 }
 function showmsg()
 {
@@ -164,6 +137,6 @@ $(function(){
 	}
 });
 </script>
-<?
+<?php
 	require_once("./teacher-footer.php");
 ?>

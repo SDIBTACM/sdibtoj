@@ -1,69 +1,54 @@
-<?
+<?php
 	@session_start();
-	if(!isset($_SESSION['user_id']))
-	{
-		echo "<a href='/JudgeOnline/loginpage.php'>Please Login First!</a>";
-		exit(0);
-	}
+	require_once("myinc.inc.php");
+	checkuserid();
 	if(!isset($_GET['eid']))
 	{
 		echo "No Such Exam";
 		exit(0);
 	}
-	require_once("../../include/db_info.inc.php");
 	$eid=intval(trim($_GET['eid']));
 	$user_id=$_SESSION['user_id'];
 	$users=trim($_GET['users']);
 	$users=mysql_real_escape_string($users);
 	$sql ="SELECT `title`,`end_time`,`creator` FROM `exam` WHERE `exam_id`='$eid'";
-	$result=mysql_query($sql) or die(mysql_error());
-	$cnt = mysql_num_rows($result);
-	if($cnt==0)
+	$row=fetchOne($sql);
+	if(!$row)
 	{
 		echo "No Such Exam";
 		exit(0);
 	}
-	$row=mysql_fetch_array($result);
-	$title=$row[0];
-	$end_time=$row[1];
+	$title=$row['title'];
+	$end_time=$row['end_time'];
 	$endtimeC=strtotime($end_time);
 	$now=time();
-	$creator=$row[2];
+	$creator=$row['creator'];
 	$priflag=0;
 	if($now>$endtimeC&&isset($_SESSION['contest_creator']))
 		$priflag=1;
-	mysql_free_result($result);
-	if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']||$priflag==1)){
+	if(checkAdmin(5,$creator,$priflag)){
 		if($now<$endtimeC){
 			echo "<h1>Exam is not Over</h1>";
 			exit(0);
 		}
 	}
 	$prisql="SELECT `creator` FROM `exam` WHERE `exam_id`='$eid'";
-	$priresult=mysql_query($prisql) or die(mysql_error());
-	$creator=mysql_result($priresult, 0);
-	mysql_free_result($priresult);
-	if(!(isset($_SESSION['administrator'])||$creator==$_SESSION['user_id']||$priflag==1))
+	$rowc=fetchOne($prisql);
+	$creator=$rowc['creator'];
+	if(checkAdmin(5,$creator,$priflag))
 	{
-		echo "<script language='javascript'>\n";
-		echo "alert(\"You have no privilege to see it!\");\n";
-		echo "history.go(-1);";
-		echo "</script>";
+		alertmsg("You have no privilege to see it!");
 	}
-	$prisql="SELECT COUNT(*) FROM `ex_privilege` WHERE `user_id`='".$users."' AND `rightstr`='e$eid'";
-	$priresult=mysql_query($prisql) or die(mysql_error());
-	$num=mysql_result($priresult, 0);
-	mysql_free_result($priresult);
+	$prisql="SELECT COUNT(*) as `numc` FROM `ex_privilege` WHERE `user_id`='".$users."' AND `rightstr`='e$eid'";
+	$row=fetchOne($prisql);
+	$num=$row['numc'];
 	if(!$num)
 	{
-		echo "<script language='javascript'>\n";
-	    echo "alert(\"The student have no privilege to take part in it\");\n";  
-        echo "location='exam_user_score.php?eid=$eid'\n";
-        echo "</script>";
+		alertmsg("The student have no privilege to take part in it","exam_user_score.php?eid={$eid}",0);
 	}
 	else
 	{
-		?>
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,7 +78,7 @@
 		<br>
 		<table class="pull-left huanhang jiacu" style="width:100%">
 		<tr><td><h4>一.选择题</h4></td></tr>
-		<?
+		<?php
 			$sql="SELECT `choosescore`,`judgescore`,`fillscore`,`prgans`,`prgfill`,`programscore` FROM `exam` WHERE `exam_id`='$eid'";
 			$result=mysql_query($sql) or die(mysql_error());
 			$row=mysql_fetch_array($result);
@@ -135,7 +120,7 @@
 			mysql_free_result($result1);
 		?>
 		<tr><td><h4>二.判断题</h4></td></tr>
-		<?
+		<?php
 			$judgearr = array();
 			$query="SELECT `question_id`,`answer` FROM `ex_stuanswer` WHERE `user_id`='".$users."' AND `exam_id`='$eid' AND `type`='2'";
 			$result=mysql_query($query) or die(mysql_error());
@@ -164,7 +149,7 @@
 			mysql_free_result($result2);
 		?>
 		<tr><td><h4>三.填空题</h4></td></tr>
-		<?
+		<?php
 			$fillarr=array();
 			$anstmp=array();
 			$query="SELECT `question_id`,`answer_id`,`answer` FROM `ex_stuanswer` WHERE `user_id`='".$users."' AND `exam_id`='$eid' AND `type`='3'";
@@ -222,6 +207,6 @@
 	</div>
 </body>
 </html>
-		<?
-	}
+<?php
+}
 ?>

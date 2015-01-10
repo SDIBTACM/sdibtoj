@@ -1,20 +1,19 @@
-<?
+<?php
 	require_once("./teacher-header.php");
-	if (!(isset($_SESSION['administrator']))){
-	echo "You have no privilege";
-	echo "<a href='/JudgeOnline/loginpage.php'>Please Login First!</a>";
-	exit(1);
+	if(!checkAdmin(1)){
+		echo "You have no privilege";
+		echo "<a href='/JudgeOnline/loginpage.php'>Please Login First!</a>";
+		exit(1);
 	}
 ?>
-<?
+<?php
 	if(isset($_POST['point'])&&isset($_POST['add']))
 	{
 		$point=trim($_POST['point']);
 		if(get_magic_quotes_gpc())
 			$post=stripslashes($point);
 		$point=mysql_real_escape_string($point);
-		$query="INSERT INTO `ex_point` VALUES('$point')";
-		mysql_query($query) or die(mysql_error());
+		Insert('ex_point',array('point'=>"'{$point}'"));
 	}
 	else if(isset($_POST['point'])&&isset($_POST['del']))
 	{
@@ -22,8 +21,7 @@
 		if(get_magic_quotes_gpc())
 			$post=stripslashes($point);
 		$point=mysql_real_escape_string($point);
-		$query="DELETE FROM `ex_point` WHERE `point`='$point'";
-		mysql_query($query) or die(mysql_error());
+		Delete('ex_point',"point='{$point}'");
 	}
 	else
 	{
@@ -37,9 +35,8 @@
 	<li class=""><a href="admin_choose.php">选择题管理</a></li>
 	<li class=""><a href="admin_judge.php">判断题管理</a></li>
 	<li class=""><a href="admin_fill.php">填空题管理</a></li>
-	<?
-		if(isset($_SESSION['administrator']))
-		{
+	<?php
+		if(checkAdmin(1)){
 			echo "<li class=\"active\"><a href=\"admin_point.php\">知识点管理</a></li>";
 		}
 	?>
@@ -49,7 +46,7 @@
 <div class="container" style="margin-left:23%" id="right">
 	<h2 style="text-align:center">知识点管理</h2>
 	<div id="mypoint" class="span10">
-	<?
+	<?php
 		$num=0;
 		while($row=mysql_fetch_object($result))
 		{
@@ -111,7 +108,7 @@ function delpoint(preid)
 	});
 }
 </script>
-<?
+<?php
 }
 	require_once("./teacher-footer.php");
 ?>

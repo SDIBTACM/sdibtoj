@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once("./teacher-header.php");
 ?>
 <?
@@ -20,11 +20,11 @@
 		$problem=intval($_GET['problem']);
 		if($problem<0||$problem>2)
 			$problem=0;
-		if(!isset($_SESSION['administrator'])&&$problem==2)
+		if(!checkAdmin(1)&&$problem==2)
 			$problem=0;
 		if($searchsql=="")
 		{
-			if($problem==0||isset($_SESSION['administrator']))
+			if($problem==0||checkAdmin(1))
 				$prosql=" WHERE `isprivate`='$problem'";
 			else
 			{
@@ -34,7 +34,7 @@
 		}
 		else
 		{
-			if($problem==0||isset($_SESSION['administrator']))
+			if($problem==0||checkAdmin(1))
 				$prosql=" AND `isprivate`='$problem'";
 			else
 			{
@@ -62,10 +62,9 @@
 	$each_page=15;// each page data num
 	$pagenum=10;//the max of page num
 
-	$sql="SELECT COUNT(*) FROM `ex_choose` $searchsql $prosql";
-	$result=mysql_query($sql) or die(mysql_error());
-	$total=mysql_result($result, 0);
-	mysql_free_result($result);
+	$sql="SELECT COUNT(*) as `numc` FROM `ex_choose` $searchsql $prosql";
+	$row=fetchOne($sql);
+	$total=$row['numc'];
 
 	$totalpage=ceil($total/$each_page);
 	if($totalpage==0)	$totalpage=1;
@@ -91,9 +90,8 @@
 	<li class="active"><a href="admin_choose.php">选择题管理</a></li>
 	<li class=""><a href="admin_judge.php">判断题管理</a></li>
 	<li class=""><a href="admin_fill.php">填空题管理</a></li>
-	<?
-		if(isset($_SESSION['administrator']))
-		{
+	<?php
+		if(checkAdmin(1)){
 			echo "<li><a href=\"admin_point.php\">知识点管理</a></li>";
 		}
 	?>
@@ -106,9 +104,8 @@
 		<input type="submit" value="添加选择题" class="mybutton">
 		<input type="button" value="查看公共题库" class="mybutton" onclick="window.location.href='?problem=0'">
 		<input type="button" value="查看私人题库" class="mybutton" onclick="window.location.href='?problem=1'">
-		<?
-			if(isset($_SESSION['administrator']))
-			{
+		<?php
+			if(checkAdmin(1)){
 				echo "<input type=\"button\" value=\"查看隐藏题库\" class=\"mybutton\" onclick=\"window.location.href='?problem=2'\">";
 			}
 		?>
@@ -199,6 +196,6 @@ $(function(){
 	}
 });
 </script>
-<?
+<?php
 	require_once("./teacher-footer.php");
 ?>

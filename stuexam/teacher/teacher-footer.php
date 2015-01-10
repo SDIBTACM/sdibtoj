@@ -1,4 +1,4 @@
-<?
+<?php
 	@session_start();
 	if (!(isset($_SESSION['administrator'])
 		||isset($_SESSION['contest_creator'])
