@@ -8,7 +8,7 @@
 		if(get_magic_quotes_gpc())
 			$search=stripslashes($search);
 		if($search!='')
-			$searchsql=" WHERE `visible`='Y' AND `creator` like '%$search%' or `title` like '%$search%'";
+			$searchsql=" WHERE `visible`='Y' AND (`creator` like '%$search%' or `title` like '%$search%')";
 		else
 			$searchsql=" WHERE `visible`='Y'";
 	}
@@ -17,38 +17,15 @@
 		$search="";
 		$searchsql=" WHERE `visible`='Y'";
 	}
-	if(isset($_GET['page']))
-	{
-		if(!is_numeric($_GET['page']))
-			$page=1;
-		$page=intval($_GET['page']);
-	}
-	else
-		$page=1;
-	$each_page=15;// each page data num
-	$pagenum=10;//the max of page num
-
-	$sql="SELECT COUNT(*) FROM `exam` $searchsql";
-	$result=mysql_query($sql) or die(mysql_error());
-	$total=mysql_result($result, 0);
-	mysql_free_result($result);
-
-	$totalpage=ceil($total/$each_page);
-	if($totalpage==0)	$totalpage=1;
-	$page=$page<1?1:$page;
-	$page=$page>$totalpage?$totalpage:$page;
-
-	$offset=($page-1)*$each_page;
-	$sqladd=" limit $offset,$each_page";
-
-	$lastpage=$totalpage;
-	$prepage=$page-1;
-	$nextpage=$page+1;
-
-	$startpage=$page-4;
-	$startpage=$startpage<1?1:$startpage;
-	$endpage=$startpage+$pagenum-1;
-	$endpage=$endpage>$totalpage?$totalpage:$endpage;
+	$pageinfo = splitpage('exam',$searchsql);
+	$page = $pageinfo['page'];
+	$prepage=$pageinfo['prepage'];
+	$startpage=$pageinfo['startpage'];
+	$endpage=$pageinfo['endpage'];
+	$nextpage=$pageinfo['nextpage'];
+	$lastpage=$pageinfo['lastpage'];
+	$eachpage=$pageinfo['eachpage'];
+	$sqladd=$pageinfo['sqladd'];
 ?>
 <div>
 <div class="leftmenu pull-left" id="left">
@@ -117,28 +94,10 @@
 		?>
 		</tbody>
 	</table>
-	<?
-	echo "<div class=\"pagination\" style=\"text-align:center\">";
-	echo "<ul>";
-	echo "<li><a href=\"./?page=1&search=$search\">First</a></li>";
-	if($page==1)
-		echo "<li class=\"disabled\"><a href=\"\">Previous</a></li>";
-	else
-		echo "<li><a href=\"./?page=$prepage&search=$search\">Previous</a></li>";
-	for($i=$startpage;$i<=$endpage;$i++)
-	{
-		if($i==$page)
-			echo "<li class=\"active\"><a href=\"./?page=$i&search=$search\">$i</a></li>";
-		else
-	  		echo "<li><a href=\"./?page=$i&search=$search\">$i</a></li>";
-	}
-	if($page==$lastpage)
-		echo "<li class=\"disabled\"><a href=\"\">Next</a></li>";
-	else
-		echo "<li><a href=\"./?page=$nextpage&search=$search\">Next</a></li>";
-	echo "<li><a href=\"./?page=$lastpage&search=$search\">Last</a></li>";
-	echo "</ul>";
-	echo "</div>";
+	<?php
+		$url = "./?pbmtype=exam";
+		$urllast = "&search={$search}";
+		showpagelast($url,$pageinfo,$urllast);
 	?>
 </div>
 </div>
