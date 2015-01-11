@@ -28,31 +28,8 @@
 			}
 			if(isset($_GET['problem']))
 			{
-				$problem=intval($_GET['problem']);
-				if($problem<0||$problem>2)
-					$problem=0;
-				if(!checkAdmin(1)&&$problem==2)
-					$problem=0;
-				if($searchsql=="")
-				{
-					if($problem==0||checkAdmin(1))
-						$prosql=" WHERE `isprivate`='$problem'";
-					else
-					{
-						$user=$_SESSION['user_id'];
-						$prosql=" WHERE `isprivate`='$problem' AND `creator` like '$user'";
-					}
-				}
-				else
-				{
-					if($problem==0||checkAdmin(1))
-						$prosql=" AND `isprivate`='$problem'";
-					else
-					{
-						$user=$_SESSION['user_id'];
-						$prosql=" AND `isprivate`='$problem' AND `creator` like '$user'";
-					}
-				}
+				$problem = intval($_GET['problem']);
+				$prosql = problemshow($problem,$searchsql);
 			}
 			else
 			{
@@ -66,42 +43,20 @@
 			{
 				if($type==1||$type==2||$type==3)
 				{
-					if(isset($_GET['page']))
-					{
-						if(!is_numeric($_GET['page']))
-							$page=1;
-						else
-							$page=intval($_GET['page']);
-					}
-					else
-						$page=1;
-					$each_page=20;// each page data num
-					$pagenum=10;//the max of page num
 					if($type==1)
-						$sql="SELECT COUNT(*) as `numc` FROM `ex_choose` $searchsql $prosql";
+						$pageinfo = splitpage('ex_choose',$searchsql,$prosql);
 					else if($type==2)
-						$sql="SELECT COUNT(*) as `numc` FROM `ex_judge` $searchsql $prosql";
+						$pageinfo = splitpage('ex_judge',$searchsql,$prosql);
 					else if($type==3)
-						$sql="SELECT COUNT(*) as `numc` FROM `ex_fill` $searchsql $prosql";
-					$rowc=fetchOne($sql);
-					$total=$rowc['numc'];
-
-					$totalpage=ceil($total/$each_page);
-					if($totalpage==0)	$totalpage=1;
-					$page=$page>$totalpage?$totalpage:$page;
-					$page=$page<1?1:$page;
-
-					$offset=($page-1)*$each_page;
-					$sqladd=" limit $offset,$each_page";
-
-					$lastpage=$totalpage;
-					$prepage=$page-1;
-					$nextpage=$page+1;
-
-					$startpage=$page-4;
-					$startpage=$startpage<1?1:$startpage;
-					$endpage=$startpage+$pagenum-1;
-					$endpage=$endpage>$totalpage?$totalpage:$endpage;
+						$pageinfo = splitpage('ex_fill',$searchsql,$prosql);
+					$page = $pageinfo['page'];
+					$prepage=$pageinfo['prepage'];
+					$startpage=$pageinfo['startpage'];
+					$endpage=$pageinfo['endpage'];
+					$nextpage=$pageinfo['nextpage'];
+					$lastpage=$pageinfo['lastpage'];
+					$eachpage=$pageinfo['eachpage'];
+					$sqladd=$pageinfo['sqladd'];
 				}
 				if($type==9)// main about the exam
 				{
@@ -271,7 +226,7 @@
 					</thread>
 					<tbody>
 					<?php
-						$cntchoose=1+($page-1)*$each_page;
+						$cntchoose=1+($page-1)*$eachpage;
 						$sql="SELECT `choose_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_choose` $searchsql $prosql ORDER BY `choose_id` ASC $sqladd";
 						$result = mysql_query($sql) or die(mysql_error());
 						while($row=mysql_fetch_object($result)){
@@ -298,27 +253,9 @@
 						}
 						mysql_free_result($result);
 						echo "</tbody></table>";
-						echo "<div class=\"pagination\" style=\"text-align:center\">";
-						echo "<ul>";
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=1&search=$search&problem=$problem\">First</a></li>";
-						if($page==1)
-							echo "<li class=\"disabled\"><a href=\"\">Previous</a></li>";
-						else
-							echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$prepage&search=$search&problem=$problem\">Previous</a></li>";
-						for($i=$startpage;$i<=$endpage;$i++)
-						{
-							if($i==$page)
-								echo "<li class=\"active\"><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$i&search=$search&problem=$problem\">$i</a></li>";
-							else
-						  		echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$i&search=$search&problem=$problem\">$i</a></li>";
-						}
-						if($page==$lastpage)
-							echo "<li class=\"disabled\"><a href=\"\">Next</a></li>";
-						else
-							echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$nextpage&search=$search&problem=$problem\">Next</a></li>";
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=1&page=$lastpage&search=$search&problem=$problem\">Last</a></li>";
-						echo "</ul>";
-						echo "</div>";
+						$url = "add_exam_problem.php?eid=$eid&type=1";
+						$urllast = "&search={$search}&problem={$problem}";
+						showpagelast($url,$pageinfo,$urllast);
 						echo"</div></div>";
 				}
 				else if($type==2)//add judge
@@ -390,7 +327,7 @@
 					</thread>
 					<tbody>
 					<?
-					$cntjudge=1+($page-1)*$each_page;
+					$cntjudge=1+($page-1)*$eachpage;
 					$sql="SELECT `judge_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_judge` $searchsql $prosql ORDER BY `judge_id` ASC $sqladd";
 					$result = mysql_query($sql) or die(mysql_error());
 					while($row=mysql_fetch_object($result)){
@@ -418,27 +355,9 @@
 					}
 					mysql_free_result($result);
 					echo "</tbody></table>";
-					echo "<div class=\"pagination\" style=\"text-align:center\">";
-					echo "<ul>";
-					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=1&search=$search&problem=$problem\">First</a></li>";
-					if($page==1)
-						echo "<li class=\"disabled\"><a href=\"\">Previous</a></li>";
-					else
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$prepage&search=$search&problem=$problem\">Previous</a></li>";
-					for($i=$startpage;$i<=$endpage;$i++)
-					{
-						if($i==$page)
-							echo "<li class=\"active\"><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$i&search=$search&problem=$problem\">$i</a></li>";
-						else
-					  		echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$i&search=$search&problem=$problem\">$i</a></li>";
-					}
-					if($page==$lastpage)
-						echo "<li class=\"disabled\"><a href=\"\">Next</a></li>";
-					else
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$nextpage&search=$search&problem=$problem\">Next</a></li>";
-					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=2&page=$lastpage&search=$search&problem=$problem\">Last</a></li>";
-					echo "</ul>";
-					echo "</div>";
+					$url = "add_exam_problem.php?eid=$eid&type=2";
+					$urllast = "&search={$search}&problem={$problem}";
+					showpagelast($url,$pageinfo,$urllast);
 					echo "</div></div>";
 				}
 				else if($type==3)//add fill
@@ -514,7 +433,7 @@
 					</thread>
 					<tbody>
 					<?
-					$cntfill=1+($page-1)*$each_page;
+					$cntfill=1+($page-1)*$eachpage;
 					$sql="SELECT `fill_id`,`question`,`addtime`,`creator`,`point`,`easycount`,`kind` FROM `ex_fill` $searchsql $prosql ORDER BY `fill_id` ASC $sqladd";
 					$result = mysql_query($sql) or die(mysql_error());
 					while($row=mysql_fetch_object($result)){
@@ -548,27 +467,11 @@
 					}
 					mysql_free_result($result);
 					echo "</tbody></table>";
-					echo "<div class=\"pagination\" style=\"text-align:center\">";
-					echo "<ul>";
-					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=1&search=$search&problem=$problem\">First</a></li>";
-					if($page==1)
-						echo "<li class=\"disabled\"><a href=\"\">Previous</a></li>";
-					else
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$prepage&search=$search&problem=$problem\">Previous</a></li>";
-					for($i=$startpage;$i<=$endpage;$i++)
-					{
-						if($i==$page)
-							echo "<li class=\"active\"><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$i&search=$search&problem=$problem\">$i</a></li>";
-						else
-					  		echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$i&search=$search&problem=$problem\">$i</a></li>";
-					}
-					if($page==$lastpage)
-						echo "<li class=\"disabled\"><a href=\"\">Next</a></li>";
-					else
-						echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$nextpage&search=$search&problem=$problem\">Next</a></li>";
-					echo "<li><a href=\"add_exam_problem.php?eid=$eid&type=3&page=$lastpage&search=$search&problem=$problem\">Last</a></li>";
-					echo "</ul>";
-					echo "</div>";
+					$pageinfo['problem']=$problem;
+					$pageinfo['search']=$search;
+					$url = "add_exam_problem.php?eid=$eid&type=3";
+					$urllast = "&search={$search}&problem={$problem}";
+					showpagelast($url,$pageinfo,$urllast);
 					echo "</div></div>";
 				}
 				else if($type==5)//the main exam question
