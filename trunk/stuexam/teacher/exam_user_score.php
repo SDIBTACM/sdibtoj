@@ -2,45 +2,10 @@
 	require_once("./teacher-header.php");
 ?>
 <?php
-	if(isset($_GET['student']))
-	{
-		$student=mysql_real_escape_string($_GET['student']);
-		if($student!='')
-			$sqladd="WHERE `stu`.`user_id` like '%$student%'";
-		else
-			$sqladd="";
-	}
-	else
-	{
-		$student="";
-		$sqladd="";
-	}
-	if(isset($_GET['scoresx']))
-	{
-		$scoresx=intval($_GET['scoresx']);
-		if($scoresx==1)
-			$sqladd=$sqladd." ORDER BY `choosesum` DESC";
-		else if($scoresx==2)
-			$sqladd=$sqladd." ORDER BY `judgesum` DESC";
-		else if($scoresx==3)
-			$sqladd=$sqladd." ORDER BY `fillsum` DESC";
-		else if($scoresx==4)
-			$sqladd=$sqladd." ORDER BY `programsum` DESC";
-		else if($scoresx==5)
-			$sqladd=$sqladd." ORDER BY `score` DESC";
-		else
-		{
-			$sqladd=$sqladd." ORDER BY `user_id`";
-			$scoresx=0;
-		}
-	}
-	else
-	{
-		$sqladd=$sqladd." ORDER BY `user_id`";
-		$scoresx=0;
-	}
 	if(isset($_GET['eid']))
 	{
+		//var_dump(SortStuScore('stu'));
+		$sqladd=SortStuScore('stu');
 		$eid=intval($_GET['eid']);
 		$prisql="SELECT `creator`,`start_time`,`end_time` FROM `exam` WHERE `exam_id`='$eid'";
 		$prirow=fetchOne($prisql);
@@ -62,7 +27,7 @@
 			if(filter_var($eid, FILTER_VALIDATE_INT)&&$eid>0)
 			{
 				$query="SELECT `stu`.`user_id`,`stu`.`nick`,`choosesum`,`judgesum`,`fillsum`,`programsum`,`score` 
-				FROM (SELECT `ex_privilege`.`user_id`,`users`.`nick` FROM `ex_privilege`,`users` WHERE `ex_privilege`.`user_id`=`users`.`user_id` AND
+				FROM (SELECT `users`.`user_id`,`users`.`nick` FROM `ex_privilege`,`users` WHERE `ex_privilege`.`user_id`=`users`.`user_id` AND
 				 `ex_privilege`.`rightstr`=\"e$eid\" )stu left join `ex_student` on `stu`.`user_id`=`ex_student`.`user_id` AND 
 				`ex_student`.`exam_id`='$eid' $sqladd";
 				$result=mysql_query($query) or die(mysql_error());
@@ -102,23 +67,9 @@
 				?>
 				</ul>
 				</div>
-				<form class="form-search pull-left">
-  				<div class="input-append">
-  				<input type="hidden" name="scoresx" value="<?=$scoresx?>" >
-  				<input type="hidden" name="eid" value="<?=$eid?>" />
-   	 			<input type="text" class="span3 search-query" name="student" value="<?=$student?>" placeholder="查询专业或学生关键词">
-    			<input type="submit" class="btn" value="Search">
-    			</div>
-				</form>
-				<select class="pull-right" name="select1" onChange="javascript:document.location.href=this.options[this.selectedIndex].value">
-				<option <?echo $scoresx==0?"selected":""?> value="exam_user_score.php?eid=<?=$eid?>&student=<?=$student?>">按账号排序</option>
-				<option <?echo $scoresx==1?"selected":""?> value="exam_user_score.php?eid=<?=$eid?>&scoresx=1&student=<?=$student?>">按选择题分数排序</option>
-				<option <?echo $scoresx==2?"selected":""?> value="exam_user_score.php?eid=<?=$eid?>&scoresx=2&student=<?=$student?>">按判断题分数排序</option>
-				<option <?echo $scoresx==3?"selected":""?> value="exam_user_score.php?eid=<?=$eid?>&scoresx=3&student=<?=$student?>">按填空题分数排序</option>
-				<option <?echo $scoresx==4?"selected":""?> value="exam_user_score.php?eid=<?=$eid?>&scoresx=4&student=<?=$student?>">按程序题分数排序</option>
-				<option <?echo $scoresx==5?"selected":""?> value="exam_user_score.php?eid=<?=$eid?>&scoresx=5&student=<?=$student?>">按总分排序</option>
-        		</select>
-				<br />
+				
+  				<input type="hidden" name="eid" id="eid" value="<?=$eid?>" />
+   	 			
 				<table class="table table-hover table-bordered table-striped">
 				<thead>
 				<tr>
@@ -135,6 +86,38 @@
 				</tr>
 				</thead>
 				<tbody>
+					<tr class='first-tr'>
+						<td></td>
+						<td><input type="text" id="xs_userid" name="xs_userid" placeholder="查询账号"/></td>
+						<td><input type="text" id="xs_name" name="xs_name" placeholder="查询姓名"/></td>
+						<td><select  name = "xs_choose" id="xs_choose">
+							<option value=0 >请选择排序方式</option>
+							<option value=1 >升序排序</option>
+							<option value=2 >降序排序</option>
+        				</select></td>
+						<td><select  name = "xs_judge" id="xs_judge">
+							<option value=0 >请选择排序方式</option>
+							<option value=1 >升序排序</option>
+							<option value=2 >降序排序</option>
+        				</select></td>
+						<td><select  name = "xs_fill" id="xs_fill">
+							<option value=0 >请选择排序方式</option>
+							<option value=1 >升序排序</option>
+							<option value=2 >降序排序</option>
+        				</select></td>
+						<td><select  name = "xs_program" id="xs_program">
+							<option value=0 >请选择排序方式</option>
+							<option value=1 >升序排序</option>
+							<option value=2 >降序排序</option>
+        				</select></td>
+						<td><select  name = "xs_score" id="xs_score">
+							<option value=0 >请选择排序方式</option>
+							<option value=1 >升序排序</option>
+							<option value=2 >降序排序</option>
+        				</select></td>
+						<td colspan='2'><a href="javascript:void(0);" onclick="xs_search()">
+						Search</a></td>
+					</tr>	
 				<?
 					$KUserId=array();
 					$KNick=array();
@@ -229,6 +212,41 @@
 	}
 ?>
 <script type="text/javascript">
+
+function xs_search(){
+	var xs_userid = $("#xs_userid").val();
+	var xs_name = $("#xs_name").val();
+	var xs_choose = $("#xs_choose option:selected").val();
+	var xs_judge = $("#xs_judge option:selected").val();
+	var xs_fill = $("#xs_fill option:selected").val();
+	var xs_program = $("#xs_program option:selected").val();
+	var xs_score = $("#xs_score option:selected").val();
+	var eid = $("#eid").val();
+	var url = "<?php echo $_SERVER['PHP_SELF'];?>";
+	url = url+"?eid="+eid;
+	if(xs_userid!=""){
+		url = url+"&xsid="+encodeURIComponent(xs_userid);
+	}
+	if(xs_name!=""){
+		url = url+"&xsname="+encodeURIComponent(xs_name);
+	}
+	//1 1 1 1 1 = 16 + 8 + 4 + 2 + 1 = 31
+	var sortAnum = 0,sortDnum=0;
+	if(xs_choose==1) sortAnum|=1;
+	else if(xs_choose==2) sortDnum|=1;
+	if(xs_judge==1) sortAnum|=2;
+	else if(xs_judge==2) sortDnum|=2;
+	if(xs_fill==1) sortAnum|=4;
+	else if(xs_fill==2) sortDnum|=4;
+	if(xs_program==1) sortAnum|=8;
+	else if(xs_program==2) sortDnum|=8;
+	if(xs_score==1) sortAnum|=16;
+	else if(xs_score==2) sortDnum|=16;
+
+	url = url+"&sortanum="+sortAnum+"&sortdnum="+sortDnum;
+	window.location.href = url;
+}
+
 function suredo(q){
 	var ret;
 	ret = confirm(q);
