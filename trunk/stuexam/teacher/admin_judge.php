@@ -18,30 +18,7 @@
 	if(isset($_GET['problem']))
 	{
 		$problem=intval($_GET['problem']);
-		if($problem<0||$problem>2)
-			$problem=0;
-		if(!checkAdmin(1)&&$problem==2)
-			$problem=0;
-		if($searchsql=="")
-		{
-			if($problem==0||checkAdmin(1))
-				$prosql=" WHERE `isprivate`='$problem'";
-			else
-			{
-				$user=$_SESSION['user_id'];
-				$prosql=" WHERE `isprivate`='$problem' AND `creator` like '$user'";
-			}
-		}
-		else
-		{
-			if($problem==0||checkAdmin(1))
-				$prosql=" AND `isprivate`='$problem'";
-			else
-			{
-				$user=$_SESSION['user_id'];
-				$prosql=" AND `isprivate`='$problem' AND `creator` like '$user'";
-			}
-		}
+		$prosql = problemshow($problem,$searchsql);
 	}
 	else
 	{
@@ -51,37 +28,15 @@
 		else
 			$prosql=" AND `isprivate`='$problem'";
 	}
-	if(isset($_GET['page']))
-	{
-		if(!is_numeric($_GET['page']))
-			$page=1;
-		$page=intval($_GET['page']);
-	}
-	else
-		$page=1;
-	$each_page=15;// each page data num
-	$pagenum=10;//the max of page num
-
-	$sql="SELECT COUNT(*) as `numc` FROM `ex_judge` $searchsql $prosql";
-	$row=fetchOne($sql);
-	$total=$row['numc'];
-
-	$totalpage=ceil($total/$each_page);
-	if($totalpage==0)	$totalpage=1;
-	$page=$page<1?1:$page;
-	$page=$page>$totalpage?$totalpage:$page;
-
-	$offset=($page-1)*$each_page;
-	$sqladd=" limit $offset,$each_page";
-
-	$lastpage=$totalpage;
-	$prepage=$page-1;
-	$nextpage=$page+1;
-
-	$startpage=$page-4;
-	$startpage=$startpage<1?1:$startpage;
-	$endpage=$startpage+$pagenum-1;
-	$endpage=$endpage>$totalpage?$totalpage:$endpage;
+	$pageinfo = splitpage('ex_choose',$searchsql,$prosql);
+	$page = $pageinfo['page'];
+	$prepage=$pageinfo['prepage'];
+	$startpage=$pageinfo['startpage'];
+	$endpage=$pageinfo['endpage'];
+	$nextpage=$pageinfo['nextpage'];
+	$lastpage=$pageinfo['lastpage'];
+	$eachpage=$pageinfo['eachpage'];
+	$sqladd=$pageinfo['sqladd'];
 ?>
 <div>
 <div class="leftmenu pull-left" id="left">
@@ -104,7 +59,7 @@
 		<input type="submit" value="添加判断题" class="mybutton">
 		<input type="button" value="查看公共题库" class="mybutton" onclick="window.location.href='?problem=0'">
 		<input type="button" value="查看私人题库" class="mybutton" onclick="window.location.href='?problem=1'">
-		<?
+		<?php
 			if(checkAdmin(1)){
 				echo "<input type=\"button\" value=\"查看隐藏题库\" class=\"mybutton\" onclick=\"window.location.href='?problem=2'\">";
 			}
@@ -131,7 +86,7 @@
 		<tbody>
 		<?
 			require_once("../../include/set_get_key.php");
-			$numofjudge=1+($page-1)*$each_page;
+			$numofjudge=1+($page-1)*$eachpage;
 			$key=$_SESSION['getkey'];
 			$sql="SELECT `judge_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_judge` $searchsql $prosql ORDER BY `judge_id` ASC $sqladd";
 			$result = mysql_query($sql) or die(mysql_error());
@@ -153,28 +108,10 @@
 		?>
 		</tbody>
 	</table>
-	<?
-	echo "<div class=\"pagination\" style=\"text-align:center\">";
-	echo "<ul>";
-	echo "<li><a href=\"admin_judge.php?page=1&search=$search&problem=$problem\">First</a></li>";
-	if($page==1)
-		echo "<li class=\"disabled\"><a href=\"\">Previous</a></li>";
-	else
-		echo "<li><a href=\"admin_judge.php?page=$prepage&search=$search&problem=$problem\">Previous</a></li>";
-	for($i=$startpage;$i<=$endpage;$i++)
-	{
-		if($i==$page)
-			echo "<li class=\"active\"><a href=\"admin_judge.php?page=$i&search=$search&problem=$problem\">$i</a></li>";
-		else
-	  		echo "<li><a href=\"admin_judge.php?page=$i&search=$search&problem=$problem\">$i</a></li>";
-	}
-	if($page==$lastpage)
-		echo "<li class=\"disabled\"><a href=\"\">Next</a></li>";
-	else
-		echo "<li><a href=\"admin_judge.php?page=$nextpage&search=$search&problem=$problem\">Next</a></li>";
-	echo "<li><a href=\"admin_judge.php?page=$lastpage&search=$search&problem=$problem\">Last</a></li>";
-	echo "</ul>";
-	echo "</div>";
+	<?php
+		$url = "admin_judge.php?pbmtype=judge";
+		$urllast = "&search={$search}&problem={$problem}";
+		showpagelast($url,$pageinfo,$urllast);
 	?>
 </div>
 </div>
