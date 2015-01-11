@@ -1,7 +1,7 @@
 <?php
 	require_once("./teacher-header.php");
 ?>
-<?
+<?php
 	if(isset($_GET['search']))
 	{
 		$search=mysql_real_escape_string($_GET['search']);
@@ -18,30 +18,7 @@
 	if(isset($_GET['problem']))
 	{
 		$problem=intval($_GET['problem']);
-		if($problem<0||$problem>2)
-			$problem=0;
-		if(!checkAdmin(1)&&$problem==2)
-			$problem=0;
-		if($searchsql=="")
-		{
-			if($problem==0||checkAdmin(1))
-				$prosql=" WHERE `isprivate`='$problem'";
-			else
-			{
-				$user=$_SESSION['user_id'];
-				$prosql=" WHERE `isprivate`='$problem' AND `creator` like '$user'";
-			}
-		}
-		else
-		{
-			if($problem==0||checkAdmin(1))
-				$prosql=" AND `isprivate`='$problem'";
-			else
-			{
-				$user=$_SESSION['user_id'];
-				$prosql=" AND `isprivate`='$problem' AND `creator` like '$user'";
-			}
-		}
+		$prosql = problemshow($problem,$searchsql);
 	}
 	else
 	{
@@ -51,37 +28,15 @@
 		else
 			$prosql=" AND `isprivate`='$problem'";
 	}
-	if(isset($_GET['page']))
-	{
-		if(!is_numeric($_GET['page']))
-			$page=1;
-		$page=intval($_GET['page']);
-	}
-	else
-		$page=1;
-	$each_page=15;// each page data num
-	$pagenum=10;//the max of page num
-
-	$sql="SELECT COUNT(*) as `numc` FROM `ex_choose` $searchsql $prosql";
-	$row=fetchOne($sql);
-	$total=$row['numc'];
-
-	$totalpage=ceil($total/$each_page);
-	if($totalpage==0)	$totalpage=1;
-	$page=$page<1?1:$page;
-	$page=$page>$totalpage?$totalpage:$page;
-
-	$offset=($page-1)*$each_page;
-	$sqladd=" limit $offset,$each_page";
-
-	$lastpage=$totalpage;
-	$prepage=$page-1;
-	$nextpage=$page+1;
-
-	$startpage=$page-4;
-	$startpage=$startpage<1?1:$startpage;
-	$endpage=$startpage+$pagenum-1;
-	$endpage=$endpage>$totalpage?$totalpage:$endpage;
+	$pageinfo = splitpage('ex_choose',$searchsql,$prosql);
+	$page = $pageinfo['page'];
+	$prepage=$pageinfo['prepage'];
+	$startpage=$pageinfo['startpage'];
+	$endpage=$pageinfo['endpage'];
+	$nextpage=$pageinfo['nextpage'];
+	$lastpage=$pageinfo['lastpage'];
+	$eachpage=$pageinfo['eachpage'];
+	$sqladd=$pageinfo['sqladd'];
 ?>
 <div>
 <div class="leftmenu pull-left" id="left">
@@ -132,7 +87,7 @@
 		<?
 			require_once("../../include/set_get_key.php");
 			$key=$_SESSION['getkey'];
-			$numofchoose=1+($page-1)*$each_page;
+			$numofchoose=1+($page-1)*$eachpage;
 			$sql="SELECT `choose_id`,`question`,`addtime`,`creator`,`point`,`easycount` FROM `ex_choose` $searchsql $prosql ORDER BY `choose_id` ASC $sqladd";
 			$result = mysql_query($sql) or die(mysql_error());
 			while($row=mysql_fetch_object($result)){
@@ -153,28 +108,10 @@
 		?>
 		</tbody>
 	</table>
-	<?
-	echo "<div class=\"pagination\" style=\"text-align:center\">";
-	echo "<ul>";
-	echo "<li><a href=\"admin_choose.php?page=1&search=$search&problem=$problem\">First</a></li>";
-	if($page==1)
-		echo "<li class=\"disabled\"><a href=\"\">Previous</a></li>";
-	else
-		echo "<li><a href=\"admin_choose.php?page=$prepage&search=$search&problem=$problem\">Previous</a></li>";
-	for($i=$startpage;$i<=$endpage;$i++)
-	{
-		if($i==$page)
-			echo "<li class=\"active\"><a href=\"admin_choose.php?page=$i&search=$search&problem=$problem\">$i</a></li>";
-		else
-	  		echo "<li><a href=\"admin_choose.php?page=$i&search=$search&problem=$problem\">$i</a></li>";
-	}
-	if($page==$lastpage)
-		echo "<li class=\"disabled\"><a href=\"\">Next</a></li>";
-	else
-		echo "<li><a href=\"admin_choose.php?page=$nextpage&search=$search&problem=$problem\">Next</a></li>";
-	echo "<li><a href=\"admin_choose.php?page=$lastpage&search=$search&problem=$problem\">Last</a></li>";
-	echo "</ul>";
-	echo "</div>";
+	<?php
+		$url = "admin_choose.php?pbmtype=choose";
+		$urllast = "&search={$search}&problem={$problem}";
+		showpagelast($url,$pageinfo,$urllast);
 	?>
 </div>
 </div>
