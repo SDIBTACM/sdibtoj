@@ -84,7 +84,7 @@
 			<th width=8% colspan="2">操作</th>
 		</thread>
 		<tbody>
-		<?
+		<?php
 			require_once("../../include/set_get_key.php");
 			$numofjudge=1+($page-1)*$eachpage;
 			$key=$_SESSION['getkey'];
