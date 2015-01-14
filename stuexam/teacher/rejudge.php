@@ -31,7 +31,7 @@
 				</ul>
 				</div>
 				<div class="container" style="margin-left:23%" id="right">
-				<h2 style="text-align:center">添加考生</h2>
+				<h2 style="text-align:center">重判</h2>
 				<div style="height:40px">
 				<ul class="nav nav-pills pull-left">
 				<li><a href="add_exam_problem.php?eid=<?=$eid?>&type=9">考试基本信息</a></li>

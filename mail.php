@@ -12,16 +12,23 @@ if (!isset($_SESSION['user_id'])){
 }
 require_once("./include/db_info.inc.php");
 require_once("./include/const.inc.php");
+if($OJ_VIP_CONTEST) 
+{
+   echo "正式比赛禁用此功能";
+   exit(0);
+}
 if(isset($OJ_LANG)){
 		require_once("./lang/$OJ_LANG.php");
 		if(file_exists("./faqs.$OJ_LANG.php")){
 			$OJ_FAQ_LINK="faqs.$OJ_LANG.php";
 		}
 }
-echo "<title>$MSG_MAIL</title>";
-   $OJ_MAIL=true;
-if($OJ_VIP_CONTEST)
-   $OJ_MAIL=false;
+  $sql="SELECT `contest_id` FROM `contest` WHERE (`end_time`>NOW() and `start_time`<NOW()) and `defunct`='N'";
+$result= mysql_query($sql);
+$row=mysql_num_rows($result);
+if($row)
+ 
+  $OJ_MAIL=false;
 //echo $row->contest_id;
 
 
@@ -74,7 +81,7 @@ if($OJ_MAIL||isset($_SESSION['administrator']))
 <?	 
 }
 else
- echo "正式比赛期间禁用此功能";
+ echo "比赛期间禁用此功能";
 ?>
 
 
