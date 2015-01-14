@@ -237,7 +237,7 @@
 .first-tr input,.first-tr select{
   margin: 0;
   padding: 5px 0;
-  width: 100%;
+  width: 99%;
   border: none;
 }
 .first-tr a{
