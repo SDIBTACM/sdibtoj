@@ -14,7 +14,7 @@
 	$each_page=15;// each page data num
 	$pagenum=10;//the max of page num
 
-	$sql="SELECT COUNT(*) FROM `exam`";
+	$sql="SELECT COUNT(*) FROM `exam` WHERE `visible`='Y'";
 	$result=mysql_query($sql) or die(mysql_error());
 	$total=mysql_result($result, 0);
 	mysql_free_result($result);
