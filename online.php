@@ -2,10 +2,12 @@
 	$debug = true;
 	require_once('./oj-header.php');
 	require_once('./include/db_info.inc.php');
-	require_once('./include/iplocation.php');
+//	require_once('./include/iplocation.php');
+        require_once('./include/IP.class.php');
       if($OJ_ONLINE){
         	$users = $on->getAll();
-         	$ip = new IpLocation();
+         	//$ip = new IpLocation();
+                $ip  =new IP();
       }     
 ?>
 
@@ -23,13 +25,32 @@
  if(is_object($u)){
  ?>
 <tr><td class="ip">
-<?php $l = $ip->getlocation($u->ip);
-   
+<?php
+      //$l = $ip->getlocation($u->ip);
+      $l =$ip->find($u->ip);
 	echo $u->ip.'<br />';
-	if(strlen(trim($l['area']))==0)
-		echo $l['country'];
-	else
-		echo $l['area'].'@'.$l['country'];
+      if(!strcmp(trim($l[0]),"局域网"))
+      {
+         echo "局域网";
+      }
+      else
+      {
+      if(strlen(trim($l[1]))==0)
+          echo $l['0'];
+      else
+       {
+           if(!strcmp($l[1],$l[2]))
+              echo $l[1].'@'.$l[0];
+           else
+              echo $l[1].$l[2].$l[3].'@'.$l[0];
+       }
+      }
+
+
+       //if(strlen(trim($l['area']))==0)
+	//	echo $l['country'];
+	//else
+	//	echo $l['area'].'@'.$l['country'];
 	?></td><td><?=$u->uri?></td><td><?=$u->refer?></td>
 <td class="time"><?=sprintf("%dmin %dsec",($u->lastmove-$u->firsttime)/60,($u->lastmove-$u->firsttime) % 60)?></td><td><?=$u->ua?></td></tr>
 <?php 
@@ -66,18 +87,33 @@ if(isset($_GET['search'])){
     	$sql=$sql." WHERE ip like '%$search%' ";
     // else
       //  $sql=$sql." where user_id<> 'xiao'";
-    $sql=$sql."  order by `time` desc LIMIT 0,50";
+    $sql=$sql."  order by `time` desc LIMIT 0,100";
 
 $result=mysql_query($sql) or die(mysql_error());
 echo "<table border=1>";
-echo "<tr align=center><td>UserID<td>Password<td>IP<td>Time</tr>";
+echo "<tr align=center><td>UserID<td>Password<td>IP<td>Location<td>Time</tr>";
 for (;$row=mysql_fetch_row($result);){
         echo "<tr align=center>";
         echo "<td><a href='userinfo.php?user=".$row[0]."'>".$row[0]."</a>";
         echo "<td>".$row[1];
         echo "<td>".$row[2];
-        echo "<td>".$row[3];
+      $l =$ip->find($row[2]);
+      if(!strcmp(trim($l[0]),"局域网"))
+         echo "<td>局域网";
+      else
+      {
+      if(strlen(trim($l[1]))==0)
+          echo "<td>".$l['0'];
+      else
+       {
+           if(!strcmp($l[1],$l[2]))
+              echo "<td>".$l[1].'@'.$l[0];
+           else
+              echo "<td>".$l[1].$l[2].$l[3].'@'.$l[0];
+       }
+         echo "<td>".$row[3];
         echo "</tr>";
+      }
 }
 echo "</table>";
 
