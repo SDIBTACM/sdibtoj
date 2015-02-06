@@ -102,18 +102,19 @@ for (;$row=mysql_fetch_row($result);){
          echo "<td>局域网";
       else
       {
-      if(strlen(trim($l[1]))==0)
-          echo "<td>".$l['0'];
-      else
-       {
+         if(strlen(trim($l[1]))==0)
+           echo "<td>".$l['0'];
+         else
+          {
            if(!strcmp($l[1],$l[2]))
               echo "<td>".$l[1].'@'.$l[0];
            else
               echo "<td>".$l[1].$l[2].$l[3].'@'.$l[0];
-       }
+           }
+         }
          echo "<td>".$row[3];
         echo "</tr>";
-      }
+    
 }
 echo "</table>";
 
