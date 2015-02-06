@@ -158,26 +158,26 @@ if (isset($_SESSION['administrator'])){
 $sql="SELECT * FROM `loginlog` WHERE `user_id`='$user_mysql' order by `time` desc LIMIT 0,30";
 $result=mysql_query($sql) or die(mysql_error());
 echo "<table border=1>";
-echo "<tr align=center><td>UserID<td>Password<td>IP<td>Time<td>Delete</tr>";
+echo "<tr align=center><td>UserID<td>Password<td>IP<td>Location<td>Time<td>Delete</tr>";
 for (;$row=mysql_fetch_row($result);){
 	echo "<tr align=center>";
 	echo "<td>".$row[0];
 	echo "<td>".$row[1];
 	echo "<td>".$row[2];
         $l =$ip->find($row[2]);
-      if(!strcmp(trim($l[0]),"局域网"))
-         echo "<td>局域网";
-      else
-      {
-      if(strlen(trim($l[1]))==0)
-          echo "<td>".$l['0'];
-      else
+       if(!strcmp(trim($l[0]),"局域网"))
+              echo "<td>局域网";
+       else
        {
-           if(!strcmp($l[1],$l[2]))
-              echo "<td>".$l[1].'@'.$l[0];
+          if(strlen(trim($l[1]))==0)
+              echo "<td>".$l['0'];
+          else
+          {
+            if(!strcmp($l[1],$l[2]))
+                echo "<td>".$l[1].'@'.$l[0];
            else
-              echo "<td>".$l[1].$l[2].$l[3].'@'.$l[0];
-       }
+               echo "<td>".$l[1].$l[2].$l[3].'@'.$l[0];
+          }
         }
 	echo "<td>".$row[3];
         echo "<td><a href=./admin/delete_log.php?uid=".$row[0]."&logtime=".strtotime($row[3]).">delete</a>";
@@ -189,3 +189,4 @@ mysql_free_result($result);
 ?>
 </center>
 <?require_once("oj-footer.php")?>
+
