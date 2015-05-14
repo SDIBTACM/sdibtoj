@@ -56,9 +56,11 @@ require_once("oj-header.php");
 	<td align=center bgcolor=\"#1A5CC8\" width=12%><font color=white>学号 </font></td>
 	<td align=center bgcolor=\"#1A5CC8\" width=15%><font color=white>学校</font></td>
 	<td align=center bgcolor=\"#1A5CC8\" width=12%><font color=white>学院</font></td>
-	<td align=center bgcolor=\"#1A5CC8\" width=12%><font color=white>专业</font></td>
-	<td align=center bgcolor=\"#1A5CC8\" width=10%><font color=white>状态 </font></td>
-	<td align=center bgcolor=\"#1A5CC8\" width=5%><font color=white>座位号</font></td>
+    <td align=center bgcolor=\"#1A5CC8\" width=12%><font color=white>专业</font></td>";
+     echo " <td align=center bgcolor=\"#1A5CC8\" width=12%><font color=white>email</font></td>";
+        if($flag)
+            echo"<td align=center bgcolor=\"#1A5CC8\" width=10%><font color=white>状态 </font></td>";
+       echo"<td align=center bgcolor=\"#1A5CC8\" width=5%><font color=white>座位号</font></td>
 	</tr>";
 	$RID=1;
 	$color=1;
@@ -88,6 +90,9 @@ require_once("oj-header.php");
 		echo "<td>-------";
 	else
 		echo "<td>$row->stumajor";
+        
+	if ($flag)
+        echo "<td>$row->stuemail";
 	if($row->ispending==1){
 		if($admin_ok){
 			echo "<td>";
