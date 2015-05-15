@@ -34,20 +34,22 @@ else{
 }
 mysql_free_result($result);
 
-if ($reg_end_time>time()){
-	echo "Registration is running!";
-	exit(0);
-}
-else if($reg_start_time>time()){
-	echo "Registration is pending!";
-	exit(0);
-}
+//if ($reg_end_time>time()){
+//	echo "Registration is running!";
+//	exit(0);
+//}
+//else if($reg_start_time>time()){
+//	echo "Registration is pending!";
+//	exit(0);
+//}
 echo "<center><h3>Registration -- $title</h3></center>\n";
-echo "<table border=1><tr><td>Name</td><td>Sex</td><td>School_id</td><td>Phone</td><td>Email</td><td>School</td><td>Department</td><td>Major</td><td>Seatnum</td></tr>\n";
-$sql="SELECT * FROM `contestreg` WHERE `contest_id`='$cid' AND ispending='1'";
+echo "<table border=1><tr><td>ID<td>Name</td><td>Sex</td><td>School_id</td><td>Phone</td><td>Email</td><td>School</td><td>Department</td><td>Major</td><td>Seatnum</td></tr>\n";
+//$sql="SELECT * FROM `contestreg` WHERE `contest_id`='$cid' AND ispending='1'";
+$sql="SELECT * FROM `contestreg` WHERE `contest_id`='$cid'";
 $result=mysql_query($sql) or die(mysql_error());
 while($row=mysql_fetch_object($result))
-{
+{       
+        $regid=$row->user_id;
 	$realname=$row->sturealname;
 	$sex=$row->stusex;
 	$stuid=$row->stuid;
@@ -64,6 +66,7 @@ while($row=mysql_fetch_object($result))
 		$stumajor=iconv("utf8","gbk",$stumajor);
 	}
 	echo "<tr>";
+	echo "<td>$regid</td>";
 	echo "<td>$realname</td>";
 	echo "<td>$sex</td>";
 	echo "<td>$stuid</td>";
