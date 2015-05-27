@@ -209,7 +209,8 @@ require_once("oj-header.php");
             if($search!='')
                $sql=$sql." and title like '%$search%' ORDER BY `contest_id` DESC  ";
         }else
-               $sql=$sql." ORDER BY `contest_id` DESC limit $start,$sz";
+               //$sql=$sql." ORDER BY `contest_id` DESC limit $start,$sz";
+               $sql=$sql." ORDER BY `start_time` DESC,`contest_id` DESC limit $start,$sz";
 $result=mysql_query($sql);
 $rows_cnt = mysql_num_rows($result);
 $color=false;
