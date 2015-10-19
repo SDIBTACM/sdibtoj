@@ -39,10 +39,8 @@ $pend=$pstart+$page_cnt;
 $sub_arr=Array();
 // submit
 if (isset($_SESSION['user_id'])){
-$sql="SELECT `problem_id` FROM `solution` WHERE `user_id`='".$_SESSION['user_id']."'".
-//	" AND `problem_id`>='$pstart'".
-//	" AND `problem_id`<'$pend'".
-	" group by `problem_id`";
+$sql="SELECT distinct `problem_id` FROM `solution` WHERE `user_id`='".$_SESSION['user_id']."'";
+	// " group by `problem_id`";
 $result=@mysql_query($sql) or die(mysql_error());
 while ($row=mysql_fetch_array($result))
 	$sub_arr[$row[0]]=true;
@@ -50,11 +48,9 @@ while ($row=mysql_fetch_array($result))
 $acc_arr=Array();
 // ac
 if (isset($_SESSION['user_id'])){
-$sql="SELECT `problem_id` FROM `solution` WHERE `user_id`='".$_SESSION['user_id']."'".
-//	" AND `problem_id`>='$pstart'".
-//	" AND `problem_id`<'$pend'".
-	" AND `result`=4".
-	" group by `problem_id`";
+$sql="SELECT distinct `problem_id` FROM `solution` WHERE `user_id`='".$_SESSION['user_id']."'".
+	" AND `result`=4";
+	// " group by `problem_id`";
 $result=@mysql_query($sql) or die(mysql_error());
 while ($row=mysql_fetch_array($result))
 	$acc_arr[$row[0]]=true;

@@ -114,7 +114,7 @@
 			}
 		?>
            
-		<th><a href="./stuexam">exam</a></th>
+		<th><a href="./stuexam">Exam</a></th>
 	</tr>
 </table>
 </center>
