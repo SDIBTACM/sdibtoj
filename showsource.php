@@ -26,7 +26,7 @@ if (!isset($_GET['id'])){
 	require_once("oj-footer.php");
 	exit(0);
 }
-$ok=false;
+$ok=0;
 $id=strval(intval($_GET['id']));
 $sql="SELECT * FROM `solution` WHERE `solution_id`='".$id."'";
 $result=mysql_query($sql);
@@ -44,11 +44,11 @@ if (isset($OJ_AUTO_SHARE)&&$OJ_AUTO_SHARE&&isset($_SESSION['user_id'])){
 	$sql="SELECT 1 FROM solution where 
 			result=4 and problem_id=$sproblem_id and user_id='".$_SESSION['user_id']."'";
 	$rrs=mysql_query($sql);
-	$ok=(mysql_num_rows($rrs)>0);
+	$sok=(mysql_num_rows($rrs)>0);
 	mysql_free_result($rrs);
 }
 
-if (isset($_SESSION['user_id'])&&$row && $row->user_id==$_SESSION['user_id']) $ok=true;
+if (isset($_SESSION['user_id'])&&$row && $row->user_id==$_SESSION['user_id'] && $sok) $ok=true;
 if(isset($OJ_VIP_CONTEST)&&$OJ_VIP_CONTEST)
 {
         $sql="SELECT 1 FROM `contest_problem` WHERE `problem_id`=$sproblem_id AND `contest_id` IN (
