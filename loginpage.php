@@ -1,4 +1,4 @@
-<?require_once("oj-header.php");?>
+<?require_once("oj-header.php")?>
 <title>LOGIN</title>
 <br><br>
 <?
@@ -12,7 +12,8 @@ if (isset($_SESSION['user_id'])){
 	<table width=400 algin=center>
 	<tr><td width=25%><?=$MSG_USER_ID?>:<td width=75%><input name="user_id" type="text" size=20></tr>
 	<tr><td><?=$MSG_PASSWORD?>:<td><input name="password" type="password" size=20></tr>
-	<tr><td><td><input name="submit" type="submit" size=10 value="Submit"></tr>
+	<tr><td><td><input name="submit" type="submit" size=10 value="Submit">
+         <a href="lostpassword.php">Lost Password</a></tr>
 	</table>
 	<center>
 </form>
