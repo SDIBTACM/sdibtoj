@@ -114,7 +114,7 @@
 			}
 		?>
            
-		<th><a href="./stuexam">Exam</a></th>
+		<th><a href="./stuexam/home/dispatcher/">Exam</a></th>
 	</tr>
 </table>
 </center>
