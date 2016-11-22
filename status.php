@@ -362,6 +362,10 @@ $sql_seat="SELECT `seatnum` FROM `contestreg` WHERE `contestreg`.`contest_id` ='
 		}
 		
 	}
+	 if( isset($_SESSION['source_browser'])){
+            if (isset($row->pass_rate)&&$row->pass_rate>0&&$row->pass_rate<0.98)
+                echo "--".(100-$row->pass_rate*100)."%";
+          }
 	if ($flag){
 
 		if ($row->result>=4){
