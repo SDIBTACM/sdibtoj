@@ -1,3 +1,4 @@
+
 <?
 require_once("./include/my_func.inc.php");
 require_once("./include/db_info.inc.php");
@@ -362,11 +363,15 @@ $sql_seat="SELECT `seatnum` FROM `contestreg` WHERE `contestreg`.`contest_id` ='
 		}
 		
 	}
-	 if( isset($_SESSION['source_browser'])){
-            if (isset($row->pass_rate)&&$row->pass_rate>0&&$row->pass_rate<0.98)
-                echo "--".(100-$row->pass_rate*100)."%";
-          }
-	if ($flag){
+
+            if (isset($row->pass_rate)&&$row->pass_rate>0&&$row->pass_rate<0.98) 
+            { 
+    	       if( isset($_SESSION['source_browser']))
+         	echo "--".($row->pass_rate*100)."%"; 
+              else      
+    		echo "--**%"; 
+           }
+if ($flag){
 
 		if ($row->result>=4){
 			echo "<td>".$row->memory." <font color=red>kb</font>";
@@ -407,7 +412,7 @@ mysql_free_result($result);
 <?
 echo "[<a href=status.php?".$str2.">Top</a>]&nbsp;&nbsp;";
 if (isset($_GET['prevtop']))
-	echo "[<a href=status.php?".$str2."&top=".$_GET['prevtop'].">Previous Page</a>]&nbsp;&nbsp;";
+	echo "[<a href=status.php?".$str2."&top=".intval($_GET['prevtop']).">Previous Page</a>]&nbsp;&nbsp;";
 else
 	echo "[<a href=status.php?".$str2."&top=".($top+20).">Previous Page</a>]&nbsp;&nbsp;";
 echo "[<a href=status.php?".$str2."&top=".$bottom."&prevtop=$top>Next Page</a>]";
