@@ -11,14 +11,14 @@ if (!(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))){
 <title>Add a contest</title>
 
 <?
-  
+
 if (isset($_POST['syear']))
 {
 	require_once("../include/db_info.inc.php");
         require_once("../include/check_post_key.php");
         $starttime=intval($_POST['syear'])."-".intval($_POST['smonth'])."-".intval($_POST['sday'])." ".intval($_POST['shour']).":".intval($_POST['sminute']).":00";
-         $endtime=intval($_POST['eyear'])."-".intval($_POST['emonth'])."-".intval($_POST['eday'])." ".intval($_POST['ehour']).":".intval($_POST['eminute']).":00";	
- 
+         $endtime=intval($_POST['eyear'])."-".intval($_POST['emonth'])."-".intval($_POST['eday'])." ".intval($_POST['ehour']).":".intval($_POST['eminute']).":00";
+
        //	echo $starttime;
 	//	echo $endtime;
 	$title=mysql_real_escape_string($_POST['title']);
@@ -51,20 +51,43 @@ if (isset($_POST['syear']))
         $langmask=$OJ_LANGMASK;
     	foreach($lang as $t){
 			$langmask+=1<<$t;
-	} 
+	}
 	$langmask=15&(~$langmask);
-	//echo $langmask;	
-         $sql="INSERT INTO `contest`(`title`,`start_time`,`end_time`,`private`,`langmask`,`description`,`reg_start_time`,`reg_end_time`)	
+
+	// 验证是否可以选择该题目
+	$plist = trim($_POST['cproblem']);
+	$_problemIds = empty($plist) ? array() : explode(',', $plist);
+	$pieces = array();
+	if (count($_problemIds) > 0) {
+		$sql = "select defunct, author, problem_id from problem where problem_id in ($plist)";
+		$result = mysql_query($sql);
+		while ($row = mysql_fetch_object($result)) {
+			if ($row->defunct == 'N') {
+				$pieces[] = $row->problem_id;
+			} else {
+				if (!strcmp($row->author, $_SESSION['user_id']) || isset($_SESSION['administrator'])) {
+					$pieces[] = $row->problem_id;
+				}
+			}
+		}
+	}
+	if (count($_problemIds) != count($pieces)) {
+		print "<script language='javascript'>\n";
+		print "alert('选择的题目列表中有隐藏题目, 不能保存!\\n');\n";
+		print "history.go(-1);\n</script>";
+		exit(0);
+	}
+
+	//echo $langmask;
+         $sql="INSERT INTO `contest`(`title`,`start_time`,`end_time`,`private`,`langmask`,`description`,`reg_start_time`,`reg_end_time`)
        VALUES('$title','$starttime','$endtime','$private',$langmask,'$description','$regstarttime','$regendtime')";
 //	echo $sql;
 	mysql_query($sql) or die(mysql_error());
 	$cid=mysql_insert_id();
 	echo "Add Contest ".$cid;
 	$sql="DELETE FROM `contest_problem` WHERE `contest_id`=$cid";
-	$plist=trim($_POST['cproblem']);
-	$pieces = explode(",",$plist );
 	if (count($pieces)>0 && strlen($pieces[0])>0){
-		$sql_1="INSERT INTO `contest_problem`(`contest_id`,`problem_id`,`num`) 
+		$sql_1="INSERT INTO `contest_problem`(`contest_id`,`problem_id`,`num`)
 			VALUES ('$cid','$pieces[0]',0)";
 		for ($i=1;$i<count($pieces);$i++){
 			$sql_1=$sql_1.",('$cid','$pieces[$i]',$i)";
@@ -79,10 +102,10 @@ if (isset($_POST['syear']))
        $sql="insert into `privilege` (`user_id`,`rightstr`)  values('".$_SESSION['user_id']."','m$cid')";
        mysql_query($sql);
       $_SESSION["m$cid"]=true;
- 
+
 	$pieces = explode("\n", trim($_POST['ulist']));
 	if (count($pieces)>0 && strlen($pieces[0])>0){
-		$sql_1="INSERT INTO `privilege`(`user_id`,`rightstr`) 
+		$sql_1="INSERT INTO `privilege`(`user_id`,`rightstr`)
 			VALUES ('".trim($pieces[0])."','c$cid')";
 		for ($i=1;$i<count($pieces);$i++)
 			$sql_1=$sql_1.",('".trim($pieces[$i])."','c$cid')";
@@ -112,13 +135,13 @@ else if(isset($_POST['problem2contest'])){
 	   $plist="";
 	   //echo $_POST['pid'];
 	   sort($_POST['pid']);
-	   foreach($_POST['pid'] as $i){		    
-			if ($plist) 
+	   foreach($_POST['pid'] as $i){
+			if ($plist)
 				$plist.=','.$i;
 			else
 				$plist=$i;
 	   }
-}  
+}
   include_once("../fckeditor/fckeditor.php") ;
 ?>
 	<body onload="JudgeUp()">
@@ -135,7 +158,7 @@ else if(isset($_POST['problem2contest'])){
 	Year:<input type=text name=eyear value=<?=date('Y')?> size=7 >
 	Month:<input type=text name=emonth value=<?=date('m')?> size=7 >
         Day:<input type=text name=eday size=7 value=<?=date('d')+(date('H')+4>23?1:0)?>>&nbsp;
-        Hour:<input type=text name=ehour size=7 value=<?=(date('H')+4)%24?>>&nbsp;	
+        Hour:<input type=text name=ehour size=7 value=<?=(date('H')+4)%24?>>&nbsp;
 	Minute:<input type=text name=eminute value=00 size=7 ></p>
 	Public:<select name=private id=private onchange="JudgePrivate(this.value)">
 		<option value=0>Public</option>
@@ -158,7 +181,7 @@ else if(isset($_POST['problem2contest'])){
 	Year:<input type=text name=reyear value=<?=date('Y')?> size=7 >
 	Month:<input type=text name=remonth value=<?=date('m')?> size=7 >
         Day:<input type=text name=reday size=7 value=<?=date('d')+(date('H')+4>23?1:0)?>>&nbsp;
-        Hour:<input type=text name=rehour size=7 value=<?=(date('H')+4)%24?>>&nbsp;	
+        Hour:<input type=text name=rehour size=7 value=<?=(date('H')+4)%24?>>&nbsp;
 	Minute:<input type=text name=reminute value=00 size=7 ></p>
 	</div>
         <?require_once("../include/set_post_key.php");?>
@@ -185,7 +208,7 @@ else if(isset($_POST['problem2contest'])){
 		else
 			divn.style.display='none';
 	}
-</script>	
+</script>
 
 <?php
 $fck_description = new FCKeditor('description') ;
@@ -202,7 +225,7 @@ $fck_description->Create() ;
 	<br />
 	*可以将学生学号从Excel整列复制过来，然后要求他们用学号做UserID注册,就能进入Private的比赛作为作业和测验。
 	<p><input type=submit value=Submit name=submit"><input type=reset value=Reset name=reset></p>
-	
+
 </form>
 </body>
 <?
