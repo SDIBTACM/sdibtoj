@@ -18,10 +18,10 @@ if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))
 if (isset($_POST['syear']))
 {
 	require_once("../include/check_post_key.php");
-	
+
 	$starttime=intval($_POST['syear'])."-".intval($_POST['smonth'])."-".intval($_POST['sday'])." ".intval($_POST['shour']).":".intval($_POST['sminute']).":00";
 	$endtime=intval($_POST['eyear'])."-".intval($_POST['emonth'])."-".intval($_POST['eday'])." ".intval($_POST['ehour']).":".intval($_POST['eminute']).":00";
-	
+
 //	echo $starttime;
 //	echo $endtime;
 	$title=mysql_real_escape_string($_POST['title']);
@@ -46,18 +46,18 @@ if (isset($_POST['syear']))
            }
 
 
-	
+
    $lang=$_POST['lang'];
    $langmask=0;
    foreach($lang as $t){
 			$langmask+=1<<$t;
-	} 
+	}
 	$langmask=15&(~$langmask);
-//	echo $langmask;	
+//	echo $langmask;
 
 	$cid=intval($_POST['cid']);
             //echo $cid;
-	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator']))) 
+	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))
          {
          echo "You don't have the privilage";
           exit();
@@ -65,12 +65,36 @@ if (isset($_POST['syear']))
 	$sql="UPDATE `contest` set `title`='$title',description='$description',`start_time`='$starttime',`reg_start_time`='$regstarttime',`reg_end_time`='$regendtime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask WHERE `contest_id`=$cid";
 	//echo $sql;
 	mysql_query($sql) or die(mysql_error());
+
+	// 验证是否可以选择该题目
+	$plist = trim($_POST['cproblem']);
+	$_problemIds = empty($plist) ? array() : explode(',', $plist);
+	$pieces = array();
+	if (count($_problemIds) > 0) {
+		$sql = "select defunct, author, problem_id from problem where problem_id in ($plist)";
+		$result = mysql_query($sql);
+		while ($row = mysql_fetch_object($result)) {
+			if ($row->defunct == 'N') {
+				$pieces[] = $row->problem_id;
+			} else {
+				if (!strcmp($row->author, $_SESSION['user_id']) || isset($_SESSION['administrator'])) {
+					$pieces[] = $row->problem_id;
+				}
+			}
+		}
+	}
+	if (count($_problemIds) != count($pieces)) {
+		print "<script language='javascript'>\n";
+		print "alert('选择的题目列表中有隐藏题目, 不能保存!\\n');\n";
+		print "history.go(-1);\n</script>";
+		exit(0);
+	}
+
 	$sql="DELETE FROM `contest_problem` WHERE `contest_id`=$cid";
 	mysql_query($sql);
-	$plist=trim($_POST['cproblem']);
-	$pieces = explode(',', $plist);
+
 	if (count($pieces)>0 && strlen($pieces[0])>0){
-		$sql_1="INSERT INTO `contest_problem`(`contest_id`,`problem_id`,`num`) 
+		$sql_1="INSERT INTO `contest_problem`(`contest_id`,`problem_id`,`num`)
 			VALUES ('$cid','$pieces[0]',0)";
 		for ($i=1;$i<count($pieces);$i++)
 			$sql_1=$sql_1.",('$cid','$pieces[$i]',$i)";
@@ -80,26 +104,26 @@ if (isset($_POST['syear']))
 			mysql_query($sql_2);
 		}
 		//echo $sql_1;
-		
+
 		mysql_query($sql_1) or die(mysql_error());
 		$sql="update `problem` set defunct='N' where `problem_id` in ($plist)";
 		mysql_query($sql) or die(mysql_error());
-	
+
 	}
-	
+
 	$sql="DELETE FROM `privilege` WHERE `rightstr`='c$cid'";
 	mysql_query($sql);
 	$pieces = explode("\n", trim($_POST['ulist']));
 	if (count($pieces)>0 && strlen($pieces[0])>0){
-		$sql_1="INSERT INTO `privilege`(`user_id`,`rightstr`) 
+		$sql_1="INSERT INTO `privilege`(`user_id`,`rightstr`)
 			VALUES ('".trim($pieces[0])."','c$cid')";
 		for ($i=1;$i<count($pieces);$i++)
 			$sql_1=$sql_1.",('".trim($pieces[$i])."','c$cid')";
 		//echo $sql_1;
 		mysql_query($sql_1) or die(mysql_error());
 	}
-	
-         echo "<script>window.location.href=\"contest_list.php\";</script>";	
+
+         echo "<script>window.location.href=\"contest_list.php\";</script>";
 	exit();
 }else{
 	$cid=intval($_GET['cid']);
@@ -136,8 +160,8 @@ if (isset($_POST['syear']))
 		$ulist=$ulist.$row[0];
 		if ($i>1) $ulist=$ulist."\n";
 	}
-	
-	
+
+
 }
 ?>
 <body onload="JudgeUp()">
@@ -176,7 +200,7 @@ Language:<select name="lang[]" multiple>
 		<option value=0 <?php echo $C_select?>>C</option>
 		<option value=1 <?php echo $CPP_select?>>C++</option>
 		<option value=2 <?php echo $P_select?>>Pascal</option>
-		<option value=3 <?php echo $J_select?>>Java</option>	
+		<option value=3 <?php echo $J_select?>>Java</option>
 	</select>
 <br>Problems:<input type=text size=60 name=cproblem value='<?php echo $plist?>'>
 	<div id="registertime" style="display:none">
