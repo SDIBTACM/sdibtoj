@@ -154,11 +154,14 @@ mysql_free_result($result);
 <?
 require_once('./include/IP.class.php');
 $ip  =new IP();
-if (isset($_SESSION['administrator'])){
-$sql="SELECT * FROM `loginlog` WHERE `user_id`='$user_mysql' order by `time` desc LIMIT 0,30";
+if (isset($_SESSION['contest_creator'])||isset($_SESSION['administrator'])){
+$sql="SELECT * FROM `loginlog` WHERE `user_id`='$user_mysql' order by `time` desc LIMIT 0,50";
 $result=mysql_query($sql) or die(mysql_error());
 echo "<table border=1>";
-echo "<tr align=center><td>UserID<td>Password<td>IP<td>Location<td>Time<td>Delete</tr>";
+echo "<tr align=center><td>UserID<td>Password<td>IP<td>Location<td>Time";
+if (isset($_SESSION['administrator']))
+      echo "<td>Delete";
+echo "</tr>";
 for (;$row=mysql_fetch_row($result);){
 	echo "<tr align=center>";
 	echo "<td>".$row[0];
@@ -180,6 +183,7 @@ for (;$row=mysql_fetch_row($result);){
           }
         }
 	echo "<td>".$row[3];
+if (isset($_SESSION['administrator']))
         echo "<td><a href=./admin/delete_log.php?uid=".$row[0]."&logtime=".strtotime($row[3]).">delete</a>";
 	echo "</tr>";
 }
@@ -189,4 +193,3 @@ mysql_free_result($result);
 ?>
 </center>
 <?require_once("oj-footer.php")?>
-
