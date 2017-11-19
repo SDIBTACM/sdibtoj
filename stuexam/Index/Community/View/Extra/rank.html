@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="程序设计考试 山东工商学院">
+    <meta name="keywords" content="Exam,SDIBT,山东工商学院,程序设计考试">
+    <!-- yours css -->
+    <css file="__PUBLIC__/Css/examsys.min.css"/>
+    <!-- Bootstrap -->
+    <css file="__PUBLIC__/Css/bootstrap.min.css"/>
+    <!--[if lt IE 9]>
+    <script src="__PUBLIC__/Js/html5shiv.min.js"></script>
+    <script src="__PUBLIC__/Js/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="navbar navbar-fixed-top navbar-default exam_header" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#header-navbar">
+                <span class="sr-only">header toggle</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="#" class="navbar-brand exam_navbar-brand">假装有个标题</a>
+        </div>
+        <!-- navbar-header-end -->
+    </div>
+    <!-- container-fluid end -->
+</div>
+<!-- navbar end -->
+
+<div class="container exam_content" style='text-align:left'>
+    <div style="text-align:center">
+        <h1>ACM预选排名</h1>
+    </div>
+    <div class="alert alert-success" role="alert">
+        <strong>恭喜下列dalao, 顺利完成预选要求, 可以正式加入集训队~!</strong>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>序号</td>
+                    <td>账号</td>
+                    <td>姓名</td>
+                    <td>院部</td>
+                    <td>专业</td>
+                </tr>
+            </thead>
+            <foreach name="acceptUsers" item="acUser" key="index">
+                <tr>
+                    <td>{$index + 1}</td>
+                    <td><a href="http://acm.sdibt.edu.cn/JudgeOnline/userinfo.php?user={$acUser['user_id']}">{$acUser['user_id']}</a></td>
+                    <td>{$acUser['name']}</td>
+                    <td>{$acUser['studepartment']}</td>
+                    <td>{$acUser['stumajor']}</td>
+                </tr>
+            </foreach>
+        </table>
+        <strong>注意!</strong> <br/>1. 为鼓励程序媛们, 女生的base比男生多0.05; <br/>2. 平时表现分跟本周做题数相挂钩<br/>
+        3. 总得分 = 中文 * 1 + 英文 * 7 + 平时表现 * 2 <br/>4. 英文题为题号1145~1191所有题目<br/>
+        5. 中文题需完成150道, 26页开始之后的不算在内~<br/>6. 每周评分较高者(名额待定)可以免自习来集训队办公室学习<br/>
+        7. 完成要求时可以正式加入集训队~
+    </div>
+
+    <table class="table table-bordered table-condensed">
+        <thread>
+            <th width=5%>排名</th>
+            <th width=10%>账号</th>
+            <th width=10%>姓名</th>
+            <th width=10%>中文题</th>
+            <th width=10%>英文题</th>
+            <th width=10%>本周做题数</th>
+            <th width=10%>平时表现</th>
+            <th width=30%>总分</th>
+        </thread>
+        <tbody>
+        <foreach name='students' item='student' key='index'>
+            <if condition="$student['chineseNum'] egt 150 and $student['englishNum'] egt 47">
+                <tr class="alert-warning">
+            <else/>
+                <tr>
+            </if>
+            <if condition="$student['chineseNum'] egt 150 and $student['englishNum'] egt 47">
+                <td class="alert-warning"><span class="glyphicon glyphicon-fire"></span></td>
+                <else/>
+                <td>{$student['rank']}</td>
+            </if>
+            <td><a href="http://acm.sdibt.edu.cn/JudgeOnline/userinfo.php?user={$student['user_id']}">{$student['user_id']}</a></td>
+            <td>{$student['name']}</td>
+            <if condition="$student['chineseNum'] egt 150">
+                <td class="alert-warning">{$student['chineseNum']}
+                    <span class="glyphicon glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+                </td>
+                <else/>
+                <td>{$student['chineseNum']}</td>
+            </if>
+            <if condition="$student['englishNum'] egt 47">
+                <td class="alert-warning">{$student['englishNum']}<span class="glyphicon glyphicon glyphicon-ok-sign" aria-hidden="true"></span></td>
+                <else/>
+                <td>{$student['englishNum']}</td>
+            </if>
+            <td>{$student['week']}</td>
+            <td>{$student['person']}</td>
+            <td>{$student['score']}</td>
+            </tr>
+        </foreach>
+        </tbody>
+    </table>
+</div>
+
+<style>
+    #examFooter, #examFooter ul li {
+        background-color: #252525;
+        text-align: center;
+    }
+
+    #examFooter .container {
+        padding-top: 30px;
+    }
+
+    #examFooter ul li {
+        border: none;
+        color: white;
+        font-size: 20px;
+    }
+
+    #examFooter ul li a, #examFooter p {
+        font-size: 15px;
+        color: #959595;
+    }
+</style>
+<footer id="examFooter">
+    <div class="container">
+        <ul class="list-group col-md-4">
+            <li class="list-group-item">下载链接</li>
+            <li class="list-group-item"><a href="/download/Firefox.exe">Firefox</a></li>
+            <li class="list-group-item"><a href="/download/codeblocks-12.11mingw-setup.exe">CodeBlocks for Win</a></li>
+        </ul>
+        <ul class="list-group col-md-4">
+            <li class="list-group-item">主站导航</li>
+            <li class="list-group-item"><a href="/JudgeOnline/faqs.php">F.A.Qs</a></li>
+            <li class="list-group-item"><a href="/JudgeOnline/contest.php">Contest</a></li>
+            <li class="list-group-item"><a href="/JudgeOnline/ranklist.php">Ranklist</a></li>
+            <li class="list-group-item"><a href="/JudgeOnline/problemset.php">ProblemSet</a></li>
+            <li class="list-group-item"><a href="/JudgeOnline/stuexam/">Examination</a></li>
+        </ul>
+        <ul class="list-group col-md-3">
+            <li class="list-group-item">关于我们</li>
+            <li class="list-group-item"><a href="/blog/">博客</a></li>
+            <li class="list-group-item"><a href="/ranklist/">省赛排名</a></li>
+            <li class="list-group-item"><a href="http://acm.sdibt.edu.cn:8001">训练计划</a></li>
+        </ul>
+        <div class="col-md-offset-2 col-md-8">
+            <p>@Copyright&copy;SDIBT_ACM | Any Problems, Please Contact Admin:<a
+                    href="mailto:sdibtacm@126.com">admin</a></p>
+        </div>
+    </div>
+</footer>
+<js file="__PUBLIC__/Js/bootstrap.min.js"/>
+</body>
+</html>

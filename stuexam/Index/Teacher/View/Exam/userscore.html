@@ -1,0 +1,283 @@
+<div class="container exam_content">
+    <h2>成绩单</h2>
+    <include file='Public:sideheader'/>
+    <input type="hidden" name="eid" id="eid" value="{$eid}"/>
+
+    <table class="table table-hover table-bordered table-condensed">
+        <thead>
+        <tr>
+            <th width=2%>Rank</th>
+            <th width=7%>账号</th>
+            <th width=9%>姓名</th>
+            <th width=5%>选择题<input type="checkbox" name="typeRadio" value="choose" /></th>
+            <th width=5%>判断题<input type="checkbox" name="typeRadio" value="judge" /></th>
+            <th width=5%>填空题<input type="checkbox" name="typeRadio" value="fill" /></th>
+            <th width=5%>程序题<input type="checkbox" name="typeRadio" value="program" /></th>
+            <th width=5%>总成绩<input type="checkbox" name="typeRadio" value="all" checked="checked"/></th>
+            <th width=7%>试卷</th>
+            <th width=7%>操作</th>
+            <th width=6%>选择删除</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class='first-tr'>
+            <form class='form-inline'>
+                <td></td>
+                <td class='form-group'>
+                    <input class='form-control' type="text" id="xs_userid" name="xs_userid" value="{$xsid}"
+                           placeholder="查询账号"/>
+                </td>
+                <td class='form-group'>
+                    <input class='form-control' type="text" id="xs_name" name="xs_name" value="{$xsname}"
+                           placeholder="查询姓名"/>
+                </td>
+                <td class='form-group'><select class='form-control' name="xs_choose" id="xs_choose">
+                    <option value='0'>排序方式</option>
+                    <option value='1'
+                    <?php echo ($asortnum & 1) ? 'selected' : '';?> >升序</option>
+                    <option value='2'
+                    <?php echo ($dsortnum & 1) ? 'selected' : '';?> >降序</option>
+                </select></td>
+                <td class='form-group'><select class='form-control' name="xs_judge" id="xs_judge">
+                    <option value='0'>排序方式</option>
+                    <option value='1'
+                    <?php echo ($asortnum & 2) ? 'selected' : '';?> >升序</option>
+                    <option value='2'
+                    <?php echo ($dsortnum & 2) ? 'selected' : '';?> >降序</option>
+                </select></td>
+                <td class='form-group'><select class='form-control' name="xs_fill" id="xs_fill">
+                    <option value='0'>排序方式</option>
+                    <option value='1'
+                    <?php echo ($asortnum & 4) ? 'selected' : '';?> >升序</option>
+                    <option value='2'
+                    <?php echo ($dsortnum & 4) ? 'selected' : '';?> >降序</option>
+                </select></td>
+                <td class='form-group'><select class='form-control' name="xs_program" id="xs_program">
+                    <option value='0'>排序方式</option>
+                    <option value='1'
+                    <?php echo ($asortnum & 8) ? 'selected' : '';?> >升序</option>
+                    <option value='2'
+                    <?php echo ($dsortnum & 8) ? 'selected' : '';?> >降序</option>
+                </select></td>
+                <td class='form-group'><select class='form-control' name="xs_score" id="xs_score">
+                    <option value='0'>排序方式</option>
+                    <option value='1'
+                    <?php echo ($asortnum & 16) ? 'selected' : '';?> >升序</option>
+                    <option value='2'
+                    <?php echo ($dsortnum & 16) ? 'selected' : '';?> >降序</option>
+                </select></td>
+                <td>
+                    <button type='button' class='btn btn-info' onclick="xs_search()">
+                        Search
+                    </button>
+                </td>
+                <td>
+                    <a href="javascript:void(0);" id="oneClickDel" class='label label-danger col-md-offset-1 col-md-4' title="一键删除">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </a>
+                    <a href="javascript:void(0);" class='label label-success col-md-offset-2 col-md-4' title="一键提交"
+                       onclick="suredo('{:U('Teacher/Info/submitAllPaper', array('eid' => $eid,'sortdnum' => $dsortnum,'sortanum' => $asortnum) )}','确认帮所有考生提交试卷嘛?')">
+                        <span class="glyphicon glyphicon-saved" aria-hidden="true"></span>
+                    </a>
+                </td>
+                <td>
+                    <input type="checkbox" name="allCheck" id="allCheck">全选
+                    <input type="checkbox" name="rejectCheck" id="rejectCheck">反选
+                </td>
+            </form>
+        </tr>
+        <form name="checkForm" id="checkSubmit" action="{:U('Info/DelAllUserScore')}" method="post">
+            <input type="hidden" name="eid" value="{$eid}" id="examId"/>
+            <input type="hidden" name="type" value="all" id="delType">
+            <foreach name='row' item='r' key='k'>
+                <tr>
+                    <td>{$k+1}</td>
+                    <td>{$r['user_id']}</td>
+                    <td><a href="javascript:void(0);" class="userScoreShow" data-uid="{$r['user_id']}">{$r['nick']|cutstring=###,12}</a></td>
+                    <td>{$r['choosesum']|checkScore}</td>
+                    <td>{$r['judgesum']|checkScore}</td>
+                    <td>{$r['fillsum']|checkScore}</td>
+                    <td>{$r['programsum']|checkScore}</td>
+                    <td>{$r['score']|checkScore}</td>
+
+                    <if condition="$r['hasTakenIn'] eq 0">
+                            <td><span class='label label-default'>未参加</span></td>
+                            <td>无</td>
+                        <else/>
+                            <if condition="$r['hasSubmit'] eq 1">
+                                <td><a class='label label-info'
+                                       href="{:U('Teacher/Info/showpaper',array('users'=>$r['user_id'],'eid'=>$eid))}">已交卷>></a>
+                                </td>
+                                <td><a class='label label-danger'
+                                       href="#" data-skip="{:U('Teacher/Info/delscore',array('users'=>$r['user_id'],'eid'=>$eid, 'sortdnum' => $dsortnum,'sortanum' => $asortnum))}"
+                                       onclick="checkWhetherDel(this)">删除分数 X</a>
+                                </td>
+                                <else/>
+                                    <if condition="$isEnd eq true">
+                                        <td><span class='label label-warning'>未交卷</span></td>
+                                        <td><a class='label label-success'
+                                               href="{:U('Teacher/Info/submitpaper',array('users'=>$r['user_id'],'eid'=>$eid, 'sortdnum' => $dsortnum,'sortanum' => $asortnum))}">提交试卷>></a>
+                                        </td>
+                                        <else/>
+                                        <td><a class='label label-danger'
+                                               href="{:U('Teacher/Info/showpaper',array('users'=>$r['user_id'],'eid'=>$eid))}">正在考试>></a>
+                                        </td>
+                                        <td><a class='label label-warning'
+                                               href="{:U('Teacher/Info/hardSubmit',array('userId'=>$r['user_id'],'eid'=>$eid, 'sortdnum' => $dsortnum,'sortanum' => $asortnum))}">强制交卷>></a>
+                                        </td>
+                                    </if>
+                            </if>
+                    </if>
+                    <td>
+                        <input type="checkbox" name="check{$r['user_id']}" class="delCheck" value="1">
+                    </td>
+                </tr>
+            </foreach>
+        </form>
+        </tbody>
+    </table>
+
+    <div class="modal fade" id="userScoreModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div>
+<script type="text/javascript">
+    var scoreurl = "{:U('Teacher/Exam/userscore')}";
+    function checkWhetherDel(the) {
+        var skipLink = $(the).data("skip");
+        var _typeAndName = getTypeAndNameSelect();
+        if (_typeAndName.length == 0) {
+            return;
+        }
+        var typeAndName = _typeAndName.split("|");
+        var typeStr = typeAndName[0];
+        var nameStr = typeAndName[1];
+        var c = confirm('确定要删除选定考生的' + nameStr +'嘛?');
+        if (c) {
+            window.location.href=skipLink + "?type=" + typeStr;
+        }
+    }
+
+    function getSelectNameByType(type) {
+        var name;
+        if (type == "choose") {
+            name = "选择题分数"
+        } else if (type == "judge") {
+            name = "判断题分数";
+        } else if (type == "fill") {
+            name = "填空题分数";
+        } else if (type == "program") {
+            name = "程序题分数";
+        } else {
+            name = "总成绩";
+        }
+        return name;
+    }
+
+    function getTypeAndNameSelect() {
+        var typeList =[];
+        var nameList = [];
+        $('input[name="typeRadio"]:checked').each(function() {
+            var type = $(this).val();
+            typeList.push(type);
+            var name = getSelectNameByType(type);
+            nameList.push(name);
+        });
+        if (typeList.length == 0) {
+            alert("请选择需要删除的题目类型!");
+            return "";
+        }
+        var typeStr = typeList.join(",");
+        var nameStr = nameList.join(",");
+        return typeStr + "|" + nameStr;
+    }
+
+    $(function () {
+        $("#exam_userscore").addClass('active');
+
+        $("#allCheck").click(function () {
+            if (this.checked) {
+                $(".delCheck").prop('checked', true);
+            } else {
+                $(".delCheck").prop('checked', false);
+            }
+        });
+
+        $("#rejectCheck").click(function () {
+            $(".delCheck").each(function () {
+                if (this.checked) {
+                    $(this).prop('checked', false);
+                } else {
+                    $(this).prop('checked', true);
+                }
+            });
+        });
+
+        $("#oneClickDel").click(function () {
+            var _typeAndName = getTypeAndNameSelect();
+            if (_typeAndName.length == 0) {
+                return;
+            }
+            var typeAndName = _typeAndName.split("|");
+            var typeStr = typeAndName[0];
+            var nameStr = typeAndName[1];
+            $("#delType").val(typeStr);
+            var c = confirm('确定要删除选定考生的' + nameStr +'嘛?');
+            if (c) {
+                $("#checkSubmit").submit();
+            }
+        });
+
+        var userScoreListUrl = "{:U('Teacher/Data/userScoreList')}";
+        $(".userScoreShow").click(function() {
+            var uid = $(this).data('uid');
+            var userName = $(this).text();
+            var eid = $("#examId").val();
+            $.ajax({
+                url : userScoreListUrl,
+                type: "GET",
+                dataType: "json",
+                data: {"uid":uid, "eid":eid},
+                success: function ($userScoreList) {
+                    var modal = $("#userScoreModal");
+                    $(modal).find(".modal-title").html('[' + userName + ']历史成绩梯度表');
+                    var content = $(modal).find(".modal-content").find(".modal-body");
+                    var tableScore = '<table class="table table-hover table-bordered table-condensed"> <thead> <tr> ' +
+                            '<th>考试名称</th> <th>选择题</th> <th>判断题</th> <th>填空题</th> <th>程序题</th> <th>总分</th> ' +
+                            '</tr></thead><tbody>';
+                    $.each($userScoreList, function(index, userScore) {
+                        tableScore = tableScore + '<tr>';
+                        tableScore = tableScore + '<td>' + userScore.title + '</td>';
+                        tableScore = tableScore + '<td>' + userScore.choosesum + '</td>';
+                        tableScore = tableScore + '<td>' + userScore.judgesum + '</td>';
+                        tableScore = tableScore + '<td>' + userScore.fillsum + '</td>';
+                        tableScore = tableScore + '<td>' + userScore.programsum + '</td>';
+                        tableScore = tableScore + '<td>' + userScore.score + '</td>';
+                        tableScore = tableScore + '</tr>';
+                    });
+
+                    $(content).append(tableScore + '</tbody></table>');
+                    $(modal).modal("show");
+                },
+                error: function () {
+                    alert("sorry,something error");
+                }
+            });
+        });
+
+        $('#userScoreModal').on('hidden.bs.modal', function () {
+            $(this).find(".modal-content").find(".modal-body").html('');
+            $(this).removeData();
+        });
+    });
+</script>

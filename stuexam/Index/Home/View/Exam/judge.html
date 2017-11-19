@@ -1,0 +1,43 @@
+<body oncontextmenu="return false" onselectstart="return false" class="nocopy">
+<div class="container">
+    <form name="judgeForm" id="judgeExam" action="{:U('Home/Judge/submitPaper')}" method="post">
+        <input type="hidden" name="eid" value="{$Think.get.eid}">
+        <input type="hidden" id="problemType" name="problemType" value="{$problemType}">
+
+        <h3>判断题</h3>
+        <foreach name='judgesx' item='jsx' key='QuestionIndex'>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row" style="position: relative">
+                        <div style="position: absolute; width: 100%; height: 100%;  z-index: 20; font-size: 15px; top: 0; left: 0;">
+                            <div class="myOpacity pull-left">{$Think.session.user_id}</div>
+                            <div class="myOpacity pull-left">{$Think.session.user_id}</div>
+                            <div class="myOpacity pull-left">{$Think.session.user_id}</div>
+                        </div>
+                    </div>
+                    <pre><font color='red'>({$allscore['judgescore']} 分)</font>{$QuestionIndex+1}.{$judgeans[$jsx]['question']|nl2br}</pre>
+                </div>
+                <div class="panel-body">
+                    <p>
+
+                    <div class="radio"><label>
+                        <if condition="isset($judgearr[$judgeans[$jsx]['judge_id']]) and $judgearr[$judgeans[$jsx]['judge_id']] eq 'Y'">
+                            <input class="pdda" type="radio" name="pdda{$judgeans[$jsx]['judge_id']}" value="Y" checked>Ture
+                            <else/>
+                            <input class="pdda" type="radio" name="pdda{$judgeans[$jsx]['judge_id']}" value="Y">Ture
+                        </if>
+                    </label></div>
+                    <div class="radio"><label>
+                        <if condition="isset($judgearr[$judgeans[$jsx]['judge_id']]) and $judgearr[$judgeans[$jsx]['judge_id']] eq 'N'">
+                            <input class="pdda" type="radio" name="pdda{$judgeans[$jsx]['judge_id']}" value="N" checked>False
+                            <else/>
+                            <input class="pdda" type="radio" name="pdda{$judgeans[$jsx]['judge_id']}" value="N">False
+                        </if>
+                    </label></div>
+                    </p>
+                </div>
+            </div>
+        </foreach>
+    </form>
+</div>
+</body>
