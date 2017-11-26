@@ -32,13 +32,26 @@ if (isset($OJ_AUTO_SHARE)&&$OJ_AUTO_SHARE&&isset($_SESSION['user_id'])){
 }
 $view_source="No source code available!";
 if (isset($_SESSION['user_id'])&&$row && $row->user_id==$_SESSION['user_id']) $ok=true;
-if (isset($_SESSION['source_browser'])) $ok=true;
+if (isset($_SESSION['source_browser'])) {
+	$sql="SELECT author FROM `problem` WHERE `defunct`='Y' and `problem_id`=$sproblem_id";//题目不可见，不能看代码
+	$rrs=mysql_query($sql);
+	$rrow=mysql_fetch_object($rrs);
+	$flag=!(mysql_num_rows($rrs)>0);
+	if($flag||$rrow->author==$_SESSION['user_id'])
+		$ok=true;
+	else
+		$ok=false;
+	mysql_free_result($rrs);
+}
+if (isset($_SESSION['administrator']))$ok=true;
 
-		$sql="SELECT `source` FROM `source_code` WHERE `solution_id`=".$id;
-		$result=mysql_query($sql);
-		$row=mysql_fetch_object($result);
-		if($row)
-			$view_source=$row->source;
+if ($ok) {
+	$sql = "SELECT `source` FROM `source_code` WHERE `solution_id`=" . $id;
+	$result = mysql_query($sql);
+	$row = mysql_fetch_object($result);
+	if ($row)
+		$view_source = $row->source;
+}
 
 ?>
 <html>
