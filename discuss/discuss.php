@@ -1,17 +1,21 @@
 <?php
 	require_once("discuss_func.inc.php");
 	if(isset($_REQUEST['pid']))
-		$pid=addslashes($_REQUEST['pid']); 
+		$pid=intval(get_num($_REQUEST['pid'])); 
 	else
 		$pid=0;
 	if(isset($_REQUEST['pid']))
-		$cid=intval($_REQUEST['cid']);
+		$cid=intval(get_num($_REQUEST['cid']));
 	else
 		$cid=0;
 	$prob_exist = problem_exist($pid, $cid);
 	if ($cid!='' && $cid!=null && $prob_exist) require_once("./contest-header.php");
 	else require_once("oj-header.php");
 	echo "<title>SDIBT Online Judge WebBoard</title>";
+	function get_num($str) {
+		preg_match('/[0-9]{1,}/', $str, $matches);
+		return $matches[0];
+	}
 ?>
 
 <center>
