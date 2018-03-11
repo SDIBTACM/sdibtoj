@@ -33,10 +33,8 @@ if (!(isset($_SESSION['administrator']))){
 </p>
 
 </p>
-<p align=left>Output:<br><!--<textarea rows=13 name=output cols=80></textarea>-->
+<p align=left>Output:<br><!--<textarea row1s=13 name=output cols=80></textarea>-->
     <textarea name="output"></textarea>
-
-
 </p>
 <p align=left>Sample Input:<br><textarea rows=13 name=sample_input cols=80></textarea></p>
 <p align=left>Sample Output:<br><textarea rows=13 name=sample_output cols=80></textarea></p>

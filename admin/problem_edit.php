@@ -82,9 +82,7 @@ Y<input type=radio name=spj value='1' <?=$row->spj=="1"?"checked":""?>>
 </p>
 
 <p>Source:<br>
-    <textarea name=source rows=1 cols=70>
-        <?=htmlspecialchars($row->source)?>
-    </textarea>
+    <textarea name=source rows=1 cols=70><?=htmlspecialchars($row->source)?></textarea>
 </p>
 
 <div align=center>
