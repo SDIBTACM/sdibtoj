@@ -1,3 +1,40 @@
+<?require_once("../include/db_info.inc.php");?>
+
+<?require_once("admin-header.php");
+if (!(isset($_SESSION['administrator']))){
+    echo "<a href='../loginpage.php'>Please Login First!</a>";
+    exit(1);
+}?>
+<?
+require_once("../include/simple_html_dom.php");
+//$url='http://plg1.cs.uwaterloo.ca/~acm00/020921/A.html';
+$url=$_POST ['url'];
+if (get_magic_quotes_gpc ()) {
+    $url = stripslashes ( $url);
+}
+$baseurl=substr($url,0,strrpos($url,"/")+1);
+//  echo $baseurl;
+$html = file_get_html($url);
+foreach($html->find('img') as $element)
+    $element->src=$baseurl.$element->src;
+$element=$html->find('h2',0);
+$title=$element->plaintext;
+$i=1;
+$sample_output=$sample_input=$descriptionHTML="";
+
+$html=$html->innertext;
+$i=strpos($html,"<h3>");
+// echo $i."-".strlen($html);
+$descriptionHTML=substr($html,0,$i-1);
+// echo $i."-".strlen($descriptionHTML);
+$i=strpos($html,"<pre>",$i);
+$j=strpos($html,"</pre>",$i);
+$sample_input=substr($html,$i+5,$j-$i-5);
+$i=strpos($html,"<pre>",$j);
+$j=strpos($html,"</pre>",$i);
+$sample_output=substr($html,$i+5,$j-$i-5);
+
+?>
 <html>
 <head>
 <meta http-equiv="Pragma" content="no-cache">
@@ -5,19 +42,10 @@
 <meta http-equiv="Content-Language" content="zh-cn">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>New Problem</title>
+    <script src="../ckeditor/ckeditor.js"></script>
 </head>
 <body leftmargin="30">
 <center>
-<?require_once("../include/db_info.inc.php");?>
-
-<?require_once("admin-header.php");
-if (!(isset($_SESSION['administrator']))){
-	echo "<a href='../loginpage.php'>Please Login First!</a>";
-	exit(1);
-}?>
-<?php
-include_once("../fckeditor/fckeditor.php") ;
-?>
 
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse"  width="100%" height="50">
 <tr>
@@ -30,36 +58,7 @@ include_once("../fckeditor/fckeditor.php") ;
 </center>
 <hr>
 <h1>Add New problem</h1>
-<?
-  require_once("../include/simple_html_dom.php");
-  //$url='http://plg1.cs.uwaterloo.ca/~acm00/020921/A.html';
-  $url=$_POST ['url'];
-  if (get_magic_quotes_gpc ()) {
-	$url = stripslashes ( $url);
-  }
-  $baseurl=substr($url,0,strrpos($url,"/")+1);
-//  echo $baseurl;
-  $html = file_get_html($url);
-  foreach($html->find('img') as $element)
-        $element->src=$baseurl.$element->src;
-  $element=$html->find('h2',0);
-  $title=$element->plaintext;
-  $i=1;
-  $sample_output=$sample_input=$descriptionHTML="";
-  
-  $html=$html->innertext;
-  $i=strpos($html,"<h3>");
- // echo $i."-".strlen($html);
-  $descriptionHTML=substr($html,0,$i-1);
- // echo $i."-".strlen($descriptionHTML);
-  $i=strpos($html,"<pre>",$i);
-  $j=strpos($html,"</pre>",$i);
-  $sample_input=substr($html,$i+5,$j-$i-5);
-  $i=strpos($html,"<pre>",$j);
-  $j=strpos($html,"</pre>",$i);
-  $sample_output=substr($html,$i+5,$j-$i-5);
 
-?>
 <form method=POST action=problem_add.php>
 <p align=center><font size=4 color=#333399>Add a Problem</font></p>
 <input type=hidden name=problem_id value=New Problem>
@@ -68,60 +67,25 @@ include_once("../fckeditor/fckeditor.php") ;
 <p align=left>Time Limit:<input type=text name=time_limit size=20 value=1>S</p>
 <p align=left>Memory Limit:<input type=text name=memory_limit size=20 value=128>MByte</p>
 <p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
-
-<?php
-$description = new FCKeditor('description') ;
-$description->BasePath = '../fckeditor/' ;
-$description->Height = 300 ;
-$description->Width=600;
-
-$description->Value ="<p></p>".$descriptionHTML;
-$description->Create() ;
-?>
+    <textarea name="description">
+        <?php echo $descriptionHTML?>
+    </textarea>
 </p>
 
 <p align=left>Input:<br><!--<textarea rows=13 name=input cols=80></textarea>-->
-
-<?php
-$input = new FCKeditor('input') ;
-$input->BasePath = '../fckeditor/' ;
-$input->Height = 300 ;
-$input->Width=600;
-
-$input->Value = '<p></p>' ;
-$input->Create() ;
-?>
+<textarea name="input"></textarea>
 </p>
 
 </p>
 <p align=left>Output:<br><!--<textarea rows=13 name=output cols=80></textarea>-->
-
-
-<?php
-$output = new FCKeditor('output') ;
-$output->BasePath = '../fckeditor/' ;
-$output->Height = 300 ;
-$output->Width=600;
-
-$output->Value = '<p></p>' ;
-$output->Create() ;
-?>
-
+    <textarea name="output"></textarea>
 </p>
 <p align=left>Sample Input:<br><textarea rows=13 name=sample_input cols=80><?=$sample_input?></textarea></p>
 <p align=left>Sample Output:<br><textarea rows=13 name=sample_output cols=80><?=$sample_output?></textarea></p>
 <p align=left>Test Input:<br><textarea rows=13 name=test_input cols=80></textarea></p>
 <p align=left>Test Output:<br><textarea rows=13 name=test_output cols=80></textarea></p>
 <p align=left>Hint:<br>
-<?php
-$output = new FCKeditor('hint') ;
-$output->BasePath = '../fckeditor/' ;
-$output->Height = 300 ;
-$output->Width=600;
-
-$output->Value = '<p></p>' ;
-$output->Create() ;
-?>
+    <textarea name="hint"></textarea>
 </p>
 <p>SpecialJudge: N<input type=radio name=spj value='0' checked>Y<input type=radio name=spj value='1'></p>
 <p align=left>Source:<br><textarea name=source rows=1 cols=70></textarea></p>
@@ -143,7 +107,14 @@ if (mysql_num_rows($result)==0){
 <?require_once("../include/set_post_key.php");?>
 <input type=submit value=Submit name=submit>
 </div></form>
+
 <p>
+    <script>
+        CKEDITOR.replace('input');
+        CKEDITOR.replace('output');
+        CKEDITOR.replace('description');
+        CKEDITOR.replace('hint');
+    </script>
 <?require_once("../oj-footer.php");?>
 </body></html>
 

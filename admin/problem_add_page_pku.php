@@ -50,6 +50,7 @@ if (!(isset($_SESSION['administrator']))){
     <meta http-equiv="Content-Language" content="zh-cn">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>New Problem</title>
+    <script src="../ckeditor/ckeditor.js"></script>
 </head>
 <body leftmargin="30">
 <center>
