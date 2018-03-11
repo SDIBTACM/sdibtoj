@@ -82,7 +82,7 @@ if(isset($_GET['id'])){
 </p>
 
 <p>Hint:<!--<textarea rows=13 name=input cols=80></textarea>-->i
-    <textarea name="output">
+    <textarea name="hint">
         <?php echo htmlspecialchars($row->hint)?>
     </textarea>
 </p>
