@@ -52,39 +52,28 @@ if(isset($_GET['id'])){
 </p>
 
 <p align=left>Description:<br>
-    <textarea name="description">
-        <?php echo htmlspecialchars($row->description)?>
-    </textarea>
+    <textarea name="description"><?php echo htmlspecialchars($row->description)?></textarea>
 </p>
 
 <p align=left>Input:<br>
 
-    <textarea name="input">
-        <?php echo htmlspecialchars($row->input)?>
-    </textarea>
+    <textarea name="input"><?php echo htmlspecialchars($row->input)?></textarea>
 </p>
 
 </p>
 <p align=left>Output:<br>
-    <textarea name="output"></textarea>
+    <textarea name="output"><?php echo htmlspecialchars($row->output)?></textarea>
 </p>
 
 <p>Sample Input:<br>
-    <textarea rows=13 name=sample_input cols=120>
-        <?=htmlspecialchars($row->sample_input)?>
-    </textarea>
+    <textarea rows=13 name=sample_input cols=120><?=htmlspecialchars($row->sample_input)?></textarea>
 </p>
 
 <p>Sample Output:<br>
-    <textarea rows=13 name=sample_output cols=120>
-        <?=htmlspecialchars($row->sample_output)?>
-    </textarea>
+    <textarea rows=13 name=sample_output cols=120><?=htmlspecialchars($row->sample_output)?></textarea>
 </p>
 
-<p>Hint:<!--<textarea rows=13 name=input cols=80></textarea>-->i
-    <textarea name="hint">
-        <?php echo htmlspecialchars($row->hint)?>
-    </textarea>
+<p>Hint:<!--<textarea rows=13 name=input cols=80></textarea>--><textarea name="hint"><?php echo htmlspecialchars($row->hint)?></textarea>
 </p>
 
 <p>SpecialJudge: 
