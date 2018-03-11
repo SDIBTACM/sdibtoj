@@ -1,13 +1,3 @@
-<html>
-<head>
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Cache-Control" content="no-cache">
-<meta http-equiv="Content-Language" content="zh-cn">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>New Problem</title>
-</head>
-<body leftmargin="30">
-<center>
 <?require_once("../include/db_info.inc.php");?>
 <?require_once("admin-header.php");
 if (!(isset($_SESSION['administrator']))){
@@ -15,10 +5,6 @@ if (!(isset($_SESSION['administrator']))){
 	exit(1);
 }
 ?>
-<?php
-include_once("../fckeditor/fckeditor.php") ;
-?>
-
 <?
   require_once("../include/simple_html_dom.php");
   //$url='http://acm.pku.edu.cn/JudgeOnline/problem?id=1000';
@@ -57,6 +43,16 @@ include_once("../fckeditor/fckeditor.php") ;
   $element=$html->find('pre[class=sio]',1);
   $sample_output=$element->innertext;
 ?>
+<html>
+<head>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Content-Language" content="zh-cn">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>New Problem</title>
+</head>
+<body leftmargin="30">
+<center>
 <form method=POST action=problem_add.php>
 <p align=center><font size=4 color=#333399>Add a Problem</font></p>
 <input type=hidden name=problem_id value=New Problem>
@@ -64,54 +60,33 @@ include_once("../fckeditor/fckeditor.php") ;
 <p align=left>Title:<input type=text name=title size=71 value="<?=$title?>"></p>
 <p align=left>Time Limit:<input type=text name=time_limit size=20 value="<?=$tlimit?>">S</p>
 <p align=left>Memory Limit:<input type=text name=memory_limit size=20 value="<?=$mlimit?>">MByte</p>
-<p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
-<?php
-$description = new FCKeditor('description') ;
-$description->BasePath = '../fckeditor/' ;
-$description->Height = 300 ;
-$description->Width=600;
-$description->Value =$descriptionHTML;
-$description->Create() ;
-?>
+    <p align=left>Description:<br>
+        <textarea name="description"></textarea>
+    </p>
 </p>
-<p align=left>Input:<br><!--<textarea rows=13 name=input cols=80></textarea>-->
-<?php
-$input = new FCKeditor('input') ;
-$input->BasePath = '../fckeditor/' ;
-$input->Height = 300 ;
-$input->Width=600;
-$input->Value = $inputHTML;//'<p></p>' ;
-$input->Create() ;
-?>
-</p>
-</p>
-<p align=left>Output:<br><!--<textarea rows=13 name=output cols=80></textarea>-->
+    <p align=left>Input:<br>
+        <textarea name="input"></textarea>
+    </p>
 
-<?php
-$output = new FCKeditor('output') ;
-$output->BasePath = '../fckeditor/' ;
-$output->Height = 300 ;
-$output->Width=600;
-$output->Value =$outputHTML;// '<p></p>' ;
-$output->Create() ;
-?>
-</p>
+    <p align=left>Output:<br>
+        <textarea name="output"></textarea>
+    </p>
+
 <p align=left>Sample Input:<br><textarea rows=13 name=sample_input cols=80><?=$sample_input?></textarea></p>
+
 <p align=left>Sample Output:<br><textarea rows=13 name=sample_output cols=80><?=$sample_output?></textarea></p>
+
 <p align=left>Test Input:<br><textarea rows=13 name=test_input cols=80></textarea></p>
+
 <p align=left>Test Output:<br><textarea rows=13 name=test_output cols=80></textarea></p>
-<p align=left>Hint:<br>
-<?php
-$output = new FCKeditor('hint') ;
-$output->BasePath = '../fckeditor/' ;
-$output->Height = 300 ;
-$output->Width=600;
-$output->Value = '<p></p>' ;
-$output->Create() ;
-?>
-</p>
+
+    <p align=left>Hint:<br><!--<textarea rows=13 name=input cols=80></textarea>-->
+        <textarea name="hint"></textarea>
+    </p>
 <p>SpecialJudge: N<input type=radio name=spj value='0' checked>Y<input type=radio name=spj value='1'></p>
+
 <p align=left>Source:<br><textarea name=source rows=1 cols=70></textarea></p>
+
 <p align=left>contest:
 	<select  name=contest_id>
 <?
@@ -130,6 +105,12 @@ if (mysql_num_rows($result)==0){
 <?require_once("../include/set_post_key.php");?>
 <input type=submit value=Submit name=submit>
 </div></form>
+    <script>
+        CKEDITOR.replace('input');
+        CKEDITOR.replace('output');
+        CKEDITOR.replace('description');
+        CKEDITOR.replace('hint');
+    </script>
 <p>
 <?require_once("../oj-footer.php");?>
 </body></html>
