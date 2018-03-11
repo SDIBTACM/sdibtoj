@@ -4,14 +4,8 @@ if (!(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))){
         echo "<a href='../loginpage.php'>Please Login First!</a>";
         exit(1);
 }
-
-
 ?>
-<meta http-equiv="Content-Type" content="text/html; charset=utf8">
-<title>Add a contest</title>
-
 <?
-
 if (isset($_POST['syear']))
 {
 	require_once("../include/db_info.inc.php");
@@ -142,8 +136,13 @@ else if(isset($_POST['problem2contest'])){
 				$plist=$i;
 	   }
 }
-  include_once("../fckeditor/fckeditor.php") ;
 ?>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="../ckeditor/ckeditor.js"></script>
+    <title>Add Contest</title>
+</head>
 	<body onload="JudgeUp()">
 	<form method=POST action='<?=$_SERVER['PHP_SELF']?>'>
 	<p align=center><font size=4 color=#333399>Add a Contest</font></p>
@@ -189,44 +188,40 @@ else if(isset($_POST['problem2contest'])){
 	<br>*题号与题号之间用英文逗号分开。例:1500,1501,1502
         <br>
         <p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
-<script language='javascript'>
-	function JudgePrivate(temp)
-	{
-		var divn=document.getElementById('registertime');
-		if(temp==2)
-			divn.style.display='';
-		else
-			divn.style.display='none';
-	}
-	function JudgeUp()
-	{
-		var ispublic=document.getElementById('private');
-		var divn=document.getElementById('registertime');
-		var value=ispublic.value;
-		if(value==2)
-			divn.style.display='';
-		else
-			divn.style.display='none';
-	}
-</script>
-
-<?php
-$fck_description = new FCKeditor('description') ;
-$fck_description->BasePath = '../fckeditor/' ;
-$fck_description->Height = 300 ;
-$fck_description->Width=600;
-
-$fck_description->Value = $description ;
-$fck_description->Create() ;
-
-?>
-<br><br>
+            <textarea name="description">
+                <?php echo $description;?>
+            </textarea>
+        </p>
+    <br>
 	Users:<textarea name="ulist" rows="10" cols="20"></textarea>
 	<br />
 	*可以将学生学号从Excel整列复制过来，然后要求他们用学号做UserID注册,就能进入Private的比赛作为作业和测验。
 	<p><input type=submit value=Submit name=submit"><input type=reset value=Reset name=reset></p>
 
 </form>
+
+<script language='javascript'>
+    function JudgePrivate(temp)
+    {
+        var divn=document.getElementById('registertime');
+        if(temp==2)
+            divn.style.display='';
+        else
+            divn.style.display='none';
+    }
+    function JudgeUp()
+    {
+        var ispublic=document.getElementById('private');
+        var divn=document.getElementById('registertime');
+        var value=ispublic.value;
+        if(value==2)
+            divn.style.display='';
+        else
+            divn.style.display='none';
+    }
+    CKEDITOR.replace('description');
+</script>
+
 </body>
 <?
 }

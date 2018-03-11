@@ -1,6 +1,4 @@
 <?php require("admin-header.php");
-include_once("../fckeditor/fckeditor.php") ;
-
 
 if(isset($_POST['cid']))
       $cid=intval($_POST['cid']);
@@ -11,9 +9,6 @@ if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))
       echo "You don't have the privilage";
       exit();
     }
-
-
-
 
 if (isset($_POST['syear']))
 {
@@ -44,7 +39,6 @@ if (isset($_POST['syear']))
              $title = stripslashes ( $title);
               $description = stripslashes ( $description);
            }
-
 
 
    $lang=$_POST['lang'];
@@ -164,6 +158,13 @@ if (isset($_POST['syear']))
 
 }
 ?>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="../ckeditor/ckeditor.js"></script>
+    <title>Contest Editor</title>
+</head>
+
 <body onload="JudgeUp()">
 <form method=POST action='<?php echo $_SERVER['PHP_SELF']?>'>
 <?php require_once("../include/set_post_key.php");?>
@@ -219,40 +220,38 @@ Language:<select name="lang[]" multiple>
 	</div>
 
 <p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
-<script language='javascript'>
-		function JudgePrivate(temp)
-		{
-			var divn=document.getElementById('registertime');
-			if(temp==2)
-				divn.style.display='';
-			else
-				divn.style.display='none';
-		}
-		function JudgeUp()
-		{
-			var ispublic=document.getElementById('private');
-			var divn=document.getElementById('registertime');
-			var value=ispublic.value;
-			if(value==2)
-				divn.style.display='';
-			else
-				divn.style.display='none';
-		}
-</script>
-<?php
-$fck_description = new FCKeditor('description') ;
-$fck_description->BasePath = '../fckeditor/' ;
-$fck_description->Height = 300 ;
-$fck_description->Width=600;
-
-$fck_description->Value = $description ;
-$fck_description->Create() ;
-
-?>
+    <p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
+        <textarea name="description">
+                <?php echo $description;?>
+            </textarea>
+    </p>
 <br><br>
 Users:<textarea name="ulist" rows="20" cols="20"><?php if (isset($ulist)) { echo $ulist; } ?></textarea>
 <p><input type=submit value=Submit name=submit><input type=reset value=Reset name=reset></p>
 
 </form>
+
+<script language='javascript'>
+    function JudgePrivate(temp)
+    {
+        var divn=document.getElementById('registertime');
+        if(temp==2)
+            divn.style.display='';
+        else
+            divn.style.display='none';
+    }
+    function JudgeUp()
+    {
+        var ispublic=document.getElementById('private');
+        var divn=document.getElementById('registertime');
+        var value=ispublic.value;
+        if(value==2)
+            divn.style.display='';
+        else
+            divn.style.display='none';
+    }
+
+</script>
+
 </body>
 <?php require_once("../oj-footer.php");?>

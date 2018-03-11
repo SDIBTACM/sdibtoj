@@ -1,33 +1,11 @@
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Edit Problem</title>
-</head>
-<body>
-<center>
 <?require_once("../include/db_info.inc.php");?>
 <?require_once("admin-header.php");
 
 if (!(isset($_SESSION['administrator'])||isset($_SESSION['problem_editor']))){
-	echo "<a href='../loginpage.php'>Please Login First!</a>";
-	exit(1);
+    echo "<a href='../loginpage.php'>Please Login First!</a>";
+    exit(1);
 }
 ?>
-<?php
-include_once("../fckeditor/fckeditor.php") ;
-?>
-<p align="center"><font color="#333399" size="4">Welcome To Administrator's Page of Judge Online of ACM ICPC, <?=$OJ_NAME?>.</font>
-<td width="100"></td>
-</center>
-<hr>
-<?
-
-if(isset($_GET['id'])){
-	require_once("../include/check_get_key.php");
-?>
-<h1>Edit problem</h1>
-<form method=POST action=problem_edit.php>
-<input type=hidden name=problem_id value=New Problem>
 <?
 $sql="SELECT * FROM `problem` WHERE `problem_id`=".intval($_GET['id']);
 $result=mysql_query($sql);
@@ -35,85 +13,105 @@ $row=mysql_fetch_object($result);
 
 if(!isset($_SESSION['administrator'])&&isset($_SESSION['problem_editor'])&&$row->author!=$_SESSION['user_id']){
     echo "You don't have the privilege to edit this problem";
-     exit(0);
- }
-
-
+    exit(0);
+}
 
 ?>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="../ckeditor/ckeditor.js"></script>
+    <title>Edit Problem</title>
+</head>
+<body>
+<center>
+<p align="center"><font color="#333399" size="4">Welcome To Administrator's Page of Judge Online of ACM ICPC, <?=$OJ_NAME?>.</font>
+<td width="100"></td>
+</center>
+<hr>
+<?
+if(isset($_GET['id'])){
+	require_once("../include/check_get_key.php");
+?>
+<h1>Edit problem</h1>
+<form method=POST action=problem_edit.php>
+<input type=hidden name=problem_id value=New Problem>
+
 <p>Problem Id: <?=$row->problem_id?></p>
 <input type=hidden name=problem_id value='<?=$row->problem_id?>'>
-<p>Title:<input type=text name=title size=71 value='<?=htmlspecialchars($row->title)?>'></p>
-<p>Time Limit:<input type=text name=time_limit size=20 value='<?=$row->time_limit?>'>S</p>
-<p>Memory Limit:<input type=text name=memory_limit size=20 value='<?=$row->memory_limit?>'>MByte</p>
-
-<!--
-<p>Description:<br><textarea rows=13 name=description cols=120><?=htmlspecialchars($row->description)?></textarea></p>
-<p>Input:<br><textarea rows=13 name=input cols=120><?=htmlspecialchars($row->input)?></textarea></p>
-<p>Output:<br><textarea rows=13 name=output cols=120><?=htmlspecialchars($row->output)?></textarea></p>
--->
-<p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
-
-<?php
-$description = new FCKeditor('description') ;
-$description->BasePath = '../fckeditor/' ;
-$description->Height = 600 ;
-$description->Width=600;
-
-$description->Value = $row->description ;
-$description->Create() ;
-?>
+<p>Title:
+    <input type=text name=title size=71 value='<?=htmlspecialchars($row->title)?>'>
 </p>
 
-<p align=left>Input:<br><!--<textarea rows=13 name=input cols=80></textarea>-->
+<p>Time Limit:
+    <input type=text name=time_limit size=20 value='<?=$row->time_limit?>'>S
+</p>
 
-<?php
-$input = new FCKeditor('input') ;
-$input->BasePath = '../fckeditor/' ;
-$input->Height = 600 ;
-$input->Width=600;
+<p>Memory Limit:
+    <input type=text name=memory_limit size=20 value='<?=$row->memory_limit?>'>MByte
+</p>
 
-$input->Value = $row->input ;
-$input->Create() ;
-?>
+<p align=left>Description:<br>
+    <textarea name="description">
+        <?php echo htmlspecialchars($row->description)?>
+    </textarea>
+</p>
+
+<p align=left>Input:<br>
+
+    <textarea name="input">
+        <?php echo htmlspecialchars($row->input)?>
+    </textarea>
 </p>
 
 </p>
-<p align=left>Output:<br><!--<textarea rows=13 name=output cols=80></textarea>-->
-
-
-<?php
-$output = new FCKeditor('output') ;
-$output->BasePath = '../fckeditor/' ;
-$output->Height = 600 ;
-$output->Width=600;
-
-$output->Value = $row->output;
-$output->Create() ;
-?>
-
-<p>Sample Input:<br><textarea rows=13 name=sample_input cols=120><?=htmlspecialchars($row->sample_input)?></textarea></p>
-<p>Sample Output:<br><textarea rows=13 name=sample_output cols=120><?=htmlspecialchars($row->sample_output)?></textarea></p>
-<p>Hint:<br>
-<?php
-$output = new FCKeditor('hint') ;
-$output->BasePath = '../fckeditor/' ;
-$output->Height = 200 ;
-$output->Width=600;
-
-$output->Value = $row->hint;
-$output->Create() ;
-?>
+<p align=left>Output:<br>
+    <textarea name="output"></textarea>
 </p>
+
+<p>Sample Input:<br>
+    <textarea rows=13 name=sample_input cols=120>
+        <?=htmlspecialchars($row->sample_input)?>
+    </textarea>
+</p>
+
+<p>Sample Output:<br>
+    <textarea rows=13 name=sample_output cols=120>
+        <?=htmlspecialchars($row->sample_output)?>
+    </textarea>
+</p>
+
+<p>Hint:<!--<textarea rows=13 name=input cols=80></textarea>-->i
+    <textarea name="output">
+        <?php echo htmlspecialchars($row->hint)?>
+    </textarea>
+</p>
+
 <p>SpecialJudge: 
 N<input type=radio name=spj value='0' <?=$row->spj=="0"?"checked":""?>>
-Y<input type=radio name=spj value='1' <?=$row->spj=="1"?"checked":""?>></p>
-<p>Source:<br><textarea name=source rows=1 cols=70><?=htmlspecialchars($row->source)?></textarea></p>
+Y<input type=radio name=spj value='1' <?=$row->spj=="1"?"checked":""?>>
+</p>
+
+<p>Source:<br>
+    <textarea name=source rows=1 cols=70>
+        <?=htmlspecialchars($row->source)?>
+    </textarea>
+</p>
+
 <div align=center>
 <?require_once("../include/set_post_key.php");?>
 <input type=submit value=Submit name=submit>
 </div></form>
+
+<script>
+    CKEDITOR.replace('input');
+    CKEDITOR.replace('output');
+    CKEDITOR.replace('description');
+    CKEDITOR.replace('hint');
+</script>
+
 <p>
+
 <?require_once("../oj-footer.php");?>
 <?}else{
 require_once("../include/check_post_key.php");
