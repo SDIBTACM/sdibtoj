@@ -1,3 +1,10 @@
+<?require_once("../include/db_info.inc.php");?>
+<?require_once("admin-header.php");
+if (!(isset($_SESSION['administrator']))){
+    echo "<a href='../loginpage.php'>Please Login First!</a>";
+    exit(1);
+}
+?>
 <html>
 <head>
 <meta http-equiv="Pragma" content="no-cache">
@@ -8,38 +15,20 @@
 </head>
 <body leftmargin="30" >
 
-<?require_once("../include/db_info.inc.php");?>
-<?require_once("admin-header.php");
-if (!(isset($_SESSION['administrator']))){
-	echo "<a href='../loginpage.php'>Please Login First!</a>";
-	exit(1);
-}
-?>
-<?php
-include_once("../fckeditor/fckeditor.php") ;
-?>
 <form method=POST action=news_add.php>
 
 <p align=left>Post a News</p>
 <p align=left>Title:<input type=text name=title size=71></p>
 
 <p align=left>Content:<br>
-<?php
-$description = new FCKeditor('content') ;
-$description->BasePath = '../fckeditor/' ;
-$description->Height = 450 ;
-$description->Width=800;
-
-$description->Value = '<p></p>' ;
-$description->Create() ;
-?>
+<textarea name="content"></textarea>
 </p>
-
- 
- 
- 	<?require_once("../include/set_post_key.php");?>
+    <?require_once("../include/set_post_key.php");?>
 <input type=submit value=Submit name=submit>
 </div></form>
+<script>
+    CKEDITOR.replace('content');
+</script>
 <p>
 <?require_once("../oj-footer.php");?>
 </body></html>

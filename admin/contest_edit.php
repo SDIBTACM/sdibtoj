@@ -250,7 +250,7 @@ Users:<textarea name="ulist" rows="20" cols="20"><?php if (isset($ulist)) { echo
         else
             divn.style.display='none';
     }
-
+    CKEDITOR.replace('description');
 </script>
 
 </body>
