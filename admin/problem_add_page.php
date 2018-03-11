@@ -5,6 +5,7 @@
 <meta http-equiv="Content-Language" content="zh-cn">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>New Problem</title>
+    <script src="../ckeditor/ckeditor.js"></script>
 </head>
 <body leftmargin="30" >
 
@@ -15,9 +16,6 @@ if (!(isset($_SESSION['administrator']))){
 	exit(1);
 }
 ?>
-<?php
-include_once("../fckeditor/fckeditor.php") ;
-?>
 <h1 >Add New problem</h1>
 
 <form method=POST action=problem_add.php>
@@ -27,43 +25,16 @@ include_once("../fckeditor/fckeditor.php") ;
 <p align=left>Time Limit:<input type=text name=time_limit size=20 value=1>S</p>
 <p align=left>Memory Limit:<input type=text name=memory_limit size=20 value=128>MByte</p>
 <p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
-
-<?php
-$description = new FCKeditor('description') ;
-$description->BasePath = '../fckeditor/' ;
-$description->Height = 250 ;
-$description->Width=800;
-
-$description->Value = '<p></p>' ;
-$description->Create() ;
-?>
+    <textarea name="description"></textarea>
 </p>
 
 <p align=left>Input:<br><!--<textarea rows=13 name=input cols=80></textarea>-->
-
-<?php
-$input = new FCKeditor('input') ;
-$input->BasePath = '../fckeditor/' ;
-$input->Height = 250 ;
-$input->Width=800;
-
-$input->Value = '<p></p>' ;
-$input->Create() ;
-?>
+    <textarea name="input"></textarea>
 </p>
 
 </p>
 <p align=left>Output:<br><!--<textarea rows=13 name=output cols=80></textarea>-->
-
-
-<?php
-$output = new FCKeditor('output') ;
-$output->BasePath = '../fckeditor/' ;
-$output->Height = 250 ;
-$output->Width=800;
-
-$output->Value = '<p></p>' ;
-$output->Create() ;
+    <textarea name="output"></textarea>
 ?>
 
 </p>
@@ -72,14 +43,7 @@ $output->Create() ;
 <p align=left>Test Input:<br><textarea rows=13 name=test_input cols=80></textarea></p>
 <p align=left>Test Output:<br><textarea rows=13 name=test_output cols=80></textarea></p>
 <p align=left>Hint:<br>
-<?php
-$output = new FCKeditor('hint') ;
-$output->BasePath = '../fckeditor/' ;
-$output->Height = 250 ;
-$output->Width=800;
-
-$output->Value = '<p></p>' ;
-$output->Create() ;
+    <textarea name="hint"></textarea>
 ?>
 </p>
 <p>SpecialJudge: N<input type=radio name=spj value='0' checked>Y<input type=radio name=spj value='1'></p>
@@ -105,6 +69,12 @@ if (mysql_num_rows($result)==0){
  	<?require_once("../include/set_post_key.php");?>
 <input type=submit value=Submit name=submit>
 </div></form>
+<script>
+    CKEDITOR.replace('input');
+    CKEDITOR.replace('output');
+    CKEDITOR.replace('description');
+    CKEDITOR.replace('hint');
+</script>
 <p>
 <?require_once("../oj-footer.php");?>
 </body></html>
