@@ -5,8 +5,8 @@ if (!(isset($_SESSION['administrator'])||isset($_SESSION['problem_editor']))){
     echo "<a href='../loginpage.php'>Please Login First!</a>";
     exit(1);
 }
-?>
-<?
+if(isset($_GET['id'])){
+	require_once("../include/check_get_key.php");
 $sql="SELECT * FROM `problem` WHERE `problem_id`=".intval($_GET['id']);
 $result=mysql_query($sql);
 $row=mysql_fetch_object($result);
@@ -29,10 +29,7 @@ if(!isset($_SESSION['administrator'])&&isset($_SESSION['problem_editor'])&&$row-
 <td width="100"></td>
 </center>
 <hr>
-<?
-if(isset($_GET['id'])){
-	require_once("../include/check_get_key.php");
-?>
+
 <h1>Edit problem</h1>
 <form method=POST action=problem_edit.php>
 <input type=hidden name=problem_id value=New Problem>
