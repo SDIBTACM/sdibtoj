@@ -23,10 +23,20 @@
 	$row = mysql_fetch_array($result);
          if ($row && pwCheck($password,$row['password']))	{	
 	 //	$_SESSION['user_id']=$row['user_id'];
-	       	mysql_free_result($result);
-                 $password1=pwGen($password);
-                 if($OJ_VIP_CONTEST)
-                 {           
+             mysql_free_result($result);
+             $password1=pwGen($password);
+
+             if (check_ip_allowed($_SERVER['REMOTE_ADDR'], $user_id))
+             {
+                 echo "<script language='javascript'>\n";
+                 echo "alert('NOT allow login in this IP ,Please Contact administrator');\n";
+                 echo "history.go(-1);\n";
+                 echo "</script>";
+                 exit(0);
+             }
+
+             if($OJ_VIP_CONTEST)
+             {
                     $today=date('Y-m-d');
                     $ip1=$_SERVER['REMOTE_ADDR'];
                     $sql="SELECT * from `loginlog` WHERE `user_id`='$user_id' and `time`>='$today' and ip<>'$ip1' and user_id not in( select user_id from privilege where rightstr='administrator') order by time DESC limit 0,1 ";
@@ -36,8 +46,8 @@
                     if($row_cnt>0)
                     {  
                        $row=mysql_fetch_row($result);
-                       echo "<script language='javascript'>\n";
-                    echo "alert('Do not login in diff machine,Please Contact administrator');\n";  
+                       	echo "<script language='javascript'>\n";
+                    	echo "alert('Do not login in diff machine,Please Contact administrator');\n";
                         echo "history.go(-1);\n";
                         echo "</script>";
                         exit(0);
@@ -68,4 +78,40 @@
 		echo "history.go(-1);\n";
 		echo "</script>";
 	}
-?>
+
+	function check_ip_allowed($ip,$user_id) {
+        $sql = "select distinct rightstr from privilege where user_id ='".$user_id."'";
+        $result=mysql_query($sql);
+        $row = array();
+        while($r = mysql_fetch_array($result)) $row = array_merge($row,$r);
+        if(array_search('administrator',$row) !== false) return true;
+
+        $ipAllowedArray = null;
+        try {
+            $fp = fopen("admin/allowed_ip", "r");
+            $row = fread($fp, filesize("admin/allowed_ip"));
+            fclose($fp);
+            $ipAllowedArray = explode("\n", $row);
+        } catch (Exception $e) {
+            return true;
+        }
+
+        $ipBin = "";
+        $ip = explode('.', $ip);
+        foreach ($ip as $i) $ipBin .= sprintf("%08s",base_convert($i,10,2));
+        error_log("login ip" . $ipBin,0);
+
+        foreach ($ipAllowedArray as $allowedIp) {
+            error_log("allowed ip" . $allowedIp,0);
+            list($allowedIp, $sec) = explode("/", $allowedIp);
+
+            $allowedIp = explode('.', $allowedIp);
+            $allowedIpBin = "";
+            foreach ($allowedIp as $i) $allowedIpBin .= sprintf("%08s",base_convert($i,10,2));
+            error_log("allowed ip bin" . $allowedIpBin ." " . $sec,0);
+
+            if (strncmp($ipBin, $allowedIpBin, $sec) == 0) return true;
+        }
+        return false;
+    }
+

@@ -55,6 +55,13 @@ if (isset($_SESSION['administrator'])){
 
 <?
 }
+
+if(isset($_SESSION['administrator'])) {?>
+    <li>
+    <a href="allowed_ip_edit.php" target="main"><b>change allow login ip</b></a>
+</li>
+<?
+}
 if (isset($_SESSION['administrator'])||isset($_SESSION['problem_editor'])){
 ?><li>
 	<a href="rejudge.php" target="main"><b>Rejudge</b></a>
