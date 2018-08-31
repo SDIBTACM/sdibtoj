@@ -168,6 +168,7 @@ else if(isset($_POST['problem2contest'])){
 		<option value=1 selected>C++</option>
 		<option value=2 selected>Pascal</option>
 		<option value=3 selected>Java</option>
+		<option value=6 selected>Python2.7</option>
 		</select>
 	<div id="registertime" style="display:none">
 	<p align=left>Register Start:<br>&nbsp;&nbsp;&nbsp;

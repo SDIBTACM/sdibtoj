@@ -71,11 +71,12 @@ else
   $langmask=$OJ_LANGMASK;
 
 
-$lang=(~((int)$langmask))&15;
+$lang=(~((int)$langmask))&127;
  $C_=($lang&1)>0;
  $CPP_=($lang&2)>0;
  $P_=($lang&4)>0;
  $J_=($lang&8)>0;
+ $PY_=($lang&64)>0;
  if(isset($_COOKIE['lastlang'])) $lastlang=$_COOKIE['lastlang'];
  else $lastlang=1;
  
@@ -83,6 +84,8 @@ $lang=(~((int)$langmask))&15;
  if($CPP_) echo"	<option value=1 ".( $lastlang==1?"selected":"").">C++</option>";
  if($P_) echo"		<option value=2 ".( $lastlang==2?"selected":"").">Pascal</option>";
  if($J_) echo"		<option value=3 ".( $lastlang==3?"selected":"").">Java</option>";
+if($PY_) echo"		<option value=6 ".( $lastlang==6?"selected":"").">Python2.7</option>";
+
 ?>
 </select>
 <br>
