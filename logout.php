@@ -1,5 +1,8 @@
 <?
 session_start();
+foreach ($_COOKIE as $key => $value) {
+    setcookie($key, null);
+}
 unset($_SESSION['user_id']);
 session_destroy();
 
