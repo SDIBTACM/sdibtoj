@@ -1,8 +1,9 @@
 <?
+setcookie("CarbonBBS_UserID", null, 1, '/forum/', null, false, true);
+setcookie("CarbonBBS_UserExpirationTime", null, 1, '/forum/', null, false, true);
+setcookie("CarbonBBS_UserCode", null, 1, '/forum/', null, false, true);
+
 session_start();
-foreach ($_COOKIE as $key => $value) {
-    setcookie($key, null);
-}
 unset($_SESSION['user_id']);
 session_destroy();
 
