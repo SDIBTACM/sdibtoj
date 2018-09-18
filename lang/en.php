@@ -1,7 +1,7 @@
 <?php
 	//oj-header.php
 	$MSG_FAQ="F.A.Qs";
-	$MSG_BBS="Discuss";
+	$MSG_BBS="Forum";
 	$MSG_HOME="Home";
 	$MSG_PROBLEMS="ProblemSet";
 	$MSG_STATUS="Status";
