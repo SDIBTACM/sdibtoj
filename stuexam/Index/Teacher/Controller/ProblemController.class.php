@@ -1,17 +1,16 @@
 <?php
+
 namespace Teacher\Controller;
 
+use Basic\Log;
+use Home\Helper\SqlExecuteHelper;
 use Teacher\Model\ChooseBaseModel;
 use Teacher\Model\FillBaseModel;
 use Teacher\Model\JudgeBaseModel;
 use Teacher\Model\QuestionBaseModel;
-
 use Teacher\Service\ProblemService;
 
-use Think\Controller;
-
-class ProblemController extends QuestionBaseController
-{
+class ProblemController extends QuestionBaseController {
 
     private $eid = null;
 
@@ -45,129 +44,23 @@ class ProblemController extends QuestionBaseController
     public function add() {
         $problemType = I('get.type', 1, 'intval');
         switch ($problemType) {
-            case ChooseBaseModel::CHOOSE_PROBLEM_TYPE:
-                $this->addChooseProblem();
-                break;
-            case JudgeBaseModel::JUDGE_PROBLEM_TYPE:
-                $this->addJudgeProblem();
-                break;
-            case FillBaseModel::FILL_PROBLEM_TYPE:
-                $this->addFillProblem();
-                break;
             case ProblemService::PROGRAM_PROBLEM_TYPE:
                 $this->addProgramProblem();
                 break;
             default:
+                Log::info("user id: {}, require: add problem to eaxm, result: FAIL, reason: undefine type {}", $this->userInfo['user_id'], $this->eid, $problemType);
                 $this->echoError('Invaild Path');
                 break;
         }
     }
 
-    private function addChooseProblem() {
-
-        $sch = getproblemsearch('choose_id', ChooseBaseModel::CHOOSE_PROBLEM_TYPE);
-        $isAdmin = $this->isSuperAdmin();
-        $myPage = splitpage('ex_choose', $sch['sql']);
-        $numOfChoose = 1 + ($myPage['page'] - 1) * $myPage['eachpage'];
-        $row = M('ex_choose')->field('choose_id,question,creator,easycount')
-            ->where($sch['sql'])->order('choose_id asc')->limit($myPage['sqladd'])
-            ->select();
-
-        $questionAddedIds = QuestionBaseModel::instance()->getQuestionIds4ExamByType($this->eid, ChooseBaseModel::CHOOSE_PROBLEM_TYPE);
-        $haveAdded = array();
-        foreach ($questionAddedIds as $qid) {
-            $haveAdded[$qid['question_id']] = 1;
-        }
-
-        $widgets = array(
-            'row' => $row,
-            'added' => $haveAdded,
-            'mypage' => $myPage,
-            'isadmin' => $isAdmin,
-            'numofchoose' => $numOfChoose
-        );
-
-        $questionIds = array();
-        foreach($row as $r) {
-            $questionIds[] = $r['choose_id'];
-        }
-        $this->getQuestionChapterAndPoint($questionIds, ChooseBaseModel::CHOOSE_PROBLEM_TYPE);
-
-        $this->ZaddWidgets($widgets);
-        $this->auto_display('choose');
-    }
-
-    private function addJudgeProblem() {
-        $sch = getproblemsearch('judge_id', JudgeBaseModel::JUDGE_PROBLEM_TYPE);
-        $isAdmin = $this->isSuperAdmin();
-        $myPage = splitpage('ex_judge', $sch['sql']);
-        $numOfJudge = 1 + ($myPage['page'] - 1) * $myPage['eachpage'];
-        $row = m('ex_judge')->field('judge_id,question,creator,easycount')
-            ->where($sch['sql'])->order('judge_id asc')->limit($myPage['sqladd'])
-            ->select();
-
-        $questionAddedIds = QuestionBaseModel::instance()->getQuestionIds4ExamByType($this->eid, JudgeBaseModel::JUDGE_PROBLEM_TYPE);
-        $haveAdded = array();
-        foreach ($questionAddedIds as $qid) {
-            $haveAdded[$qid['question_id']] = 1;
-        }
-
-        $widgets = array(
-            'row' => $row,
-            'added' => $haveAdded,
-            'mypage' => $myPage,
-            'isadmin' => $isAdmin,
-            'numofjudge' => $numOfJudge
-        );
-
-        $questionIds = array();
-        foreach($row as $r) {
-            $questionIds[] = $r['judge_id'];
-        }
-        $this->getQuestionChapterAndPoint($questionIds, JudgeBaseModel::JUDGE_PROBLEM_TYPE);
-
-        $this->ZaddWidgets($widgets);
-        $this->auto_display('judge');
-    }
-
-    private function addFillProblem() {
-        $sch = getproblemsearch('fill_id', FillBaseModel::FILL_PROBLEM_TYPE);
-        $isAdmin = $this->isSuperAdmin();
-        $myPage = splitpage('ex_fill', $sch['sql']);
-        $numOfFill = 1 + ($myPage['page'] - 1) * $myPage['eachpage'];
-        $row = M('ex_fill')->field('fill_id,question,creator,easycount,kind')
-            ->where($sch['sql'])->order('fill_id asc')->limit($myPage['sqladd'])
-            ->select();
-
-        $questionAddedIds = QuestionBaseModel::instance()->getQuestionIds4ExamByType($this->eid, FillBaseModel::FILL_PROBLEM_TYPE);
-        $haveAdded = array();
-        foreach ($questionAddedIds as $qid) {
-            $haveAdded[$qid['question_id']] = 1;
-        }
-
-        $widgets = array(
-            'row' => $row,
-            'added' => $haveAdded,
-            'mypage' => $myPage,
-            'isadmin' => $isAdmin,
-            'numoffill' => $numOfFill
-        );
-
-        $questionIds = array();
-        foreach($row as $r) {
-            $questionIds[] = $r['fill_id'];
-        }
-        $this->getQuestionChapterAndPoint($questionIds, FillBaseModel::FILL_PROBLEM_TYPE);
-
-        $this->ZaddWidgets($widgets);
-        $this->auto_display('fill');
-    }
-
     public function addProgramProblem() {
         if (IS_POST && I('post.eid')) {
             if (!check_post_key()) {
+                Log::error("user id: {} post key error", $this->userInfo['user_id']);
                 $this->echoError('发生错误！');
             } else if (!$this->isCreator()) {
+                Log::info("user id: {} exam id: {}, require: add program problem to eaxm, result: FAIL, reason: no privilege", $this->userInfo['user_id'], I('post.eid', 0, 'intval'));
                 $this->echoError('You have no privilege of this exam');
             } else {
                 $eid = I('post.eid', 0, 'intval');
@@ -187,9 +80,7 @@ class ProblemController extends QuestionBaseController
                 } else {
                     $pList = implode(',', $problemIds);
                 }
-                $sql = "select defunct, author, problem_id from problem where problem_id in ($pList)";
-
-                $res = M()->query($sql);
+                $res = SqlExecuteHelper::Teacher_GetProgramList($pList);
                 $validProblemCnt = 0;
 
                 foreach ($res as $r) {
@@ -206,8 +97,10 @@ class ProblemController extends QuestionBaseController
                 }
                 $flag = ProblemService::instance()->addProgram2Exam($eid, $problemIds);
                 if ($flag === true) {
+                    Log::info("user: {} exam id: {}, require: add program problem to eaxm, result: success", $this->userInfo['user_id'], $eid);
                     $this->success('程序题添加成功', U('Teacher/Problem/addProgramProblem', array('eid' => $eid, 'type' => 4)), 2);
                 } else {
+                    Log::warn("user: {} exam id: {}, require: aadd program problem to eaxm, result: FAIL, reason: unknow", $this->userInfo['user_id'], $eid);
                     $this->echoError('Invaild Path');
                 }
             }

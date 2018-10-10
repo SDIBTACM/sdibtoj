@@ -1,0 +1,202 @@
+<div class="container exam_content">
+    <h2>考试分析</h2>
+    <include file='Public:sideheader'/>
+
+    <form class='form-inline'>
+        <input type="hidden" name="eid" value="{$eid}">
+
+        <div class="form-group">
+            <input type="text" class="form-control input-lg search-input" id="student" name='student' value="{$student}"
+                   placeholder="查询专业或学生关键词如jk">
+        </div>
+        <button type="submit" class="btn btn-default btn-lg">Search</button>
+    </form>
+    <table class="table-bordered table table-bordered">
+        <tr class="warning">
+            <td colspan=2><strong>考试编号:{$eid}</strong></td>
+            <td colspan=2><strong>应考人数:{$totalnum}</strong></td>
+            <td colspan=2><strong>实考人数:{$row['realnum']}</strong></td>
+        </tr>
+        <tr class="info">
+            <td colspan=6><h3>各部分得分</h3></td>
+        </tr>
+        <tr>
+            <td>题型</td>
+            <td>选择题</td>
+            <td>判断题</td>
+            <td>填空题</td>
+            <td>程序设计题</td>
+            <td>总分</td>
+        </tr>
+        <tr>
+            <td>最高分</td>
+            <td>{$row['choosemax']|formatToFloatScore}</td>
+            <td>{$row['judgemax']|formatToFloatScore}</td>
+            <td>{$row['fillmax']|formatToFloatScore}</td>
+            <td>{$row['programmax']|formatToFloatScore}</td>
+            <td>{$row['scoremax']|formatToFloatScore}</td>
+        </tr>
+        <tr>
+            <td>最低分</td>
+            <td>{$row['choosemin']|formatToFloatScore}</td>
+            <td>{$row['judgemin']|formatToFloatScore}</td>
+            <td>{$row['fillmin']|formatToFloatScore}</td>
+            <td>{$row['programmin']|formatToFloatScore}</td>
+            <td>{$row['scoremin']|formatToFloatScore}</td>
+        </tr>
+        <tr>
+            <td>平均分</td>
+            <td>{$row['chooseavg']|formatToFloatScore}</td>
+            <td>{$row['judgeavg']|formatToFloatScore}</td>
+            <td>{$row['fillavg']|formatToFloatScore}</td>
+            <td>{$row['programavg']|formatToFloatScore}</td>
+            <td>{$row['scoreavg']|formatToFloatScore}</td>
+        </tr>
+    </table>
+    <table class="table-bordered table table-bordered">
+        <tr class="info">
+            <td colspan=6><h3>各分数段人数</h3></td>
+        </tr>
+        <tr>
+            <td>分数段</td>
+            <td>60以下</td>
+            <td>60~69</td>
+            <td>70~79</td>
+            <td>80~89</td>
+            <td>90及以上</td>
+        </tr>
+        <tr>
+            <td>人数</td>
+            <td>{$fd[0]}</td>
+            <td>{$fd[1]}</td>
+            <td>{$fd[2]}</td>
+            <td>{$fd[3]}</td>
+            <td>{$fd[4]}</td>
+        </tr>
+    </table>
+
+    <table class="table-bordered table table-bordered">
+        <tr class="info"><td colspan=<php>echo count($programIds)+1</php>><h3>各编程题平均分</h3></td></tr>
+        <tr>
+            <td>题号</td>
+            <foreach name="programIds" item="program">
+                <td>{$program['question_id']}</td>
+            </foreach>
+        </tr>
+        <tr>
+            <td>平均分</td>
+            <foreach name="programIds" item="program">
+                <td>{$programAvgScore[$program['question_id']]|formatToFloatScore}</td>
+            </foreach>
+        </tr>
+    </table>
+
+    <table class="table-bordered table table-bordered">
+        <tr class="info"><td colspan="6"><h3>选择题章节知识点分布</h3></td></tr>
+        <tr><td>序号</td><td>编号</td><td>章</td><td>节</td><td>知识点</td><td>正确率(正确人数/实考人数)</td></tr>
+        <foreach name="chooseResultMap" key="_index" item="resultMap">
+            <if condition="isset($choosePointMap[$resultMap['id']])">
+                <foreach name="choosePointMap[$resultMap['id']]" item="point" key="index">
+                    <tr>
+                        <if condition="$index eq 0">
+                            <td rowspan="{$choosePointMap[$resultMap['id']]|count}"
+                                style="vertical-align: middle">
+                                <a href="{:U('Teacher/Choose/index', array('id' => $resultMap['id']))}" target="_blank">{$_index+1}</a>
+                            </td>
+                            <td rowspan="{$choosePointMap[$resultMap['id']]|count}"
+                                style="vertical-align: middle">{$resultMap['privateCode']}</td>
+                        </if>
+                        <td>{$point['chapterName']}</td>
+                        <td>{$point['parent_point']}</td>
+                        <td>{$point['point']}</td>
+                        <if condition="$index eq 0">
+                            <td rowspan="{$choosePointMap[$resultMap['id']]|count}"
+                                style="vertical-align: middle">{$resultMap['rightPerson']} / {$row['realnum']}</td>
+                        </if>
+                    </tr>
+                </foreach>
+                <else/>
+                    <tr>
+                        <td><a href="{:U('Teacher/Choose/index', array('id' => $resultMap['id']))}" target="_blank">{$_index+1}</a></td>
+                        <td>{$resultMap['privateCode']}</td>
+                        <td>---</td>
+                        <td>---</td>
+                        <td>---</td>
+                        <td>{$resultMap['rightPerson']} / {$row['realnum']}</td>
+                    </tr>
+            </if>
+        </foreach>
+    </table>
+
+    <table class="table-bordered table table-bordered">
+        <tr class="info"><td colspan="6"><h3>判断题章节知识点分布</h3></td></tr>
+        <tr><td>序号</td><td>编号</td><td>章</td><td>节</td><td>知识点</td><td>正确率(正确人数/实考人数)</td></tr>
+        <foreach name="judgeResultMap" key="_index" item="resultMap">
+            <if condition="isset($judgePointMap[$resultMap['id']])">
+                <foreach name="judgePointMap[$resultMap['id']]" item="point" key="index">
+                    <tr>
+                        <if condition="$index eq 0">
+                            <td rowspan="{$judgePointMap[$resultMap['id']]|count}"
+                                style="vertical-align: middle">
+                                <a href="{:U('Teacher/Judge/index', array('id' => $resultMap['id']))}" target="_blank">{$_index+1}</a>
+                            </td>
+                            <td rowspan="{$judgePointMap[$resultMap['id']]|count}"
+                                style="vertical-align: middle">{$resultMap['privateCode']}</td>
+                        </if>
+                        <td>{$point['chapterName']}</td>
+                        <td>{$point['parent_point']}</td>
+                        <td>{$point['point']}</td>
+                        <if condition="$index eq 0">
+                            <td rowspan="{$judgePointMap[$resultMap['id']]|count}"
+                                style="vertical-align: middle">{$resultMap['rightPerson']} / {$row['realnum']}</td>
+                        </if>
+                    </tr>
+                </foreach>
+                <else/>
+                <tr>
+                    <td><a href="{:U('Teacher/Judge/index', array('id' => $resultMap['id']))}" target="_blank">{$_index+1}</a></td>
+                    <td>{$resultMap['privateCode']}</td>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>{$resultMap['rightPerson']} / {$row['realnum']}</td>
+                </tr>
+            </if>
+        </foreach>
+    </table>
+
+    <table class="table-bordered table table-bordered">
+        <tr class="info"><td colspan="5"><h3>填空题章节知识点分布</h3></td></tr>
+        <tr><td>序号</td><td>章</td><td>节</td><td>知识点</td></tr>
+        <foreach name="fillQuestionIds" item="_fillId" key="_index">
+            <if condition="isset($fillPointMap[$_fillId])">
+                <foreach name="fillPointMap[$_fillId]" item="point" key="index">
+                    <tr>
+                        <if condition="$index eq 0">
+                            <td rowspan="{$fillPointMap[$_fillId]|count}"
+                                style="vertical-align: middle">
+                                <a href="{:U('Teacher/Fill/index', array('id' => $_fillId))}" target="_blank">{$_index+1}</a>
+                            </td>
+                        </if>
+                        <td>{$point['chapterName']}</td>
+                        <td>{$point['parent_point']}</td>
+                        <td>{$point['point']}</td>
+                    </tr>
+                </foreach>
+                <else/>
+                <tr>
+                    <td><a href="{:U('Teacher/Fill/index', array('id' => $_fillId))}" target="_blank">{$_index+1}</a></td>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>---</td>
+                </tr>
+            </if>
+        </foreach>
+    </table>
+
+</div>
+<script type="text/javascript">
+    $(function () {
+        $("#exam_analysis").addClass('active');
+    });
+</script>

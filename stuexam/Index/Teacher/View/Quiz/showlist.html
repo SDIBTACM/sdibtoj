@@ -1,0 +1,71 @@
+<div class="container exam_content">
+    <div class="row">
+        <div class="col-md-2"><h2>考试总览</h2></div>
+    </div>
+
+    <form class="form-inline text-right" role="form" method="get">
+        <div class='form-group pull-left'>
+            <a href="{:U('Teacher/quiz/index')}" class='btn btn-info form-control'>添加考试</a>
+        </div>
+        <div class="form-group">
+            <label class="sr-only">creator list</label>
+            <select class="form-control" name="creator">
+                <option value="">请选择创建者</option>
+                <foreach name="teacherList" item="teacher">
+                    <if condition="$creator eq $teacher">
+                        <option value="{$teacher}" selected>{$teacher}</option>
+                        <else/>
+                        <option value="{$teacher}">{$teacher}</option>
+                    </if>
+                </foreach>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-info">点击查询</button>
+    </form>
+
+    <table class="table table-hover table-bordered table-condensed">
+        <thread>
+            <th width=5%>ID</th>
+            <th width=30%>考试名称</th>
+            <th width=12%>开始时间</th>
+            <th width=12%>结束时间</th>
+            <th width=8%>状态</th>
+            <th width=8%>创建者</th>
+            <th width=8% colspan="3">操作</th>
+        </thread>
+        <tbody>
+        <foreach name='row' item='r'>
+            <tr>
+                <td>{$r['exam_id']}</td>
+                <td>
+                    <a href="{:U('Teacher/Exam/userscore',array('eid'=>$r['exam_id']))}">{$r['title']|htmlspecialchars}</a>
+                </td>
+                <td style="font-size: medium"><label class='label label-info'>{$r['start_time']}</label></td>
+                <td style="font-size: medium"><label class='label label-info'>{$r['end_time']}</label></td>
+                <if condition="time() gt strtotime($r['end_time'])">
+                    <td><label class='label label-success'>Ended</label></td>
+                    <else/>
+                    <if condition="time() lt strtotime($r['start_time'])">
+                        <td><label class='label label-info'>Pending</label></td>
+                        <else/>
+                        <td><label class='label label-danger'>Running</label></td>
+                    </if>
+                </if>
+                <td><label class='label label-default'>{$r['creator']}</label></td>
+                <td><a title="删除"
+                       href="javascript:suredo('{:U('Teacher/quiz/del',array('id'=>$r['exam_id'],'getkey'=>$mykey,'page'=>$mypage['page']))}','确定删除?')">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true" style="color: peru"></span>
+                </a></td>
+                <td><a title="编辑" href="{:U('Teacher/quiz/index',array('eid'=>$r['exam_id'],'page'=>$mypage['page']))}">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                </a></td>
+                <td><a title="复制" href="javascript:void(0);"
+                       onclick="suredo('{:U('Teacher/Quiz/copyOneExam',array('eid'=>$r['exam_id']))}','确定要复制该考试嘛?')">
+                    <span class="glyphicon glyphicon-share" aria-hidden="true" style="color: green"></span>
+                </a></td>
+            </tr>
+        </foreach>
+        </tbody>
+    </table>
+    {$mypage|showpagelast=###,U("Teacher/Quiz/showList"),"$extraQuery"}
+</div>

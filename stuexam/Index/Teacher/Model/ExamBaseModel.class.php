@@ -26,10 +26,6 @@ class ExamBaseModel extends GeneralModel
     private function __clone() {
     }
 
-    protected function getDao() {
-        return M($this->getTableName());
-    }
-
     protected function getTableName() {
         return ExamTableConfig::TABLE_NAME;
     }
@@ -49,7 +45,7 @@ class ExamBaseModel extends GeneralModel
         return self::$_instance;
     }
 
-    public function getExamInfoById($examId, $field = array()) {
+    public function getById($examId, $field = array()) {
         $where = array(
             'exam_id' => $examId,
             'visible' => 'Y'

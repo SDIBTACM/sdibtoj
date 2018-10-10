@@ -9,10 +9,8 @@
 namespace Home\Controller;
 
 use Home\Model\AnswerModel;
-use Home\Model\ExamAdminModel;
-
 use Teacher\Model\ChooseBaseModel;
-
+use Teacher\Service\ChooseService;
 use Teacher\Service\ExamService;
 use Teacher\Service\ProblemService;
 use Teacher\Service\StudentService;
@@ -35,15 +33,12 @@ class ChooseController extends QuestionController
 
         $this->start2Exam();
 
-        $allBaseScore = ExamService::instance()->getBaseScoreByExamId($this->examId);
         $chooseArr = ExamService::instance()->getUserAnswer(
             $this->examId, $this->userInfo['user_id'], ChooseBaseModel::CHOOSE_PROBLEM_TYPE);
         $chooseAns = ProblemService::instance()->getProblemsAndAnswer4Exam(
             $this->examId, ChooseBaseModel::CHOOSE_PROBLEM_TYPE);
-        $chooseSeq = ExamAdminModel::instance()->getProblemSequence(
-            $this->examId, ChooseBaseModel::CHOOSE_PROBLEM_TYPE, $this->randnum);
+        $chooseSeq = getProblemSequence(count($chooseAns), $this->randnum);
 
-        $this->zadd('allscore', $allBaseScore);
         $this->zadd('choosearr', $chooseArr);
         $this->zadd('choosesx', $chooseSeq);
         $this->zadd('chooseans', $chooseAns);
@@ -60,12 +55,15 @@ class ChooseController extends QuestionController
     }
 
     public function submitPaper() {
-        $allScore = ExamService::instance()->getBaseScoreByExamId($this->examId);
-        $cRight = AnswerModel::instance()->saveProblemAnswer(
-            $this->userInfo['user_id'], $this->examId, ChooseBaseModel::CHOOSE_PROBLEM_TYPE, false);
-        $inArr['choosesum'] = $cRight * $allScore['choosescore'];
-        StudentService::instance()->submitExamPaper(
-            $this->userInfo['user_id'], $this->examId, $inArr);
+        $userId = $this->userInfo['user_id'];
+        AnswerModel::instance()->saveProblemAnswer($userId, $this->examId, ChooseBaseModel::CHOOSE_PROBLEM_TYPE);
+        $chooseSum = ChooseService::instance()->doRejudgeChooseByExamIdAndUserId(
+            $this->examId, $userId, $this->examBase['choosescore']
+        );
+        $inArr['choosesum'] = $chooseSum;
+        StudentService::instance()->submitExamPaper($userId, $this->examId, $inArr);
+
+        $this->chooseSumScore = $chooseSum;
         $this->checkActionAfterSubmit();
         redirect(U('Home/Question/navigation', array('eid' => $this->examId)));
     }

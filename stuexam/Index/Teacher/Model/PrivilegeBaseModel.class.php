@@ -18,16 +18,14 @@ class PrivilegeBaseModel extends GeneralModel
     const PROBLEM_PRIVATE = 1; // 私有题库
     const PROBLEM_SYSTEM = 2;  // 隐藏题库
 
+    const TEACHER_LIST_CACHE_KEY = "teacher_list";
+
     private static $_instance = null;
 
     private function __construct() {
     }
 
     private function __clone() {
-    }
-
-    protected function getDao() {
-        return M($this->getTableName());
     }
 
     protected function getTableName() {
@@ -88,5 +86,26 @@ class PrivilegeBaseModel extends GeneralModel
         );
         $field = array('user_id');
         return $this->queryAll($where, $field);
+    }
+
+    public function getTeacherListWithCache() {
+        $userIds = S(self::TEACHER_LIST_CACHE_KEY);
+        if (!$userIds) {
+            $where = array(
+                "rightstr" => array('in', array("contest_creator", "administrator"))
+            );
+            $field = array('user_id');
+            $userIdMap = M("privilege")->field($field)->where($where)->select();
+            $userIds = array();
+            foreach ($userIdMap as $_map) {
+                array_push($userIds, $_map['user_id']);
+            }
+            $option = array(
+                "expire" => C('TEACHER_LIST_CACHE_TIME'),
+                "type" => "File"
+            );
+            S(self::TEACHER_LIST_CACHE_KEY, $userIds, $option);
+        }
+        return $userIds;
     }
 }

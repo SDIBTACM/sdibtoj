@@ -9,9 +9,9 @@
 namespace Teacher\Controller;
 
 
-use Constant\Constants\Chapter;
 use Teacher\Model\KeyPointBaseModel;
-use Teacher\Model\QuestionPointBaseModel;
+use Teacher\Model\PrivilegeBaseModel;
+use Teacher\Service\ProblemService;
 
 class QuestionBaseController extends TemplateController
 {
@@ -44,35 +44,11 @@ class QuestionBaseController extends TemplateController
         $this->zadd('parentNode', $parentNode);
         $this->zadd('childrenNode', $childrenNode);
 
-        $this->zadd('teacherList', C('TEACHER_LIST'));
+        $this->zadd('teacherList', PrivilegeBaseModel::instance()->getTeacherListWithCache());
     }
 
     protected function getQuestionChapterAndPoint($questionIds, $type) {
-        $questionPoints = QuestionPointBaseModel::instance()->getQuestionsPoint($questionIds, $type);
-        $questionPointMap = array();
-
-        $pointIds = array();
-        foreach($questionPoints as $questionPoint) {
-            $pointIds[] = $questionPoint['point_id'];
-            $pointIds[] = $questionPoint['point_parent_id'];
-        }
-        $pointIds = array_unique($pointIds);
-        $pointMap = array();
-        $points = KeyPointBaseModel::instance()->getByIds($pointIds);
-        foreach ($points as $point) {
-            $pointMap[$point['id']] = $point['name'];
-        }
-
-        foreach ($questionPoints as $questionPoint) {
-            if (!isset($questionPointMap[$questionPoint['question_id']])) {
-                $questionPointMap[$questionPoint['question_id']] = array();
-            }
-            $questionPointMap[$questionPoint['question_id']][] = array(
-                'chapter' => $questionPoint['chapter_id'],
-                'parent_point' => $pointMap[$questionPoint['point_parent_id']],
-                'point' => $pointMap[$questionPoint['point_id']]
-            );
-        }
+        $questionPointMap = ProblemService::instance()->getQuestionPoint($questionIds, $type);
         $this->zadd('questionPointMap', $questionPointMap);
     }
 }

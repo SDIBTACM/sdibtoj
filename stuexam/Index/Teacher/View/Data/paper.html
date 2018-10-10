@@ -1,0 +1,94 @@
+<style>
+	.answerac {
+		color: green;
+	}
+	.answerwa {
+		color: red;
+	}
+</style>
+<div class="container exam_content" style='text-align:left'>
+	<div style="text-align:center">
+		<h1>{$title|default=""}</h1>
+		<h3>考生账号:{$Think.get.users}</h3>
+	</div>
+
+	<h4>一.选择题</h4>
+	<foreach name='chooseans' item='cans' key='numofchoose'>
+	<div class="panel panel-default">
+		<div class="panel-heading"><span class="label label-danger">{$allscore['choosescore']} 分</span>{$numofchoose+1}.{$cans['question']|nl2br}</div>
+		<div class="panel-body">
+			<p>(A) {$cans['ams']}<br/>(B) {$cans['bms']}<br/>(C) {$cans['cms']}<br/>(D) {$cans['dms']}</p>
+		</div>
+		<div class="panel-footer">
+			<strong>我的答案:
+				<php>
+                    $myanswer = isset($choosearr[ $cans['choose_id'] ]) ? $choosearr[ $cans['choose_id'] ] : "未选";
+                    if ($myanswer == $cans['answer']) {
+                        echo "<span class='answerac'>$myanswer | 正确</span>";
+                    } else {
+                        echo "<span class='answerwa'>$myanswer | 错误</span>";
+                    }
+				</php>
+				<br/>正确答案:{$cans['answer']}</strong>
+		</div>
+	</div>
+	</foreach>
+
+	<h4>二.判断题</h4>
+	<foreach name='judgeans' item='jans' key='numofjudge'>
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="label label-danger">{$allscore['judgescore']} 分</span>{$numofjudge+1}.{$jans['question']|nl2br}</div>
+			<div class="panel-body"><strong>我的答案:
+                <php>
+                    $myanswer = isset($judgearr[ $jans['judge_id'] ]) ? $judgearr[ $jans['judge_id'] ] : "未选";
+                    if ($myanswer == $jans['answer']) {
+                        echo "<span class='answerac'>$myanswer | 正确</span>";
+                    } else {
+                        echo "<span class='answerwa'>$myanswer | 错误</span>";
+                    }
+                </php></strong></div>
+			<div class="panel-footer"><strong>正确答案:{$jans['answer']}</strong></div>
+		</div>
+	</foreach>
+
+	<h4>三.填空题</h4>
+	<foreach name='fillans' item='fans' key='numoffill'>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<if condition="$fans['kind'] eq 1">
+					<span class="label label-danger">{$allscore['fillscore']*$fans['answernum']} 分</span>
+				<elseif condition="$fans['kind'] eq 2" />
+					<span class="label label-danger">{$allscore['prgans']} 分</span>
+				<else/>
+					<span class="label label-danger">{$allscore['prgfill']} 分</span>
+				</if>
+			{$numoffill+1}.{$fans['question']|nl2br}</div>
+			<div class="panel-body">
+				<for start='1' end="$fans['answernum']+1">
+					<if condition="$i eq 1">
+						<strong>我的答案:</strong>
+					</if>
+					<strong>答案({$i})
+                        <php>
+                            $rightans = $fillans2[ $fans['fill_id'] ][$i - 1]['answer'];
+                            $myanswer = isset($fillarr[$fans['fill_id']][$i]) ? $fillarr[$fans['fill_id']][$i] : "未选";
+                            if ($myanswer == $rightans && strlen($myanswer) == strlen($rightans)) {
+                                echo "<span class='answerac'>$myanswer | 正确</span>";
+                            } else {
+                                echo "<span class='answerwa'>$myanswer | 错误</span>";
+                            }
+                        </php>
+                    </strong>
+				</for>
+			</div>
+			<div class="panel-footer">
+				<foreach name="fillans2[$fans['fill_id']]" item='tmprow' key='k'>
+					<if condition='$k eq 0'>
+						<strong>正确答案:</strong>
+					</if>
+					<strong>答案({$tmprow['answer_id']}) {$tmprow['answer']|default=''}    </strong>
+				</foreach>
+			</div>
+		</div>
+	</foreach>
+</div>

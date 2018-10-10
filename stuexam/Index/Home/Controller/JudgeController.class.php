@@ -9,11 +9,9 @@
 namespace Home\Controller;
 
 use Home\Model\AnswerModel;
-use Home\Model\ExamAdminModel;
-
 use Teacher\Model\JudgeBaseModel;
-
 use Teacher\Service\ExamService;
+use Teacher\Service\JudgeService;
 use Teacher\Service\ProblemService;
 use Teacher\Service\StudentService;
 
@@ -35,15 +33,13 @@ class JudgeController extends QuestionController
 
         $this->start2Exam();
 
-        $allBaseScore = ExamService::instance()->getBaseScoreByExamId($this->examId);
-        $judgearr = ExamService::instance()->getUserAnswer($this->examId, $this->userInfo['user_id'], JudgeBaseModel::JUDGE_PROBLEM_TYPE);
-        $judgeans = ProblemService::instance()->getProblemsAndAnswer4Exam($this->examId, JudgeBaseModel::JUDGE_PROBLEM_TYPE);
-        $judgesx = ExamAdminModel::instance()->getProblemSequence($this->examId, JudgeBaseModel::JUDGE_PROBLEM_TYPE, $this->randnum);
+        $judgeArr = ExamService::instance()->getUserAnswer($this->examId, $this->userInfo['user_id'], JudgeBaseModel::JUDGE_PROBLEM_TYPE);
+        $judgeAns = ProblemService::instance()->getProblemsAndAnswer4Exam($this->examId, JudgeBaseModel::JUDGE_PROBLEM_TYPE);
+        $judgeSeq = getProblemSequence(count($judgeAns), $this->randnum);
 
-        $this->zadd('allscore', $allBaseScore);
-        $this->zadd('judgearr', $judgearr);
-        $this->zadd('judgesx', $judgesx);
-        $this->zadd('judgeans', $judgeans);
+        $this->zadd('judgearr', $judgeArr);
+        $this->zadd('judgesx', $judgeSeq);
+        $this->zadd('judgeans', $judgeAns);
         $this->zadd('questionName', JudgeBaseModel::JUDGE_PROBLEM_NAME);
         $this->zadd('problemType', JudgeBaseModel::JUDGE_PROBLEM_TYPE);
 
@@ -56,11 +52,15 @@ class JudgeController extends QuestionController
     }
 
     public function submitPaper() {
-        $allscore = ExamService::instance()->getBaseScoreByExamId($this->examId);
-        $jright = AnswerModel::instance()->saveProblemAnswer($this->userInfo['user_id'], $this->examId, JudgeBaseModel::JUDGE_PROBLEM_TYPE, false);
-        $inarr['judgesum'] = $jright * $allscore['judgescore'];
-        StudentService::instance()->submitExamPaper(
-            $this->userInfo['user_id'], $this->examId, $inarr);
+        $userId = $this->userInfo['user_id'];
+        AnswerModel::instance()->saveProblemAnswer($userId, $this->examId, JudgeBaseModel::JUDGE_PROBLEM_TYPE);
+        $judgeSum = JudgeService::instance()->doRejudgeJudgeByExamIdAndUserId(
+            $this->examId, $userId, $this->examBase['judgescore']
+        );
+        $inArr['judgesum'] = $judgeSum;
+        StudentService::instance()->submitExamPaper($userId, $this->examId, $inArr);
+
+        $this->judgeSumScore = $judgeSum;
         $this->checkActionAfterSubmit();
         redirect(U('Home/Question/navigation', array('eid' => $this->examId)));
     }

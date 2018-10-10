@@ -1,10 +1,11 @@
 <?php
 namespace Home\Model;
 
+use Basic\Log;
+use Home\Helper\SqlExecuteHelper;
 use Teacher\Model\ChooseBaseModel;
-use Teacher\Model\JudgeBaseModel;
 use Teacher\Model\FillBaseModel;
-use Teacher\Model\ExamBaseModel;
+use Teacher\Model\JudgeBaseModel;
 use Teacher\Model\QuestionBaseModel;
 use Teacher\Service\ProblemService;
 
@@ -26,184 +27,177 @@ class AnswerModel
         return self::$_instance;
     }
 
-    public function saveProblemAnswer($user_id, $eid, $type, $issave = true) {
+    public function saveProblemAnswer($user_id, $eid, $type) {
         switch ($type) {
             case ChooseBaseModel::CHOOSE_PROBLEM_TYPE:
-                return $this->saveChooseAnswer($user_id, $eid, $issave);
+                $this->saveChooseAnswer($user_id, $eid);
                 break;
             case JudgeBaseModel::JUDGE_PROBLEM_TYPE:
-                return $this->saveJudgeAnswer($user_id, $eid, $issave);
+                $this->saveJudgeAnswer($user_id, $eid);
                 break;
             case FillBaseModel::FILL_PROBLEM_TYPE:
-                return $this->saveFillAnswer($user_id, $eid, $issave);
+                $this->saveFillAnswer($user_id, $eid);
                 break;
         }
     }
 
-    private function saveChooseAnswer($user_id, $eid, $issave) {
-        $cntchoose = 0;
-        $tempsql = "";
-        $right = 0;
-        $chooseq = $this->getQuestion4ExamByType($eid, ChooseBaseModel::CHOOSE_PROBLEM_TYPE, $issave);
-        foreach ($chooseq as $value) {
+    private function saveChooseAnswer($user_id, $eid) {
+        $cntChoose = 0;
+        $tempSql = "";
+        $chooseQ = $this->getQuestion4ExamByType($eid, ChooseBaseModel::CHOOSE_PROBLEM_TYPE);
+        foreach ($chooseQ as $value) {
             $id = $value['question_id'];
             if (isset($_POST["xzda$id"])) {
-                $myanswer = trim($_POST["xzda$id"]);
-                if ($cntchoose == 0) {
-                    $tempsql = "INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','1','$id','1','$myanswer')";
-                    $cntchoose = 1;
+                $myAnswer = trim($_POST["xzda$id"]);
+                if ($cntChoose == 0) {
+                    $tempSql = "INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','1','$id','1','$myAnswer')";
+                    $cntChoose = 1;
                 } else {
-                    $tempsql = $tempsql . ",('$user_id','$eid','1','$id','1','$myanswer')";
-                }
-                if (!$issave && $myanswer == $value['answer']) {
-                    $right++;
+                    $tempSql = $tempSql . ",('$user_id','$eid','1','$id','1','$myAnswer')";
                 }
             }
         }
-        if (!empty($tempsql)) {
-            $tempsql = $tempsql . " on duplicate key update `answer`=values(`answer`)";
-            M()->execute($tempsql);
+        if (!empty($tempSql)) {
+            $tempSql = $tempSql . " on duplicate key update `answer`=values(`answer`)";
+            $status = M()->execute($tempSql);
+        } else {
+            $status = false;
         }
-        return $right;
+
+        if ($status === false) {
+            Log::warn("user id: {}, exam id: {}, require: save choose answer, result: FAIL! sqldata: {}, sqlresult: {}",
+                $user_id, $eid, $tempSql, $status);
+        } else {
+            Log::info("user id: {}, exam id: {}, require: save choose answer, result: success", $user_id, $eid, $status);
+        }
     }
 
-    private function saveJudgeAnswer($user_id, $eid, $issave) {
-        $cntjudge = 0;
-        $tempsql = "";
-        $right = 0;
-        $judgeq = $this->getQuestion4ExamByType($eid, JudgeBaseModel::JUDGE_PROBLEM_TYPE, $issave);
-        foreach ($judgeq as $value) {
+    private function saveJudgeAnswer($user_id, $eid) {
+        $cntJudge = 0;
+        $tempSql = "";
+        $judgeQ = $this->getQuestion4ExamByType($eid, JudgeBaseModel::JUDGE_PROBLEM_TYPE);
+        foreach ($judgeQ as $value) {
             $id = $value['question_id'];
             if (isset($_POST["pdda$id"])) {
-                $myanswer = trim($_POST["pdda$id"]);
-                if ($cntjudge == 0) {
-                    $tempsql = "INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','2','$id','1','$myanswer')";
-                    $cntjudge = 1;
+                $myAnswer = trim($_POST["pdda$id"]);
+                if ($cntJudge == 0) {
+                    $tempSql = "INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','2','$id','1','$myAnswer')";
+                    $cntJudge = 1;
                 } else {
-                    $tempsql = $tempsql . ",('$user_id','$eid','2','$id','1','$myanswer')";
-                }
-                if (!$issave && $myanswer == $value['answer']) {
-                    $right++;
+                    $tempSql = $tempSql . ",('$user_id','$eid','2','$id','1','$myAnswer')";
                 }
             }
         }
-        if (!empty($tempsql)) {
-            $tempsql = $tempsql . " on duplicate key update `answer`=values(`answer`)";
-            M()->execute($tempsql);
+        if (!empty($tempSql)) {
+            $tempSql = $tempSql . " on duplicate key update `answer`=values(`answer`)";
+            $status = M()->execute($tempSql);
+        } else {
+            $status = false;
         }
-        return $right;
+
+        if ($status === false) {
+            Log::warn("user id: {}, exam id: {}, require: save judge answer, result: FAIL! sqldata: {}, sqlresult: {}",
+                $user_id, $eid, $tempSql, $status);
+        } else {
+            Log::info("user id: {}, exam id: {}, require: save judge answer, result: success", $user_id, $eid, $status);
+        }
     }
 
-    private function saveFillAnswer($user_id, $eid, $issave) {
-
-        $cntfill = 0;
-        $tempsql = "";
-        $fillsum = 0;
-        $fillq = $this->getQuestion4ExamByType($eid, FillBaseModel::FILL_PROBLEM_TYPE, $issave);
-        if (!$issave) {
-            $field = array('fillscore', 'prgans', 'prgfill');
-            $score = ExamBaseModel::instance()->getExamInfoById($eid, $field);
-        }
-        foreach ($fillq as $value) {
+    private function saveFillAnswer($user_id, $eid) {
+        $cntFill = 0;
+        $tempSql = "";
+        $fillQ = $this->getQuestion4ExamByType($eid, FillBaseModel::FILL_PROBLEM_TYPE);
+        foreach ($fillQ as $value) {
             $aid = $value['answer_id'];
             $fid = $value['fill_id'];
             $name = $fid . "tkda";
             if (isset($_POST["$name$aid"])) {
-                $myanswer = $_POST["$name$aid"];
-                $myanswer = test_input($myanswer);
-                $myanswer = addslashes($myanswer);
-                if ($cntfill == 0) {
-                    $tempsql = "INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$fid','$aid','$myanswer')";
-                    $cntfill = 1;
+                $myAnswer = $_POST["$name$aid"];
+                $myAnswer = test_input($myAnswer);
+                $myAnswer = addslashes($myAnswer);
+                if ($cntFill == 0) {
+                    $tempSql = "INSERT INTO `ex_stuanswer` VALUES('$user_id','$eid','3','$fid','$aid','$myAnswer')";
+                    $cntFill = 1;
                 } else {
-                    $tempsql = $tempsql . ",('$user_id','$eid','3','$fid','$aid','$myanswer')";
-                }
-                if (!$issave) {
-                    $rightans = addslashes($value['answer']);
-                    if ($myanswer == $rightans && strlen($myanswer) == strlen($rightans)) {
-                        if ($value['kind'] == 1) {
-                            $fillsum += $score['fillscore'];
-                        } else if ($value['kind'] == 2) {
-                            $fillsum = $fillsum + $score['prgans'] / $value['answernum'];
-                        } else if ($value['kind'] == 3) {
-                            $fillsum = $fillsum + $score['prgfill'] / $value['answernum'];
-                        }
-                    }
+                    $tempSql = $tempSql . ",('$user_id','$eid','3','$fid','$aid','$myAnswer')";
                 }
             }
         }
-        if (!empty($tempsql)) {
-            $tempsql = $tempsql . " on duplicate key update `answer`=values(`answer`)";
-            M()->execute($tempsql);
+        if (!empty($tempSql)) {
+            $tempSql = $tempSql . " on duplicate key update `answer`=values(`answer`)";
+            $status = M()->execute($tempSql);
+        } else {
+            $status = false;
         }
-        if (!$issave) {
-            return $fillsum;
+
+        if ($status === false) {
+            Log::warn("user id: {}, exam id: {}, require: save fill answer, result: FAIL! sqldata: {}, sqlresult: {}",
+                $user_id, $eid, $tempSql, $status);
+        } else {
+            Log::info("user id: {}, exam id: {}, require: save fill answer, result: success", $user_id, $eid, $status);
         }
     }
 
-    private function getQuestion4ExamByType($eid, $type, $issave = true) {
-        if ($issave) {
-            if ($type == FillBaseModel::FILL_PROBLEM_TYPE) {
-                $query = "SELECT `fill_id`,`answer_id` FROM `fill_answer` WHERE `fill_id` IN
-				( SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='$type')";
-                $arr = M()->query($query);
-            } else {
-                $arr = QuestionBaseModel::instance()->getQuestionIds4ExamByType($eid, $type);
-            }
+    private function getQuestion4ExamByType($eid, $type) {
+        if ($type == FillBaseModel::FILL_PROBLEM_TYPE) {
+            $arr = SqlExecuteHelper::Home_GetFillQuestionForExam($eid, $type);
         } else {
-            if ($type == ChooseBaseModel::CHOOSE_PROBLEM_TYPE) {
-                $sql = "SELECT `question_id`,`answer` FROM `ex_choose`,`exp_question` WHERE `exam_id`='$eid' AND `type`='1' AND `choose_id`=`question_id`";
-            } else if ($type == JudgeBaseModel::JUDGE_PROBLEM_TYPE) {
-                $sql = "SELECT `question_id`,`answer` FROM `ex_judge`,`exp_question` WHERE `exam_id`='$eid' AND `type`='2' AND `judge_id`=`question_id`";
-            } else {
-                $sql = "SELECT `fill_answer`.`fill_id`,`answer_id`,`answer`,`answernum`,`kind` FROM `fill_answer`,`ex_fill` WHERE `fill_answer`.`fill_id`=`ex_fill`.`fill_id` AND `fill_answer`.`fill_id` IN ( SELECT `question_id` FROM `exp_question` WHERE `exam_id`='$eid' AND `type`='3')";
-            }
-            $arr = M()->query($sql);
+            $arr = QuestionBaseModel::instance()->getQuestionIds4ExamByType($eid, $type);
         }
         return $arr;
     }
 
-    public function getRightProgramCount($user_id, $eid, $start_timeC, $end_timeC) {
+    public function getExamProgramStatus($user_id, $eid, $start_timeC, $end_timeC) {
+        $status = array();
+        // 获取所有的考试编程题
         $questionArr = QuestionBaseModel::instance()->getQuestionIds4ExamByType($eid, ProblemService::PROGRAM_PROBLEM_TYPE);
         $questionIds = array();
-        foreach($questionArr as $_q) {
+        foreach ($questionArr as $_q) {
             $questionIds[] = $_q['question_id'];
         }
         if (empty($questionIds)) {
-            return 0;
+            return $status;
         }
+
         $questionIdStr = implode('\',\'', $questionIds);
         $questionIdStr = '\'' . $questionIdStr . '\'';
 
-        $count = 0;
-
-        // oj的pass_rate对于正确的时候不准, 添加这个作为容错处理
-        $rightProgramQuery = "select distinct(problem_id) as problem_id from solution where problem_id in ($questionIdStr) and " .
-            "user_id='$user_id' and result=4 and in_date>'$start_timeC' and in_date<'$end_timeC'";
-        $rightIdAns = M()->query($rightProgramQuery);
+        // oj的pass_rate对于正确的时候不准, 添加这个作为容错处理, 获取所有已经对了的题目
+        $rightIdAns = SqlExecuteHelper::Home_GetPerfectProgramResult($user_id, $questionIdStr, $start_timeC, $end_timeC);
         $rightIds = array();
         foreach ($rightIdAns as $p) {
             $rightIds[] = $p['problem_id'];
-            $count = $count + 1;
+            $status[$p['problem_id']] = 1;
         }
 
+        // 过滤到所有对了的题目, 查询其他题目的状态
         $otherIds = array_diff($questionIds, $rightIds);
         if (empty($otherIds)) {
-            return $count;
+            return $status;
         }
+
         $otherIdStr = implode('\',\'', $otherIds);
         $questionIdStr = '\'' . $otherIdStr . '\'';
-
-        $query = "select max(pass_rate) as rate from solution where problem_id in ($questionIdStr) and " .
-                "user_id='$user_id' and in_date>'$start_timeC' and in_date<'$end_timeC' group by problem_id";
-        $data = M()->query($query);
+        $data = SqlExecuteHelper::Home_GetProgramResultData($questionIdStr, $user_id, $start_timeC, $end_timeC);
 
         foreach ($data as $d) {
             if ($d['rate'] >= 0.98) {
-                $count = $count + 1;
+                $status[$d['problem_id']] = 1;
             } else {
-                $count = $count + $d['rate'];
+                $status[$d['problem_id']] = $d['rate'];
             }
+        }
+        return $status;
+    }
+
+    public function getRightProgramCount($user_id, $eid, $start_timeC, $end_timeC) {
+        $programStatus = $this->getExamProgramStatus($user_id, $eid, $start_timeC, $end_timeC);
+        $count = 0;
+        if (empty($programStatus)) {
+            return $count;
+        }
+        foreach ($programStatus as $value) {
+            $count += $value;
         }
         return $count;
     }

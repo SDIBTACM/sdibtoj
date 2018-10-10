@@ -1,12 +1,6 @@
 <?php
 return array(
-	//Database config
-	'DB_TYPE'=>'mysql',
-	'DB_HOST'=>'127.0.0.1',
-	'DB_NAME'=>'jol',
-	'DB_USER'=>'root',
-	'DB_PWD'=>'root',
-	'DB_PREFIX'=>'',
+    'LOAD_EXT_CONFIG' => 'log,database',
 
 	'OJ_VIP_CONTEST'=>false,
 
@@ -19,10 +13,9 @@ return array(
 
 	//'SHOW_PAGE_TRACE' => true,
 	'URL_CASE_INSENSITIVE'  =>  false,
+    'LOG_LEVEL'  =>'EMERG,ALERT,CRIT,ERR',
 
-    'ISDEBUG' => true,
-	'EXAM_VERSION' => '1.0.1',
+	'EXAM_VERSION' => '1.0.2',
 
-	'TEACHER_LIST' => array('wangjp','xiao','tanghl','191227938','yuwenli','ZhihuiLiu','xqs','xf_zh','ncx','yuliping',
-		'zhangb','azytyut','zhangfan','wbyq','sdwulxw','jxb19870205','liupq','xm105', "libokkkkk"),
+	'TEACHER_LIST_CACHE_TIME' => 86400 // 默认一天
 );

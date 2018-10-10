@@ -1,11 +1,15 @@
 <?php
 namespace Teacher\Service;
 
+use Basic\Log;
+use Constant\Constants\Chapter;
+use Home\Helper\SqlExecuteHelper;
 use Home\Model\AnswerModel;
 use Teacher\Model\ChooseBaseModel;
-use Teacher\Model\JudgeBaseModel;
 use Teacher\Model\FillBaseModel;
-use Think\Log;
+use Teacher\Model\JudgeBaseModel;
+use Teacher\Model\KeyPointBaseModel;
+use Teacher\Model\QuestionPointBaseModel;
 
 class ProblemService
 {
@@ -29,6 +33,9 @@ class ProblemService
     }
 
     public function addProgram2Exam($eid, $problemIds) {
+        if ($eid <= 0) {
+            return false;
+        }
         $len = count($problemIds);
         $sql = "DELETE FROM `exp_question` WHERE `exam_id`={$eid} AND `type`='4'";
         M()->execute($sql);
@@ -73,13 +80,11 @@ class ProblemService
     }
 
     public function getProgramProblems4Exam($eid) {
-        $sql = "SELECT `question_id` as `program_id`,`title`,`description`,`input`,`output`,`sample_input`,`sample_output` FROM `exp_question`,`problem` WHERE `exam_id`='$eid' AND `type`='4' AND `question_id`=`problem_id` order by exp_qid asc";
-        $ans = M()->query($sql);
-        return $ans;
+        return SqlExecuteHelper::Teacher_GetProgramProblem4Exam($eid);
     }
 
-    public function syncProgramAnswer($userId, $eid, $pid, $answer, $passRate) {
-        Log::record("userId: $userId, eid: $eid, pid: $pid, answer:$answer, passRate:$passRate");
+    public function syncProgramAnswer($userId, $eid, $pid, $judgeResult, $passRate) {
+        Log::info("user id: {} , exam id: {} , problem id: {} , answer: {} , pass rate: {}", $userId, $eid, $pid, $judgeResult, $passRate === null ? "1.00" : $passRate);
         $dao = M('ex_stuanswer');
         $where = array(
             'user_id' => $userId,
@@ -93,19 +98,19 @@ class ProblemService
         $res = $dao->field($field)->where($where)->find();
         // 如果沒有保存
         if (empty($res)) {
-            Log::record("empty record need to add");
-            if ($answer != 4) {
+            Log::warn("empty record need to add");
+            if ($judgeResult != 4) {
                 $where['answer'] = strval($passRate);
             } else {
-                $where['answer'] = strval($answer);
+                $where['answer'] = "4";
             }
             return $dao->add($where);
         } else {
-            Log::record("need to update");
+            Log::info("Program result need to update");
             $_ans = $res['answer'];
             if (strcmp($_ans, "4") != 0) {
                 $data = array();
-                if ($answer == 4) {
+                if ($judgeResult == 4) {
                     $data['answer'] = "4";
                 } else if ($passRate > doubleval($_ans)) {
                     $data['answer'] = strval($passRate);
@@ -120,8 +125,69 @@ class ProblemService
 
     public function doRejudgeProgramByExamIdAndUserId($eid, $userId, $programScore, $start_timeC, $end_timeC) {
         $row_cnt = AnswerModel::instance()->getRightProgramCount($userId, $eid, $start_timeC, $end_timeC);
-        $programsum = round($row_cnt * $programScore);
+        $programsum = formatToFloatScore($row_cnt * $programScore);
         //$program over
         return $programsum;
+    }
+
+    public function doFixStuAnswerProgramRank($eid, $userId, $startTime, $endTime) {
+        $programStatus = AnswerModel::instance()->getExamProgramStatus($userId, $eid, $startTime, $endTime);
+        if (empty($programStatus)) {
+            return;
+        }
+
+        foreach($programStatus as $pid => $value) {
+            if ($value == 1) {
+                ProblemService::instance()->syncProgramAnswer($userId, $eid, $pid, 4, null);
+            } else {
+                ProblemService::instance()->syncProgramAnswer($userId, $eid, $pid, -1, $value);
+            }
+        }
+    }
+
+    public function getByPrivateCode($problemType, $privateCode) {
+        switch ($problemType) {
+            case ChooseBaseModel::CHOOSE_PROBLEM_TYPE:
+                return ChooseBaseModel::instance()->getByPrivateCode($privateCode);
+
+            case JudgeBaseModel::JUDGE_PROBLEM_TYPE:
+                return JudgeBaseModel::instance()->getByPrivateCode($privateCode);
+
+            case FillBaseModel::FILL_PROBLEM_TYPE:
+                return FillBaseModel::instance()->getByPrivateCode($privateCode);
+
+            default:
+                return null;
+        }
+    }
+
+    public function getQuestionPoint($questionIds, $type) {
+        $questionPoints = QuestionPointBaseModel::instance()->getQuestionsPoint($questionIds, $type);
+        $questionPointMap = array();
+
+        $pointIds = array();
+        foreach($questionPoints as $questionPoint) {
+            $pointIds[] = $questionPoint['point_id'];
+            $pointIds[] = $questionPoint['point_parent_id'];
+        }
+        $pointIds = array_unique($pointIds);
+        $pointMap = array();
+        $points = KeyPointBaseModel::instance()->getByIds($pointIds);
+        foreach ($points as $point) {
+            $pointMap[$point['id']] = $point['name'];
+        }
+
+        foreach ($questionPoints as $questionPoint) {
+            if (!isset($questionPointMap[$questionPoint['question_id']])) {
+                $questionPointMap[$questionPoint['question_id']] = array();
+            }
+            $questionPointMap[$questionPoint['question_id']][] = array(
+                'chapter' => Chapter::getById($questionPoint['chapter_id'])->getPriority(),
+                'chapterName' => Chapter::getById($questionPoint['chapter_id'])->getName(),
+                'parent_point' => $pointMap[$questionPoint['point_parent_id']],
+                'point' => $pointMap[$questionPoint['point_id']]
+            );
+        }
+        return $questionPointMap;
     }
 }

@@ -1,19 +1,14 @@
 <?php
 namespace Teacher\Controller;
 
-use Teacher\Model\ChooseBaseModel;
-use Teacher\Model\JudgeBaseModel;
-use Teacher\Model\FillBaseModel;
-use Teacher\Model\PrivilegeBaseModel;
+use Basic\Log;
 use Teacher\Model\ExamBaseModel;
-
+use Teacher\Model\PrivilegeBaseModel;
+use Teacher\Model\StudentBaseModel;
 use Teacher\Service\ChooseService;
-use Teacher\Service\JudgeService;
-use Teacher\Service\ExamService;
 use Teacher\Service\FillService;
+use Teacher\Service\JudgeService;
 use Teacher\Service\ProblemService;
-
-use Think\Controller;
 
 class InfoController extends TemplateController
 {
@@ -22,55 +17,9 @@ class InfoController extends TemplateController
         parent::_initialize();
     }
 
-    public function showpaper() {
-        if (!(isset($_GET['eid']) && isset($_GET['users']))) {
-            $this->echoError('Wrong Path');
-            return;
-        }
-
-        $eid = intval(trim($_GET['eid']));
-        $this->isCanWatchInfo($eid);
-
-        $users = trim($_GET['users']);
-        $row = ExamBaseModel::instance()->getExamInfoById($eid, array('title'));
-
-        $_res = PrivilegeBaseModel::instance()->getPrivilegeByUserIdAndExamId($users, $eid);
-        if (empty($_res)) {
-            $this->echoError("The student have no privilege to take part in it");
-        }
-
-        $allscore = ExamService::instance()->getBaseScoreByExamId($eid);
-
-        $choosearr = ExamService::instance()->getUserAnswer($eid, $users, ChooseBaseModel::CHOOSE_PROBLEM_TYPE);
-        $judgearr = ExamService::instance()->getUserAnswer($eid, $users, JudgeBaseModel::JUDGE_PROBLEM_TYPE);
-        $fillarr = ExamService::instance()->getUserAnswer($eid, $users, FillBaseModel::FILL_PROBLEM_TYPE);
-
-        $chooseans = ProblemService::instance()->getProblemsAndAnswer4Exam($eid, ChooseBaseModel::CHOOSE_PROBLEM_TYPE);
-        $judgeans = ProblemService::instance()->getProblemsAndAnswer4Exam($eid, JudgeBaseModel::JUDGE_PROBLEM_TYPE);
-        $fillans = ProblemService::instance()->getProblemsAndAnswer4Exam($eid, FillBaseModel::FILL_PROBLEM_TYPE);
-        $fillans2 = array();
-
-        if ($fillans) {
-            foreach ($fillans as $key => $value) {
-                $fillans2[$value['fill_id']] = ProblemService::instance()
-                    ->getProblemsAndAnswer4Exam($value['fill_id'], ProblemService::PROBLEMANS_TYPE_FILL);
-            }
-        }
-        $this->zadd('title', $row['title']);
-        $this->zadd('allscore', $allscore);
-        $this->zadd('choosearr', $choosearr);
-        $this->zadd('judgearr', $judgearr);
-        $this->zadd('fillarr', $fillarr);
-        $this->zadd('chooseans', $chooseans);
-        $this->zadd('judgeans', $judgeans);
-        $this->zadd('fillans', $fillans);
-        $this->zadd('fillans2', $fillans2);
-
-        $this->auto_display('paper');
-    }
-
     public function delscore() {
         if (!(isset($_GET['eid']) && isset($_GET['users']))) {
+            Log::info("user id: {} url error, url data: {}, ", $this->userInfo['user_id'], $_SERVER['REQUEST_URI']);
             $this->echoError('Wrong Path');
             return;
         }
@@ -81,6 +30,7 @@ class InfoController extends TemplateController
         $sortdnum = I('get.sortdnum', 0, 'intval');
         $users = trim($_GET['users']);
         if (!$this->isOwner4ExamByExamId($eid)) {
+            Log::info("user id: {} exam id: {} stuid: {}, require: del one score, result: FAIL, reason: no privilege", $this->userInfo['user_id'], $users, $eid);
             $this->echoError('You have no privilege to do it!');
             return;
         }
@@ -93,6 +43,7 @@ class InfoController extends TemplateController
         foreach ($typeList as $type) {
             $this->delScoreByType($type, $where);
         }
+        Log::info("user id: {} exam id: {} stuid: {}, require: del one score, result: success", $this->userInfo['user_id'], $users, $eid);
         $this->redirect("Exam/userscore", array(
             'eid' => $eid,
             'sortdnum' => $sortdnum,
@@ -103,6 +54,7 @@ class InfoController extends TemplateController
     public function submitAllPaper() {
         $eid = I('get.eid', 0, 'intval');
         if (empty($eid)) {
+            Log::info("user id: {} url error, url data: {}, ", $this->userInfo['user_id'], $_SERVER['REQUEST_URI']);
             $this->alertError('Invaild Exam');
             return;
         }
@@ -110,6 +62,7 @@ class InfoController extends TemplateController
         $sortanum = I('get.sortanum', 0, 'intval');
         $sortdnum = I('get.sortdnum', 0, 'intval');
         if (!$this->isOwner4ExamByExamId($eid)) {
+            Log::info("user id: {} exam: {}, require: submit all paper, result: FAIL, reason: no privilege", $this->userInfo['user_id'], $eid);
             $this->echoError('You have no privilege to do it!');
         }
 
@@ -140,16 +93,18 @@ class InfoController extends TemplateController
         if (!empty($userIds2Submit)) {
             $userIds2Submit = array_unique($userIds2Submit);
             $field = array('start_time', 'end_time');
-            $prirow = ExamBaseModel::instance()->getExamInfoById($eid, $field);
+            $prirow = ExamBaseModel::instance()->getById($eid, $field);
             $start_timeC = strftime("%Y-%m-%d %X", strtotime($prirow['start_time']));
             $end_timeC = strftime("%Y-%m-%d %X", strtotime($prirow['end_time']));
 
             foreach ($userIds2Submit as $_uid) {
                 $mark = isset($negScoreUserId[$_uid]) ? 1 : 0;
-                $this->rejudgepaper($_uid, $eid, $start_timeC, $end_timeC, $mark);
+                $this->rejudgePaper($_uid, $eid, $start_timeC, $end_timeC, $mark);
                 usleep(10000);
             }
         }
+        Log::info("user id: {} exam: {}, require: submit all paper, result: success", $this->userInfo['user_id'], $eid);
+
         $this->redirect("Exam/userscore", array(
             'eid' => $eid,
             'sortdnum' => $sortdnum,
@@ -161,10 +116,13 @@ class InfoController extends TemplateController
         $eid = I('post.eid', 0, 'intval');
         $typeStr = I('post.type', 'all');
         if (empty($eid)) {
+            Log::info("user id: {} url error, url data: {}, ", $this->userInfo['user_id'], $_SERVER['REQUEST_URI']);
             $this->echoError("bad exam id");
             return;
         }
         if (!$this->isOwner4ExamByExamId($eid)) {
+            Log::info("user id: {} exam id: {}, require: del all score, result: FAIL, reason: no privilege",
+                $this->userInfo['user_id'], $eid);
             $this->echoError('You have no privilege to do it!');
         }
         unset($_POST['type']);
@@ -184,11 +142,13 @@ class InfoController extends TemplateController
                 $this->delScoreByType($type, $where);
             }
         }
+        Log::info("user id: {} exam id: {}, require: del all score, result: success", $this->userInfo['user_id'], $eid);
         $this->redirect("Exam/userscore", array('eid' => $eid));
     }
 
     public function submitpaper() {
         if (!(isset($_GET['eid']) && isset($_GET['users']))) {
+            Log::info("user id: {} url error, url data: {}, ", $this->userInfo['user_id'], $_SERVER['REQUEST_URI']);
             $this->echoError('Wrong Path');
             return;
         }
@@ -197,16 +157,19 @@ class InfoController extends TemplateController
         $sortanum = I('get.sortanum', 0, 'intval');
         $sortdnum = I('get.sortdnum', 0, 'intval');
         if (!$this->isOwner4ExamByExamId($eid)) {
+            Log::info("user id: {} exam id: {} stuid: {}, require: submit paper, result: FAIL, reason: privilege", $this->userInfo['user_id'], $eid, $userId);
             $this->echoError('You have no privilege to do it!');
         }
-        $flag = $this->dojudgeone($eid, $userId);
+        $flag = $this->doJudgeOne($eid, $userId);
         if ($flag) {
+            Log::info("user id: {} exam id: {} stuid: {}, require: submit paper, result: success", $this->userInfo['user_id'], $eid, $userId);
             $this->redirect("Exam/userscore", array(
                 'eid' => $eid,
                 'sortdnum' => $sortdnum,
                 'sortanum' => $sortanum
             ));
         }
+        Log::warn("user id: {} exam id: {} stuid: {}, require: submit paper, result: FAIL, reason: unknow", $this->userInfo['user_id'], $eid, $userId);
     }
 
     public function hardSubmit() {
@@ -215,11 +178,15 @@ class InfoController extends TemplateController
         $sortanum = I('get.sortanum', 0, 'intval');
         $sortdnum = I('get.sortdnum', 0, 'intval');
         if (!$this->isOwner4ExamByExamId($eid)) {
+            Log::info("user id: {} exam id: {} stuid: {}, require: hard submit paper, result: FAIL, reason: no privilege",
+                $this->userInfo['user_id'], $eid, $userId);
             $this->echoError('You have no privilege to do it!');
         }
         if (empty($eid) || empty($userId)) {
         } else {
-            $this->dojudgeone($eid, $userId);
+            $this->doJudgeOne($eid, $userId);
+            Log::info("user id: {} exam id: {} stuid: {}, require: hard submit paper, result: success",
+                $this->userInfo['user_id'], $eid, $userId);
         }
         $this->redirect("Exam/userscore", array(
             'eid' => $eid,
@@ -230,47 +197,55 @@ class InfoController extends TemplateController
 
     public function dorejudge() {
         if (!(IS_POST && I('post.eid'))) {
+            Log::info("user id: {} url error, url data: {}, ", $this->userInfo['user_id'], $_SERVER['REQUEST_URI']);
             $this->echoError('Wrong Method');
             return;
         }
-        if (!check_post_key() || !$this->isSuperAdmin()) {
+        if (!$this->isSuperAdmin()) {
+            $this->echoError('发生错误！');
+            Log::info("user id: {}, require: rejudge, result: FAIL, reason: no privilege",
+                $this->userInfo['user_id']);
+        }
+        if (!check_post_key()) {
+            Log::error("user id: {} post key error", $this->userInfo['user_id']);
             $this->echoError('发生错误！');
         }
         $eid = intval($_POST['eid']);
 
         if (I('post.rjall')) {
-            $prirow = ExamBaseModel::instance()->getExamInfoById($eid, array('start_time', 'end_time'));
+            $prirow = ExamBaseModel::instance()->getById($eid, array('start_time', 'end_time'));
             $start_timeC = strftime("%Y-%m-%d %X", strtotime($prirow['start_time']));
             $end_timeC = strftime("%Y-%m-%d %X", strtotime($prirow['end_time']));
             $userlist = M('ex_student')->field('user_id')->where('exam_id=%d', $eid)->select();
             if ($userlist) {
                 foreach ($userlist as $value) {
-                    $this->rejudgepaper($value['user_id'], $eid, $start_timeC, $end_timeC, 1);
+                    $this->rejudgePaper($value['user_id'], $eid, $start_timeC, $end_timeC, 1);
                 }
                 unset($userlist);
             }
             $this->success('全部重判成功！', U('Teacher/Exam/userscore', array('eid' => $eid)), 2);
         } else if (I('post.rjone')) {
             $rjuserid = test_input($_POST['rjuserid']);
-            $flag = $this->dojudgeone($eid, $rjuserid);
+            $flag = $this->doJudgeOne($eid, $rjuserid);
             if ($flag) {
+                Log::info("user id: {} exam id: {}, require: rejudge exam, result: success", $this->userInfo['user_id'], $eid);
                 $this->success('重判成功！', U('Teacher/Exam/userscore', array('eid' => $eid)), 2);
             }
         } else {
+            Log::info("user id: {} exam id: {}, post data: {} require: rejudge exam, result: FAIL, reason: post error ",
+                $this->userInfo['user_id'], $eid, I('post.'));
             $this->echoError('Invaild Path');
         }
     }
 
-    private function dojudgeone($eid, $userId) {
+    private function doJudgeOne($eid, $userId) {
         $field = array('start_time', 'end_time');
-        $prirow = ExamBaseModel::instance()->getExamInfoById($eid, $field);
+        $prirow = ExamBaseModel::instance()->getById($eid, $field);
         $start_timeC = strftime("%Y-%m-%d %X", strtotime($prirow['start_time']));
         $end_timeC = strftime("%Y-%m-%d %X", strtotime($prirow['end_time']));
 
-        $rightstr = "e$eid";
-        $cnt1 = M('ex_privilege')
-            ->where("user_id='%s' and rightstr='%s'", $userId, $rightstr)
-            ->count();
+        $where = array('user_id' => $userId, 'rightstr' => "e$eid");
+        $cnt1 = PrivilegeBaseModel::instance()->countNumber($where);
         if ($cnt1 == 0) {
             $this->echoError('Student ID is Wrong!');
             return false;
@@ -278,31 +253,43 @@ class InfoController extends TemplateController
         if (time() < $start_timeC) {
             $this->echoError('Exam Not Start');
         }
-        $mark = M('ex_student')
-            ->where("exam_id=%d and user_id='%s'", $eid, $userId)
-            ->count();
-        $this->rejudgepaper($userId, $eid, $start_timeC, $end_timeC, $mark);
+        $where = array("exam_id" => $eid, "user_id" => $userId);
+        $mark = StudentBaseModel::instance()->countNumber($where);
+        $this->rejudgePaper($userId, $eid, $start_timeC, $end_timeC, $mark);
         return true;
     }
 
-    private function rejudgepaper($userId, $eid, $start_timeC, $end_timeC, $mark) {
+    private function rejudgePaper($userId, $eid, $start_timeC, $end_timeC, $mark) {
 
-        $allscore = ExamService::instance()->getBaseScoreByExamId($eid);
-
+        $allscore = ExamBaseModel::instance()->getById($eid,
+            array('choosescore', 'judgescore', 'fillscore', 'prgans', 'prgfill', 'programscore')
+        );
         $choosesum = ChooseService::instance()->doRejudgeChooseByExamIdAndUserId($eid, $userId, $allscore['choosescore']);
         $judgesum = JudgeService::instance()->doRejudgeJudgeByExamIdAndUserId($eid, $userId, $allscore['judgescore']);
         $fillsum = FillService::instance()->doRejudgeFillByExamIdAndUserId($eid, $userId, $allscore);
         $programsum = ProblemService::instance()->doRejudgeProgramByExamIdAndUserId($eid, $userId, $allscore['programscore'], $start_timeC, $end_timeC);
 
         $sum = $choosesum + $judgesum + $fillsum + $programsum;
-        if ($mark == 0) { // if the student has not submitted the paper
-            $sql = "INSERT INTO `ex_student` VALUES('" . $userId . "','$eid','$sum','$choosesum','$judgesum','$fillsum','$programsum')";
-            M()->execute($sql);
+
+        $data = array(
+            'score' => $sum,
+            'choosesum' => $choosesum,
+            'judgesum' => $judgesum,
+            'fillsum' => $fillsum,
+            'programsum' => $programsum
+        );
+
+        if ($mark == 0) {
+            // if the student has not submitted the paper
+            $data['user_id'] = $userId;
+            $data['exam_id'] = $eid;
+            StudentBaseModel::instance()->insertData($data);
         } else {
-            $sql = "UPDATE `ex_student` SET `score`='$sum',`choosesum`='$choosesum',`judgesum`='$judgesum',`fillsum`='$fillsum',`programsum`='$programsum'
-			WHERE `user_id`='" . $userId . "' AND `exam_id`='$eid'";
-            M()->execute($sql);
+            StudentBaseModel::instance()->updateStudentScore($eid, $userId, $data);
         }
+        Log::info("user id: {} exam id: {} stuid:{}, require: rejudge one paper, result: success",
+            $this->userInfo['user_id'], $eid, $userId);
+        ProblemService::instance()->doFixStuAnswerProgramRank($eid, $userId, $start_timeC, $end_timeC);
     }
 
     private function getTypeList($typeStr) {

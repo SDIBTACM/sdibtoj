@@ -21,10 +21,6 @@ class KeyPointBaseModel extends GeneralModel
     private function __clone() {
     }
 
-    protected function getDao() {
-        return M($this->getTableName());
-    }
-
     protected function getTableName() {
         return KeyPointTableConfig::TABLE_NAME;
     }
@@ -53,7 +49,7 @@ class KeyPointBaseModel extends GeneralModel
     }
 
     public function getAllPoint() {
-        return $this->getDao()->select();
+        return $this->getDao()->order(array("id asc"))->select();
     }
 
     public function getByIds($ids) {
