@@ -108,6 +108,7 @@ $len=strlen($source);
 
 $prefix_file="$OJ_DATA/$id/prefix.$language_ext[$language]";
 $append_file="$OJ_DATA/$id/append.$language_ext[$language]";
+echo $prefix_file;
 if(isset($OJ_APPENDCODE)&&$OJ_APPENDCODE&&file_exists($prefix_file)){
      $source=mysql_real_escape_string(file_get_contents($prefix_file)."\n").$source;
 }

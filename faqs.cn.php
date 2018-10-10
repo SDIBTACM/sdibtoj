@@ -79,6 +79,19 @@ begin
 end.
 </font></pre>
 <br><br>
+<font color="#ff0000">注意:如果想通过Python3编译，需要自己指定解释器,不指定的话默认是 Python2。</font><br>
+ Python2:<br>
+<pre><font color="blue">
+print sum(map(int,raw_input().split()))
+</font></pre>
+ Python3:<br>
+<pre><font color="blue">
+#!/python3
+a,b=input().split()
+print(int(a)+int(b))
+</font></pre>
+<br><br>
+
 <font color="#ff0000">注意:如果选择Java编译，类名要为Main，代码见下面。Java编译器为JDK 1.6。</font><br>
 Java:<br>
 <pre><font color="blue">

@@ -1,2 +1,9 @@
 .DS_Store
 .idea/
+upload/
+include/db_info.inc.php
+lostpassword.php
+database.php
+admin/changevjpass.php
+stuexam/Index/Common/Conf/database.php
+.svn/

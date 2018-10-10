@@ -492,7 +492,6 @@ CREATE TABLE `contestreg` (
   `stumajor` varchar(100) DEFAULT NULL,
   `ispending` tinyint(4) NOT NULL DEFAULT '0',
   `registertime` datetime DEFAULT NULL,
-  `seatnum` int(4) DEFAULT NULL,
   PRIMARY KEY (`user_id`,`contest_id`),
   FOREIGN KEY (`user_id`) REFERENCES users(`user_id`),
   FOREIGN KEY (`contest_id`) REFERENCES users(`contest_id`)	

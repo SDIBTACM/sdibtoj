@@ -195,7 +195,6 @@ Public:<select name=private id=private onchange="JudgePrivate(this.value)">
  $CPP_select=($lang&2)>0?"selected":"";
  $P_select=($lang&4)>0?"selected":"";
  $J_select=($lang&8)>0?"selected":"";
- $PY_select = ($lang&64)>0?"selected":"";
 // echo $lang;
 ?>
 Language:<select name="lang[]" multiple>
@@ -203,7 +202,6 @@ Language:<select name="lang[]" multiple>
 		<option value=1 <?php echo $CPP_select?>>C++</option>
 		<option value=2 <?php echo $P_select?>>Pascal</option>
 		<option value=3 <?php echo $J_select?>>Java</option>
-		<option value=6 <?php echo $PY_select?>>Python2.7</option>
 	</select>
 <br>Problems:<input type=text size=60 name=cproblem value='<?php echo $plist?>'>
 	<div id="registertime" style="display:none">

@@ -1,4 +1,5 @@
 <?
+
 setcookie("CarbonBBS_UserID", null, 1, '/forum/', null, false, true);
 setcookie("CarbonBBS_UserExpirationTime", null, 1, '/forum/', null, false, true);
 setcookie("CarbonBBS_UserCode", null, 1, '/forum/', null, false, true);

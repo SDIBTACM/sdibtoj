@@ -5,12 +5,13 @@ if (!(isset($_SESSION['administrator'])||isset($_SESSION['problem_editor']))){
     echo "<a href='../loginpage.php'>Please Login First!</a>";
     exit(1);
 }
+
 if(isset($_GET['id'])){
-	require_once("../include/check_get_key.php");
-$sql="SELECT * FROM `problem` WHERE `problem_id`=".intval($_GET['id']);
+        require_once("../include/check_get_key.php");
+
+$sql="SELECT * FROM `problem` WHERE `problem_id`=" . intval($_GET['id']);
 $result=mysql_query($sql);
 $row=mysql_fetch_object($result);
-
 if(!isset($_SESSION['administrator'])&&isset($_SESSION['problem_editor'])&&$row->author!=$_SESSION['user_id']){
     echo "You don't have the privilege to edit this problem";
     exit(0);
@@ -29,6 +30,7 @@ if(!isset($_SESSION['administrator'])&&isset($_SESSION['problem_editor'])&&$row-
 <td width="100"></td>
 </center>
 <hr>
+
 
 <h1>Edit problem</h1>
 <form method=POST action=problem_edit.php>
@@ -127,19 +129,19 @@ if (get_magic_quotes_gpc ()) {
 	$spj = stripslashes ( $spj);
 	$source = stripslashes ( $source );
 }
-$basedir=$OJ_DATA."/$id";
-echo "Sample data file in $basedir Updated!<br>";
+//$basedir=$OJ_DATA."/$id";
+//echo "Sample data file in $basedir Updated!<br>";
 
-	if($sample_input){
+//	if($sample_input){
 		//mkdir($basedir);
-		$fp=fopen($basedir."/sample.in","w");
-		fputs($fp,str_replace("\r\n","\n",$sample_input));
-		fclose($fp);
+	//	$fp=fopen($basedir."/sample.in","w");
+	//	fputs($fp,str_replace("\r\n","\n",$sample_input));
+	//	fclose($fp);
 		
-		$fp=fopen($basedir."/sample.out","w");
-		fputs($fp,str_replace("\r\n","\n",$sample_output));
-		fclose($fp);
-	}
+	//	$fp=fopen($basedir."/sample.out","w");
+	//	fputs($fp,str_replace("\r\n","\n",$sample_output));
+	//	fclose($fp);
+//	}
 	$title=mysql_real_escape_string($title);
 	$time_limit=mysql_real_escape_string($time_limit);
 	$memory_limit=mysql_real_escape_string($memory_limit);
@@ -168,4 +170,5 @@ echo "<a href='../problem.php?id=$id'>See The Problem!</a>";
 ?>
 </body>
 </html>
+
 

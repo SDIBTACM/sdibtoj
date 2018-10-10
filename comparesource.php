@@ -44,15 +44,13 @@ if (isset($_SESSION['source_browser'])) {
 	mysql_free_result($rrs);
 }
 if (isset($_SESSION['administrator']))$ok=true;
-
 if ($ok) {
-	$sql = "SELECT `source` FROM `source_code` WHERE `solution_id`=" . $id;
-	$result = mysql_query($sql);
-	$row = mysql_fetch_object($result);
-	if ($row)
-		$view_source = $row->source;
+		$sql="SELECT `source` FROM `source_code` WHERE `solution_id`=".$id;
+		$result=mysql_query($sql);
+		$row=mysql_fetch_object($result);
+		if($row)
+			$view_source=$row->source;
 }
-
 ?>
 <html>
 <head>

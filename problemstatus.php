@@ -99,6 +99,7 @@ $flag=!(mysql_num_rows($rrs)>0);
 $sql="SELECT `contest_id` FROM `contest` WHERE (`end_time`>NOW() and `start_time`<NOW()) and `defunct`='N'";
 $result= mysql_query($sql);
 $row=mysql_num_rows($result);
+//暂时注释
 if($row)
    $OJ_AUTO_SHARE=false;
 

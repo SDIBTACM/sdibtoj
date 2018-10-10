@@ -36,10 +36,12 @@ require_once("oj-header.php");
 		$admin_ok=0;
 	echo "<center><h1 style=\"COLOR:#1A5CC8\">报名列表</h1>";
 	echo "<font style=\"COLOR:#1A5CC8\">比赛名称：$row->title</font>";
+	$acm_register_cid = 1863;
+	if ($cid == $acm_register_cid) echo "<a href='http://acm.sdibt.edu.cn/JudgeOnline/stuexam/community/extra/rank?cid=$cid' style='color:red' target='_blank'> &nbsp;   预选排名</a>";
 	echo "<br><font style=\"COLOR:#1A5CC8\">注册时间：    $row->reg_start_time 到     $row->reg_end_time    </font>";
    if($flag)
 		echo "<span style=\"COLOR:red\">报名表下载:<a href=cstregister.xls.php?cid=$cid>Download</a></font>";
-	if($admin_ok){
+	if($admin_ok && $cid != $acm_register_cid){
 		echo "<form action=\"admin/setseatnum.php?cid=$cid\" method=\"post\">";
 		echo "<input value=\"生成座位号\" id=\"seat\" type=\"Submit\"></form>";
 	}

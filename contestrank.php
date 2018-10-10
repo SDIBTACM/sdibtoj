@@ -34,8 +34,8 @@ class TM{
 			$this->p_ac_sec[$pid]=$sec;
 			$this->solved++;
 			$this->time+=$sec+$this->p_wa_num[$pid]*1200;
-//			echo "Time:".$this->time."<br>";
-//			echo "Solved:".$this->solved."<br>";
+		//	echo "Time:".$this->time."<br>";
+		//	echo "Solved:".$this->solved."<br>";
 		}
 	}
 }
@@ -132,7 +132,7 @@ while ($row=mysql_fetch_object($result)){
 	//if(time()<$end_time&&$lock<strtotime($row->in_date))
 	//$U[$user_cnt]->Add($row->num,strtotime($row->in_date)-$start_time,0);
 //	if(strtotime($row->in_date)-$start_time>=0)
-	$U[$user_cnt]->Add($row->num,strtotime($row->in_date)-$start_time,intval($row->result));
+        $U[$user_cnt]->Add($row->num,strtotime($row->in_date)-$start_time,intval($row->result));
 }
 mysql_free_result($result);
 usort($U,"s_cmp");
@@ -260,24 +260,24 @@ function metal(){
                        cell.style.cssText="background-color:gold;";
                        cell1.style.backgroundImage="url(./image/cup.gif)";
                      }
-                     if(r>1&&r<=total*.1+1){
+                     if(r>1&&r<=3){
                      //  if(r>1&&r<=total*.1+1)
                           cell.style.cssText="background-color:gold";
                           cell1.style.backgroundImage="url(./image/gold.gif)";
                       }     
-                     if(r>total*.1+1&&r<=total*.3+1){
+                     if(r>3&&r<=8){
                      // if(r>total*.1+1&&r<=total*.3+1)
                         cell.style.cssText="background-color:silver";
                         cell1.style.backgroundImage="url(./image/silver.gif)";
 
                      }
-                     if(r>total*.3+1&&r<=total*.6+1){
+                     if(r>=9&&r<=15){
                     // if(r>total*.3+1&&r<=total*.6+1)
                         cell.style.cssText="background-color:saddlebrown;color:white";
                         cell1.style.backgroundImage="url(./image/bronze.gif)";
 
                      }
-                     if(r>total*.6&&ac>0){
+                     if(r>=16&&r<=28&&ac>0){
                      // if(r>total*.6&&ac>0)
                         cell.style.cssText="background-color:steelblue;color:white";
                          cell1.style.backgroundImage="url(./image/yousheng.gif)";

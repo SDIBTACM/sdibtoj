@@ -32,7 +32,7 @@
 		if ($rank < 0)
 			$rank = 0;
 			
-		$sql = "SELECT `user_id`,`nick`,`solved`,`submit` FROM `users` ORDER BY `solved` DESC,submit,reg_time  LIMIT  " . strval ( $rank ) . ",$page_size";
+		$sql = "SELECT `user_id`,`nick`,`solved`,`submit` FROM `users` ORDER BY `solved` DESC,submit  LIMIT  " . strval ( $rank ) . ",$page_size";
 		
 		if($scope){
 			$s="";
@@ -53,7 +53,7 @@
 					(select count(distinct problem_id) solved ,user_id from solution where in_date>'$s' and result=4 group by user_id order by solved desc limit " . strval ( $rank ) . ",".($page_size*2).") s on users.user_id=s.user_id
 					left join 
 		                       (select count( problem_id) submit ,user_id from solution where in_date>'$s' group by user_id order by submit desc limit 0,".($page_size*3+$rank).") t on users.user_id=t.user_id		
-                      ORDER BY s.`solved` DESC,t.submit,reg_time  LIMIT  0,50
+                      ORDER BY s.`solved` DESC,t.submit  LIMIT  0,50
 			 ";
 		   //echo $sql;
 		}
@@ -102,7 +102,7 @@
 			if ($row->submit == 0)
 				echo "0.000%";
 			else
-				echo sprintf ( "%.03lf%%", 100 * $row->solved / $row->submit );
+				echo sprintf ( "%.03lf%%", 100 *( $row->solved / $row->submit) );
 			echo "</tr>";
 		}
 		echo "</table></center>";

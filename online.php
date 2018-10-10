@@ -1,12 +1,13 @@
 <?php
-	$debug = true;
+	//$debug = true;
 	require_once('./oj-header.php');
 	require_once('./include/db_info.inc.php');
 //	require_once('./include/iplocation.php');
-        require_once('./include/IP.class.php');
+        //require_once('./include/IP.class.php');
+        require_once('./include/IP4datx.class.php');
       if($OJ_ONLINE){
         	$users = $on->getAll();
-         	//$ip = new IpLocation();
+         //	$ip = new IpLocation();
                 $ip  =new IP();
       }     
 ?>
@@ -26,7 +27,7 @@
  ?>
 <tr><td class="ip">
 <?php
-      //$l = $ip->getlocation($u->ip);
+    //  $l = $ip->getlocation($u->ip);
       $l =$ip->find($u->ip);
 	echo $u->ip.'<br />';
       if(!strcmp(trim($l[0]),"局域网"))
@@ -41,16 +42,17 @@
        {
            if(!strcmp($l[1],$l[2]))
               echo $l[1].'@'.$l[0];
-           else
-              echo $l[1].$l[2].$l[3].'@'.$l[0];
+           else 
+              echo $l[1].$l[2].'@'.$l[0];
+              //echo $l[1].$l[2].$l[3].'@'.$l[0];
        }
       }
 
 
-       //if(strlen(trim($l['area']))==0)
-	//	echo $l['country'];
-	//else
-	//	echo $l['area'].'@'.$l['country'];
+     //  if(strlen(trim($l['area']))==0)
+//		echo $l['country'];
+//	else
+//		echo $l['area'].'@'.$l['country'];
 	?></td><td><?=$u->uri?></td><td><?=$u->refer?></td>
 <td class="time"><?=sprintf("%dmin %dsec",($u->lastmove-$u->firsttime)/60,($u->lastmove-$u->firsttime) % 60)?></td><td><?=$u->ua?></td></tr>
 <?php 
@@ -102,19 +104,19 @@ for (;$row=mysql_fetch_row($result);){
          echo "<td>局域网";
       else
       {
-         if(strlen(trim($l[1]))==0)
-           echo "<td>".$l['0'];
-         else
-          {
+      if(strlen(trim($l[1]))==0)
+          echo "<td>".$l['0'];
+      else
+       {
            if(!strcmp($l[1],$l[2]))
               echo "<td>".$l[1].'@'.$l[0];
            else
-              echo "<td>".$l[1].$l[2].$l[3].'@'.$l[0];
-           }
-         }
+              echo "<td>".$l[1].$l[2].'@'.$l[0];
+              //echo "<td>".$l[1].$l[2].$l[3].'@'.$l[0];
+       }
+        }
          echo "<td>".$row[3];
         echo "</tr>";
-    
 }
 echo "</table>";
 

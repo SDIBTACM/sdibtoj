@@ -7,7 +7,6 @@ if (!(isset($_SESSION['administrator']))) {
 define('IS_POST', strstr($_SERVER['REQUEST_METHOD'], 'POST') ? 1 : 0);
 define('IS_GET', strstr($_SERVER['REQUEST_METHOD'], 'GET') ? 1 : 0);
 $row = null;
-
 if (IS_POST) {
     require_once("../include/check_post_key.php");
     $new = $_POST['ip'];
@@ -15,14 +14,14 @@ if (IS_POST) {
     $fp = fopen("allowed_ip", "w");
     fwrite($fp, $new);
     fclose($fp);
+    $row = $new;
     echo "change success";
 } else if (IS_GET) {
-
     try {
         $fp = fopen("allowed_ip", "r");
         $row = fread($fp,filesize("allowed_ip"));
     } catch (Exception $e) {
-
+       	
     }
 }
 ?>
@@ -40,3 +39,4 @@ if (IS_POST) {
     <?require_once("../include/set_post_key.php");?>
     <input type=submit value=Submit name=submit>
 </form>
+

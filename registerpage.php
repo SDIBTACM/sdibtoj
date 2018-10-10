@@ -20,7 +20,7 @@
 			<td><input name="school" size=30 type=text>
 		</tr>
 		<tr><td><?=$MSG_EMAIL?>:
-			<td><input name="email" size=30 type=text>
+			<td><input name="email" size=30 type=text>*
 		</tr>
                  <?php if($OJ_VCODE){?>
 		<tr><td>Type:

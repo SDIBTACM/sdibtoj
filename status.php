@@ -145,7 +145,7 @@ if (isset($_GET['user_id'])){
 if (isset($_GET['language'])) $language=intval($_GET['language']);
 else $language=-1;
 
-if ($language>10 || $language<0) $language=-1;
+if ($language>6 || $language<0) $language=-1;
 if ($language!=-1){
 	$sql=$sql."AND `language`='".strval($language)."' ";
 	$str2=$str2."&language=".$language;
@@ -192,7 +192,8 @@ else $language=-1;
 if ($language<0||$language>10) $language=-1;
 if ($language==-1) echo "<option value='-1' selected>All</option>";
 else echo "<option value='-1'>All</option>";
-for ($i=0;$i<4;$i++){
+for ($i=0;$i<7;$i++){
+if ($i == 5) continue;
 	if ($i==$language) echo "<option value=$i selected>$language_name[$i]</option>";
 	else echo "<option value=$i>$language_name[$i]</option>";
 }

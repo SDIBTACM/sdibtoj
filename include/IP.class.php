@@ -99,7 +99,8 @@ class IP
 
     public function __destruct()
     {
-        if (self::$fp !== NULL)
+    //    if (self::$fp !== NULL)
+       if(is_resource(self::$fp))
         {
             fclose(self::$fp);
         }

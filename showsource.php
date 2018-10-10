@@ -48,7 +48,8 @@ if (isset($OJ_AUTO_SHARE)&&$OJ_AUTO_SHARE&&isset($_SESSION['user_id'])){
 	mysql_free_result($rrs);
 }
 
-if ((isset($_SESSION['user_id'])&&$row && $row->user_id==$_SESSION['user_id'] && $sok)||(isset($_SESSION['user_id'])&&$suser_id==$_SESSION['user_id'])) $ok=true;
+if ((isset($_SESSION['user_id']) && $row && $sok)||(isset($_SESSION['user_id'])&&$suser_id==$_SESSION['user_id'])) $ok=true;
+#if ((isset($_SESSION['user_id'])&&$row && $row->user_id==$_SESSION['user_id'] && $sok)||(isset($_SESSION['user_id'])&&$suser_id==$_SESSION['user_id'])) $ok=true;
 if(isset($OJ_VIP_CONTEST)&&$OJ_VIP_CONTEST)
 {
         $sql="SELECT 1 FROM `contest_problem` WHERE `problem_id`=$sproblem_id AND `contest_id` IN (

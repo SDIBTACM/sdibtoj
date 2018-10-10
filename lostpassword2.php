@@ -51,4 +51,3 @@ $lost_key=$_POST['lost_key'];
 </div><!--end wrapper-->
 </body>
 </html>
-lostpassword2.php

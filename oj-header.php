@@ -10,13 +10,14 @@
 	require_once('./include/db_info.inc.php');
         require_once('./include/my_func.inc.php');
 	
-       if(noRefresh())
-       {
-                echo "刷新太快，休息休息";
-                sleep(10);
-                 exit (0);
+//       if(noRefresh())
+  //     {
+    //            echo "刷新太快，休息休息。<br>";
+      //          echo "给你讲个故事吧.<br>step 1.从前有座山，山里有个庙，庙里有个老和尚，老和尚正在给小和尚讲故事，讲什么故事呢？<br>step 2.重复1<br>step 3.看明白没，这是不是个递归？";
+          //      sleep(10);
+        //         exit (0);
         
-       }
+      // }
 	function checkcontest($MSG_CONTEST){
 		require_once("include/db_info.inc.php");
 		$sql="SELECT count(*) FROM `contest` WHERE `end_time`>NOW() AND `defunct`='N'";
@@ -68,7 +69,7 @@
 <h2><img id=logo src=./image/logo.png><font color="red">Welcome To <?=$OJ_NAME?> ACM-ICPC Online Judge</font></h2>
 <table width=96%> 
 	<tr align="center" class='hd' valign="top">
-                 <th><a href="http://acm.sdibt.edu.cn:8080/judge/"><font color=red>VIRTUAL JUDGE</font></a></th>
+                 <th><a href="../vjudge/"><font color=red>VIRTUAL JUDGE</font></a></th>
 		<?if(isset($OJ_DICT)&&$OJ_DICT&&$OJ_LANG=="cn"){?>
       <div class=hd>
 		      <span style="color:1a5cc8" id="dict_status"></span>
@@ -109,7 +110,7 @@
 				print "<th><a href=registerpage.php>$MSG_REGISTER</a></th>";
 			}
 			if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])||isset($_SESSION['problem_editor'])){
-				print "<th><a href=admin>$MSG_ADMIN</a></th>";
+				print "<th><a href=admin/>$MSG_ADMIN</a></th>";
 			
 			}
 		?>
@@ -140,4 +141,3 @@ var mark=<?php echo $flag?>;
 if(mark)
   setInterval(function(){blink.color=blink.color=='red'?'white':'red'},500)
 </script>
-

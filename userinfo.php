@@ -152,7 +152,7 @@ mysql_free_result($result);
 
 </table>
 <?
-require_once('./include/IP.class.php');
+require_once('./include/IP4datx.class.php');
 $ip  =new IP();
 if (isset($_SESSION['contest_creator'])||isset($_SESSION['administrator'])){
 $sql="SELECT * FROM `loginlog` WHERE `user_id`='$user_mysql' order by `time` desc LIMIT 0,50";

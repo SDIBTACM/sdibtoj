@@ -82,4 +82,3 @@ echo "<tr><td width='90%' colspan='4'><form>$MSG_SEARCH<input type='text' name='
 echo "</table></center>";
 require("../oj-footer.php");
 ?>
-

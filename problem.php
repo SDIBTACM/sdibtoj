@@ -89,7 +89,7 @@ if (isset($_GET['id'])){
         $row11=mysql_fetch_array($result11);       
         $ac=$row11['count'];
 	mysql_free_result($result11);
-       $co_flag=true;
+        $co_flag=true;
 }else{
 	require_once("oj-header.php");
 	echo "<title>$MSG_NO_SUCH_PROBLEM</title><h2>$MSG_NO_SUCH_PROBLEM</h2>";
@@ -102,7 +102,7 @@ if (mysql_num_rows($result)!=1){
       $id=intval($_GET['id']);
 	   mysql_free_result($result);
 	   $sql="SELECT  contest.`contest_id` , contest.`title`,contest_problem.num FROM `contest_problem`,`contest` WHERE contest.contest_id=contest_problem.contest_id and `problem_id`=$id and defunct='N' and NOW()< contest.end_time ORDER BY `num`";
-	   //echo $sql;
+	  // echo $sql;
            $result=mysql_query($sql);
 	   if($i=mysql_num_rows($result)){
 	      echo "This problem is in Contest(s) below:<br>";

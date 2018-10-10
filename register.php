@@ -45,6 +45,11 @@ if ($len>100){
 	$err_cnt++;
 }
 $len=strlen($_POST['email']);
+
+if ($len==0){
+	$err_str=$err_str."Please input Email,it will be used when you forgot the password!\\n";
+	$err_cnt++;
+}
 if ($len>100){
 	$err_str=$err_str."Email Too Long!\\n";
 	$err_cnt++;

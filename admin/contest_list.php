@@ -39,7 +39,10 @@ for (;$row=mysql_fetch_object($result);){
                $sql1="select user_id from privilege where rightstr='m$row->contest_id'";
                $result1=mysql_query($sql1) or die(mysql_error());
                $row1=mysql_fetch_object($result1);
-               echo "<td><a href=../userinfo.php?user=$row1->user_id>$row1->user_id";
+                if( $row1 )
+                      echo "<td><a href=../userinfo.php?user=$row1->user_id>$row1->user_id";
+                 else
+                      echo "<td>";
 
 
 		if(isset($_SESSION['administrator'])){

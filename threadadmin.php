@@ -1,6 +1,6 @@
 <?php
         session_start();
-        require_once("../include/db_info.inc.php");
+        require_once("./include/db_info.inc.php");
         require_once("discuss_func.inc.php");
         if ($_REQUEST['target']=='reply'){
                 $rid = $_REQUEST['rid']; $tid = $_REQUEST['tid'];
@@ -12,7 +12,7 @@
                 $rid = mysql_escape_string($rid);
                 $sql = "UPDATE reply SET status = $stat WHERE `rid` = '$rid'";
                 if (!isset($_SESSION['administrator']))
-                        if ($stat!=2) err_msg("<a href=\"../loginpage.php\">Please Login First</a>");
+                        if ($stat!=2) err_msg("<a href=\"./loginpage.php\">Please Login First</a>");
                         else $sql.=" AND author_id='".mysql_escape_string($_SESSION['user_id'])."'";
                 mysql_query($sql) or die(mysql_error());
                 if (mysql_affected_rows()>0) header('Location: thread.php?tid='.$tid);
@@ -45,7 +45,7 @@
                 else {
                         require_once("./oj-header.php");
                         echo "The thread does not exist.";
-                        require_once("../oj-footer.php");
+                        require_once("./oj-footer.php");
                         exit(0);
                 }
         }

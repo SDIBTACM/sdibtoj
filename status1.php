@@ -64,7 +64,7 @@ $user_id="";
 if (isset($_GET['user_id'])){
 	$user_id=trim($_GET['user_id']);
 	if (is_valid_user_name($user_id) && $user_id!=""){
-           if(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))
+           if(isset($_SESSION['administrator'])||isset($_SESSION['source_browser']))
                    $sql=$sql."AND user_id like '%$user_id%' ";
                else
 		   $sql=$sql."AND `user_id`='".$user_id."' ";
@@ -222,7 +222,7 @@ while(	$row=mysql_fetch_object($result)){
 			echo "<td>*<font color=".$judge_color[$row->result].">".$judge_result[$row->result]."</font>-<font color=red>";
 			if( isset($_SESSION['source_browser'])){
 				//	echo "<a href=showsource.php?id=".$row->sim_s_id." target=original>".$row->sim_s_id."(".$row->sim."%)</a>";
-                                 echo "<a href=comparesource.php?left=".$row->sim_s_id."&right=".$row->solution_id."  class='btn btn-info'  target=original>".$row->sim_s_id."(".$row->sim."%)</a>";
+                                 echo "<a href=comparesource.php?left=".$row->solution_id."&right=".$row->sim_s_id."  class='btn btn-info'  target=original>".$row->sim_s_id."(".$row->sim."%)</a>";
 
 			}else{
 					echo $row->sim_s_id;

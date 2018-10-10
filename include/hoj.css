@@ -9,7 +9,6 @@ h2{color:blue}
 	color:#FFFFFF;
         font-weight:bold;
         white-space: nowrap;
-        background: url("../image/menu_bg.png");
 }
 .toprow a{ font-family: Arial; font-weight: bold; font-size: 18px; color: #FFFFFF; margin: 15px }
 .toprow a:hover{ font-family: Arial; font-weight: bold; font-size: 18px; color:orange; margin: 15px }

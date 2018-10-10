@@ -76,7 +76,18 @@ begin
 end.
 </font></pre>
 <br><br>
-
+<font color="#ff0000"> note: if you want use Python3，declare your code interpreter with shell style statement</font><br>
+ Python2:<br>
+<pre><font color="blue">
+print sum(map(int,raw_input().split()))
+</font></pre>
+ Python3:<br>
+<pre><font color="blue">
+#!/python3
+a,b=input().split()
+print(int(a)+int(b))
+</font></pre>
+<br><br>
 Here is a sample solution for problem 1003 using Java:<br>
 <pre><font color="blue">
 import java.util.*;
