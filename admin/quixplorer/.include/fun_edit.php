@@ -40,7 +40,7 @@ Comment:
 require_once("./.include/permissions.php");
 //------------------------------------------------------------------------------
 function savefile($file_name) {			// save edited file
-	$code = stripslashes($GLOBALS['__POST']["code"]);
+	//$code = stripslashes($GLOBALS['__POST']["code"]);
         $code = str_replace(PHP_EOL, '', $code);
 	$fp = @fopen($file_name, "w");
 	if($fp===false) show_error(basename($file_name).": ".$GLOBALS["error_msg"]["savefile"]);
