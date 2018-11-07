@@ -33,7 +33,7 @@ if(isset($_GET['search'])){
       $sql="select  `problem_id`,`title`,`in_date`,`defunct`,`author` FROM `problem` where `defunct`='Y'  order by `problem_id` desc  ";
    else
      {
-      $search=mysql_real_escape_string($_GET['search']); 
+      $search=mysql_real_escape_string($_GET['search']);
       $sql="select  `problem_id`,`title`,`in_date`,`defunct`,`author` FROM `problem` where (author like '%$search%' or title like '%$search%' or source like '%$search%') order by `problem_id` desc  ";
       }
 }
@@ -50,11 +50,11 @@ echo "<center><table width=90% border=1>";
 if (isset($_SESSION['administrator']))
   {     
          echo "<form method=post action=contest_add.php>";
-         echo "<tr><td colspan=7><input type=submit name='problem2contest' value='CheckToNewContest'>";
+         echo "<tr><td colspan=8><input type=submit name='problem2contest' value='CheckToNewContest'>";
 }
 echo "<tr><td>PID<td>Title<td>author<td>Date";
 //if(isset($_SESSION['administrator'])){
-    echo "<td>Defunct<td>Edit<td>TestData</tr>";
+    echo "<td>Defunct<td>Edit<td>TestData<td>Action</tr>";
 //}
 for (;$row=mysql_fetch_object($result);){
      if($row->defunct=="N"||isset($_SESSION['administrator'])||($row->author==$_SESSION['problem_editor']&&$row->author==$_SESSION['user_id']))
@@ -67,18 +67,56 @@ for (;$row=mysql_fetch_object($result);){
 	echo "<td>".$row->author;
         echo "<td>".$row->in_date;
 	if(isset($_SESSION['administrator'])||$row->author==$_SESSION['user_id']){
-	//	echo "<td><a href=problem_df_change.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">".($row->defunct=="N"?"Delete":"Resume")."</a>";
- echo "<td><a href=problem_df_change.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">".($row->defunct=="N"?"<span titlc='click to reserve it' class=green>Available</span>":"<span class=red title='click to be available'>Reserved</span>")."</a>";
-
-		echo "<td><a href=problem_edit.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">Edit</a>";
-	echo "<td><a href=quixplorer/index.php?action=list&dir=$row->problem_id&order=name&srt=yes>TestData</a>";
-
-        }
+        echo "<td><a href=problem_df_change.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">".($row->defunct=="N"?
+                "<span title='click to reserve it' class=green>Available</span>":
+                "<span class=red title='click to be available'>Reserved</span>")."</a>";
+        echo "<td><a href=problem_edit.php?id=$row->problem_id&getkey=".$_SESSION['getkey'].">Edit</a>";
+	    echo "<td><a href=quixplorer/index.php?action=list&dir=$row->problem_id&order=name&srt=yes>TestData</a>";
+	} else {
+	    echo "<td></td><td></td><td></td>";
+    }
+         if (isset($_SESSION['administrator'])) {
+             echo "<td><a href='#' onclick='exchangeProblem($row->problem_id)'>Exchange</a>";
+         } else {
+             echo "<td>";
+         }
 	echo "</tr>";
     }
  }
 echo "</form>";
-echo "<tr><td width='90%' colspan='4'><form>$MSG_SEARCH<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td></tr>";
+echo "<tr><td width='90%' colspan='8'><form>$MSG_SEARCH<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td></tr>";
 echo "</table></center>";
+?>
+
+<script src="../mergely/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    function exchangeProblem(from) {
+        var res = prompt("请输入要转移到的题目编号", "");
+        if (res == null) {
+            return;
+        }
+        var to = parseInt(res);
+        if (to <= 0) {
+            return;
+        }
+        $.ajax({
+            type: 'GET',
+            dataType: 'text',
+            url: "problem_move.php?moveFrom="+from +"&moveTo=" + to,
+            success: function (response) {
+                if (response === "success") {
+                    window.location.reload();
+                } else {
+                    alert(response);
+                }
+            },
+            error: function() {
+                alert("something error");
+            }
+        });
+    }
+</script>
+
+<?php
 require("../oj-footer.php");
 ?>
