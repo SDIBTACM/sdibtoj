@@ -67,7 +67,7 @@ if ($moveFrom <= 0 || $moveTo <= 0 || $moveFrom == transferProblemId || $moveTo 
     exit(1);
 }
 
-$flag = true;//moveData($moveFrom, $moveTo, $OJ_DATA . '/');
+$flag = moveData($moveFrom, $moveTo, $OJ_DATA . '/');
 if (!$flag) {
     echo "transfer test data failed";
     exit(1);
