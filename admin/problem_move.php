@@ -21,7 +21,7 @@ function removeAcDir($dirPath) {
     $files = glob($dirPath . '*', GLOB_MARK);
     foreach ($files as $file) {
         if (is_dir($file)) {
-            removeDir($file);
+            removeAcDir($file);
         } else {
             unlink($file);
         }
