@@ -8,6 +8,29 @@ require_once("../include/db_info.inc.php");
 
 const transferProblemId = 2756;
 
+function removeAcDir($dirPath) {
+    if (!file_exists($dirPath) || !is_dir($dirPath)) {
+        var_dump("no such dir");
+        return;
+    }
+
+    if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
+        $dirPath .= '/';
+    }
+
+    $files = glob($dirPath . '*', GLOB_MARK);
+    var_dump($files);
+
+    foreach ($files as $file) {
+        if (is_dir($file)) {
+            removeDir($file);
+        } else {
+            unlink($file);
+        }
+    }
+    rmdir($dirPath);
+}
+
 function mockProblemInfo($from, $to) {
     $sql = 'select * from problem where problem_id = ' . $from;
     $result = mysql_query($sql);
@@ -47,6 +70,10 @@ function moveData($moveFrom, $moveTo, $path) {
     $tempNameDir = $path . "transferDir";
     $moveFromDir = $path . $moveFrom;
     $moveToDir = $path . $moveTo;
+
+    // 删除掉之前的ac代码
+    removeAcDir($moveFromDir . '/ac');
+    removeAcDir($moveToDir . '/ac');
 
     $ok_1 = @rename($moveFromDir, $tempNameDir);
     $ok_2 = @rename($moveToDir, $moveFromDir);
