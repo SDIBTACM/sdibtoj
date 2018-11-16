@@ -10,7 +10,6 @@ const transferProblemId = 2756;
 
 function removeAcDir($dirPath) {
     if (!file_exists($dirPath) || !is_dir($dirPath)) {
-        var_dump("no such dir");
         return;
     }
 
