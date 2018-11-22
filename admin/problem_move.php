@@ -34,17 +34,30 @@ function mockProblemInfo($from, $to) {
     $row = mysql_fetch_array($result);
     mysql_free_result($result);
 
+    $title=mysql_real_escape_string($row['title']);
+    $time_limit=mysql_real_escape_string($row['time_limit']);
+    $memory_limit=mysql_real_escape_string($row['memory_limit']);
+    $description=mysql_real_escape_string($row['description']);
+
+    $input=mysql_real_escape_string($row['input']);
+    $output=mysql_real_escape_string($row['output']);
+    $sample_input=mysql_real_escape_string($row['sample_input']);
+    $sample_output=mysql_real_escape_string($row['sample_output']);
+
+    $hint=mysql_real_escape_string($row['hint']);
+    $source=mysql_real_escape_string($row['source']);
+
     $update = "update problem set " .
-        "title = '${row['title']}'" .
-        ", time_limit = " . $row['time_limit'] .
-        ", memory_limit = " . $row['memory_limit'] .
-        ", description = '${row['description']}'" .
-        ", input = '${row['input']}'" .
-        ", output = '${row['output']}'" .
-        ", sample_input = '${row['sample_input']}'"  .
-        ", sample_output = '${row['sample_output']}'" .
-        ", hint = '${row['hint']}'" .
-        ", source = '${row['source']}'" .
+        "title = '$title'" .
+        ", time_limit = " . $time_limit .
+        ", memory_limit = " . $memory_limit .
+        ", description = '$description'" .
+        ", input = '$input'" .
+        ", output = '$output'" .
+        ", sample_input = '$sample_input'"  .
+        ", sample_output = '$sample_output'" .
+        ", hint = '$hint'" .
+        ", source = '$source'" .
         ", in_date = '${row['in_date']}'" .
         ", defunct = '${row['defunct']}'" .
         ", spj = '${row['spj']}'" .
