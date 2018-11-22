@@ -51,15 +51,25 @@ function mockProblemInfo($from, $to) {
         ", author = '${row['author']}'" .
         " where problem_id = " .  $to;
 
-    mysql_query($update);
+    return mysql_query($update);
+}
+
+function mockProblemWithRetry($moveFrom, $moveTo) {
+    $retryTime = 3;
+    while ($retryTime-- > 0) {
+        if (mockProblemInfo($moveFrom, $moveTo)) {
+            break;
+        }
+        usleep(1000);
+    }
 }
 
 function moveProblem($moveFrom, $moveTo) {
-    mockProblemInfo($moveFrom, transferProblemId);
+    mockProblemWithRetry($moveFrom, transferProblemId);
     usleep(200);
-    mockProblemInfo($moveTo, $moveFrom);
+    mockProblemWithRetry($moveTo, $moveFrom);
     usleep(200);
-    mockProblemInfo(transferProblemId, $moveTo);
+    mockProblemWithRetry(transferProblemId, $moveTo);
 }
 
 function moveData($moveFrom, $moveTo, $path) {
