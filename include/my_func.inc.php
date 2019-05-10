@@ -133,5 +133,79 @@ function noRefresh()
     }
 }
 
+function isIpInSubnets($ip, $subnets)
+{
+    if (is_null($subnet)) return true;
+    if (!is_array($subnets)) return isIpInSubnet($ip, $subnets);
+
+    foreach ($subnets as $subnet) {
+        if (isIpInSubnet($ip, $subnet) || $subnet == "")
+            return true;
+    }
+    return false;
+}
+
+function isIpInSubnet($ip, $subnet)
+{
+
+    if (! (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ||
+        filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) ) {
+        return false;
+    }
+
+    if (substr_count($subnet, '/') < 1) {
+        return $ip == $subnet;
+    } else if (substr_count($subnet, '/') > 1) {
+        return false;
+    }
+
+    $subnetArray = explode('/', $subnet);
+
+    if (! (filter_var($subnetArray[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ||
+        filter_var($subnetArray[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) ) {
+        return false;
+    }
+
+    return isIpMatchSubnetWithMask($ip, $subnetArray[0], $subnetArray[1]);
+}
+
+function isIpMatchSubnetWithMask($ip, $subnet, $mask)
+{
+    if ($mask < 0 || $mask == null) {
+        return false;
+    }
+
+    if ($mask == 0) {
+        return true;
+    }
+
+	if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && 
+	    filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && $mask <= 32) {
+        return substr_compare(sprintf('%032b', ip2long($ip)), sprintf('%032b', ip2long($subnet)), 0, $mask) == 0;
+    }
+
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && 
+	    filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && $mask <= 128) {
+		$bytesAddr = unpack('n*', @inet_pton($ip));
+		$bytesTest = unpack('n*', @inet_pton($subnet));
+	
+		if (!$bytesAddr || !$bytesTest) {
+		    return false;
+		}
+	
+		for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; ++$i) {
+		    $left = $netmask - 16 * ($i - 1);
+		    $left = ($left <= 16) ? $left : 16;
+		    $mask = ~(0xffff >> $left) & 0xffff;
+		    if (($bytesAddr[$i] & $mask) != ($bytesTest[$i] & $mask)) {
+			return false;
+		    }
+        }
+		return true;
+        }
+
+        return false;
+    }
 
 ?>
+

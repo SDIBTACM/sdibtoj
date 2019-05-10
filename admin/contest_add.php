@@ -71,10 +71,11 @@ if (isset($_POST['syear']))
 		print "history.go(-1);\n</script>";
 		exit(0);
 	}
+	$ipList = json_encode(explode("\r\n", $_POST['ip_list']));
 
 	//echo $langmask;
-         $sql="INSERT INTO `contest`(`title`,`start_time`,`end_time`,`private`,`langmask`,`description`,`reg_start_time`,`reg_end_time`)
-       VALUES('$title','$starttime','$endtime','$private',$langmask,'$description','$regstarttime','$regendtime')";
+         $sql="INSERT INTO `contest`(`title`,`start_time`,`end_time`,`private`,`langmask`,`description`,`reg_start_time`,`reg_end_time`, `allow_ips`)
+       VALUES('$title','$starttime','$endtime','$private',$langmask,'$description','$regstarttime','$regendtime', '$ipList')";
 //	echo $sql;
 	mysql_query($sql) or die(mysql_error());
 	$cid=mysql_insert_id();
@@ -194,8 +195,10 @@ else if(isset($_POST['problem2contest'])){
         </p>
     <br>
 	Users:<textarea name="ulist" rows="10" cols="20"></textarea>
+	Allow Login IP:<textarea name="ip_list" rows="10" cols="20"></textarea>
 	<br />
-	*可以将学生学号从Excel整列复制过来，然后要求他们用学号做UserID注册,就能进入Private的比赛作为作业和测验。
+    <p> * 可以将学生学号从Excel整列复制过来，然后要求他们用学号做UserID注册,就能进入Private的比赛作为作业和测验。</p>
+    <p>* Allow login ip 使用CIDR模式记录。</p>
 	<p><input type=submit value=Submit name=submit"><input type=reset value=Reset name=reset></p>
 
 </form>

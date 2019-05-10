@@ -176,6 +176,7 @@ CREATE TABLE `contest` (
   `langmask` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'bits for LANG to mask',
   `reg_start_time` datetime DEFAULT NULL,
   `reg_end_time` datetime DEFAULT NULL,
+  `allow_ips` varchar(255) DEFAULT '[]',
   PRIMARY KEY (`contest_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1458 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

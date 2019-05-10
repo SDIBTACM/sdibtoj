@@ -24,6 +24,14 @@ if (isset($_GET['cid'])){
 	}else{
 		$row=mysql_fetch_object($result);
 		$now=time();
+		if (! ((isset($_SESSION['administrator']) || isset($_SESSION['contest_creator']))) ) {
+			if (! isIpInSubnets($_SERVER['REMOTE_ADDR'], json_decode($row->allow_ips, true) )) {
+				require_once("contest-header.php");
+				echo "<center><h1>Not Invited!</h1></center>";
+				require_once("oj-footer.php");
+				exit(0);
+			}
+		}
 		$start_time=strtotime($row->start_time);
 		$end_time=strtotime($row->end_time);
                 $description=$row->description;

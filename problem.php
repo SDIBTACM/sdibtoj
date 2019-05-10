@@ -5,7 +5,7 @@
 		require_once("./lang/$OJ_LANG.php");
 	}
 ?>
-
+<?require_once("./include/my_func.inc.php")?>
 <?
 $pr_flag=false;
 $co_flag=false;
@@ -34,6 +34,16 @@ if (isset($_GET['id'])){
 	// contest
 	$cid=intval($_GET['cid']);
 	$pid=intval($_GET['pid']);
+
+	$row = mysql_fetch_object(mysql_query("SELECT allow_ips from contest where cid = $cid"));
+	if (! ((isset($_SESSION['administrator']) || isset($_SESSION['contest_creator']))) ) {
+		if (! isIpInSubnets($_SERVER['REMOTE_ADDR'], json_decode($row->allow_ips, true) )) {
+			require_once("contest-header.php");
+			echo "<center><h1>Not Invited!</h1></center>";
+			require_once("oj-footer.php");
+			exit(0);
+		}
+	}
 
 	if (!isset($_SESSION['administrator']))
 		$sql="SELECT langmask,start_time,end_time FROM `contest` WHERE `defunct`='N' AND `contest_id`=$cid AND `start_time`<NOW()";

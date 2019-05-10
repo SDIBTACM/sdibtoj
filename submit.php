@@ -44,6 +44,17 @@ if (isset($_POST['id'])) {
 }else if (isset($_POST['pid']) && isset($_POST['cid'])){
 	$pid=intval($_POST['pid']);
 	$cid=intval($_POST['cid']);
+
+	$row = mysql_fetch_object(mysql_query("SELECT allow_ips from contest where cid = $cid"));
+	if (! ((isset($_SESSION['administrator']) || isset($_SESSION['contest_creator']))) ) {
+		if (! isIpInSubnets($_SERVER['REMOTE_ADDR'], json_decode($row->allow_ips, true) )) {
+			require_once("contest-header.php");
+			echo "You are not invited!\n";
+			require_once("oj-footer.php");
+			exit(0);
+		}
+	}
+	
 	// check user if private
 	$sql="SELECT `private` FROM `contest` WHERE `contest_id`='$cid' AND `start_time`<=NOW() AND `end_time`>NOW()";
 	$result=mysql_query($sql);

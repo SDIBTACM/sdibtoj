@@ -55,8 +55,9 @@ if (isset($_POST['syear']))
          {
          echo "You don't have the privilage";
           exit();
-         }
-	$sql="UPDATE `contest` set `title`='$title',description='$description',`start_time`='$starttime',`reg_start_time`='$regstarttime',`reg_end_time`='$regendtime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask WHERE `contest_id`=$cid";
+		 }
+	$ipList = json_encode(explode("\r\n", $_POST['ip_list']));
+	$sql="UPDATE `contest` set `title`='$title',description='$description',`start_time`='$starttime',`reg_start_time`='$regstarttime',`reg_end_time`='$regendtime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask, `allow_ips` = '$ipList' WHERE `contest_id`=$cid";
 	//echo $sql;
 	mysql_query($sql) or die(mysql_error());
 
@@ -137,6 +138,7 @@ if (isset($_POST['syear']))
 	$title=htmlspecialchars($row['title']);
 	$regstarttime=$row['reg_start_time'];
 	$regendtime=$row['reg_end_time'];
+	$ipList = implode("\r\n", json_decode($row['allow_ips'], true));
 	mysql_free_result($result);
 	$plist="";
 	$sql="SELECT `problem_id` FROM `contest_problem` WHERE `contest_id`=$cid ORDER BY `num`";
@@ -227,6 +229,7 @@ Language:<select name="lang[]" multiple>
     </p>
 <br><br>
 Users:<textarea name="ulist" rows="20" cols="20"><?php if (isset($ulist)) { echo $ulist; } ?></textarea>
+Allow Login IP:<textarea name="ip_list" rows="20" cols="20"><?php if (isset($ipList)) { echo $ipList; } ?></textarea>
 <p><input type=submit value=Submit name=submit><input type=reset value=Reset name=reset></p>
 
 </form>
