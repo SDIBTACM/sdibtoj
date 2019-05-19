@@ -21,6 +21,10 @@
 <div style="margin:0px 10px">Content : </div>
 <div><textarea name=content style="border:1px dashed #8080FF; width:700px; height:400px; font-size:75%; margin:0 10px; padding:10px"></textarea></div>
 <div><input type="submit" style="margin:5px 10px" value="Submit"></input></div>
+<?php if($OJ_VCODE){?>
+<div style="margin:0px 10px">Verification code:</div>
+<div><input name="vcode" size=4 type=text style="border:1px dashed #8080FF; width:100px; height:20px; font-size:75%;margin:0 10px; padding:2px 10px"> <img src=vcode.php align="absmiddle">*</div>
+<?php }?>
 </form>
 </div>
 </center>

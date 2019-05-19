@@ -117,6 +117,10 @@ if (isset($_SESSION['user_id'])){?>
 <form action="post.php?action=reply" method=post>
 <input type=hidden name=tid value=<?php echo $_REQUEST['tid'];?>>
 <div><textarea name=content style="border:1px dashed #8080FF; width:700px; height:200px; font-size:75%;margin:0 10px; padding:10px"></textarea></div>
+<?php if($OJ_VCODE){?>
+<div style="font-size:80%; margin:0px 10px">Verification code:</div>
+<div><input name="vcode" size=4 type=text style="border:1px dashed #8080FF; width:100px; height:20px; font-size:75%;margin:0 10px; padding:2px 10px"> <img src=vcode.php align="absmiddle">*</div>
+<?php }?>
 <div><input type="submit" style="margin:5px 10px" value="Submit"></input></div>
 </form>
 <?

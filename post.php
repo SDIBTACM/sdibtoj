@@ -21,7 +21,15 @@
                 require_once("./oj-footer.php");
                 exit(0);
         }
-        
+        $vcode=trim($_POST['vcode']);
+	if($OJ_VCODE && ($vcode != $_SESSION["vcode"] || $vcode == "" || $vcode == null) ){
+		$_SESSION["vcode"] = null;
+		require_once("oj-header.php");
+		echo "Verification code error";
+		require_once("./oj-footer.php");
+		exit(0);
+	}
+
         $tid=null;
         if ($_REQUEST['action']=='new'){
                 if (array_key_exists('title',$_POST) && array_key_exists('content', $_POST) && $_POST['title']!='' && $_POST['content']!=''){
