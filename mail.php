@@ -145,7 +145,7 @@ if(isset($_POST['to_user'])){
         	echo "<td>".$row->mail_id;
                 if ($row->new_mail) echo "<font color=red>New</font>";
                 echo "<td><a href='userinfo.php?user=$row->from_user'>".$row->from_user."</a>";
-       	        echo "<td><a href='mail.php?vid=$row->mail_id'>".$row->title."</a>";
+       	        echo "<td><a href='mail.php?vid=$row->mail_id'>". htmlspecialchars(str_replace("\n\r","\n",$row->title)) ."</a>";
 	        echo "<td>".$row->in_date;
 	        echo "</tr>";
           }
@@ -182,7 +182,7 @@ for (;$row=mysql_fetch_row($result);){
         echo "<td><a href='userinfo.php?user=$row[1]'>".$row[1]."</a>";
         echo "<td><a href='userinfo.php?user=$row[2]'>".$row[2]."</a>";
 
-        echo "<td><a href='mail.php?vid=$row[0]'>".$row[3]."</a>";
+        echo "<td><a href='mail.php?vid=$row[0]'>". htmlspecialchars(str_replace("\n\r","\n",$row[3])). "</a>";
 
 
         echo "<td>".$row[7];
