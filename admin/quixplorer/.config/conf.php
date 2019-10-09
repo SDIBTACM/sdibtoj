@@ -52,7 +52,7 @@ if (!isset($_SESSION['administrator'])&&isset($_SESSION['problem_editor']))
 	$GLOBALS["language"] = "en";
 	
 	// the filename of the QuiXplorer script: (you rarely need to change this)
-	$GLOBALS["script_name"] = "http://".$GLOBALS['__SERVER']['HTTP_HOST'].$GLOBALS['__SERVER']["PHP_SELF"];
+	$GLOBALS["script_name"] = "//".$GLOBALS['__SERVER']['HTTP_HOST'].$GLOBALS['__SERVER']["PHP_SELF"];
 	
 	// allow Zip, Tar, TGz -> Only (experimental) Zip-support
 	$GLOBALS["zip"] = false;	//function_exists("gzcompress");
