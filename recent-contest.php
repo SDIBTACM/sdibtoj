@@ -6,7 +6,7 @@
 
 <div align="center">
 <?php
-    $json = @file_get_contents('http://contests.acmicpc.info/contests.json');
+    $json = @file_get_contents('http://algcontest.rainng.com/contests.json');
 
 $rows = json_decode($json, true);
 
@@ -30,7 +30,6 @@ $odd=true;
 </tbody>
 </table>
 </div>
-<div align=center>DataSource:http://contests.acmicpc.info/contests.json  Spider Author:<a href="http://contests.acmicpc.info" >doraemonok</a></div>
+<div align=center>DataSource:http://algcontest.rainng.com/contests.json  Spider Author:<a href="https://github.com/Azure99/AlgContestInfo" >Azure99</a></div>
 <?php require('oj-footer.php');?>
-
 
