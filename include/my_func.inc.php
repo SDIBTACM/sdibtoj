@@ -135,7 +135,7 @@ function noRefresh()
 
 function isIpInSubnets($ip, $subnets)
 {
-    if (is_null($subnet)) return true;
+    if (is_null($subnets)) return true;
     if (!is_array($subnets)) return isIpInSubnet($ip, $subnets);
 
     foreach ($subnets as $subnet) {
