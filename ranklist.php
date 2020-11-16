@@ -72,13 +72,30 @@
 }	
 		$result = mysql_query ( $sql ); //mysql_error();
 		echo "<center><table width=90%>";
-                echo "<tr><td><td><td align=\"center\"><form><br>UserName or NickName<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form>
-                      <td colspan=3 align=right>
-			<a href=ranklist.php?scope=d>Day</a>
-			<a href=ranklist.php?scope=w>Week</a>
-			<a href=ranklist.php?scope=m>Month</a>
-			<a href=ranklist.php?scope=y>Year</a>
-			</tr>";
+                 echo "<tr><td><td><td align=\"center\"><form><br>UserName or NickName<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form>
+                      <td colspan=4 align=right>";
+                       if ($scope=='d')
+                              echo "<a href=ranklist.php?scope=d><font color=red>&nbsp;Day</font></a>";
+                       else
+                               echo "<a href=ranklist.php?scope=d>&nbsp;Day</a>";
+                       if ($scope=='w')
+                                echo "<a href=ranklist.php?scope=w><font color=red>&nbsp;Week</font></a>";
+                        else
+                                echo "<a href=ranklist.php?scope=w>&nbsp;Week</a>";
+                       if ($scope=='m')
+                                echo "<a href=ranklist.php?scope=m><font color=red>&nbsp;Month</font></a>";
+                       else
+                                echo "<a href=ranklist.php?scope=m>&nbsp;Month</a>";
+                       if ($scope=='y')
+                                echo "<a href=ranklist.php?scope=y><font color=red>&nbsp;Year</font></a>";
+                        else
+                                echo "<a href=ranklist.php?scope=y>&nbsp;Year</a>";
+
+                       if ($scope=='')
+                                echo "<a href=ranklist.php><font color=red>&nbsp;All</font></a>";
+                        else
+                                echo "<a href=ranklist.php>&nbsp;All</a>";
+                        echo"</tr>";
 		echo "<tr class='toprow'>
 				<td width=5% align=center><b>$MSG_Number</b>
 				<td width=10% align=center><b>$MSG_USER</b>
