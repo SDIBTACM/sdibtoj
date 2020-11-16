@@ -5,15 +5,10 @@
 		$scope=$_GET['scope'];
 	if($scope!=""&&$scope!='d'&&$scope!='w'&&$scope!='m')
 		$scope='y';
-		
 	$rank = 0;
 	if(isset( $_GET ['start'] ))
-		$rank = intval ( $_GET ['start'] );
-
-	 
-		ob_start ();
-		
-		
+		$rank = intval ( $_GET ['start'] ); 
+		ob_start ();	
 		?>
 		<?
 		
@@ -48,13 +43,18 @@
 				    $s=date('Y').'-'.date('m').'-01';break;
                                     default :$s=date('Y').'-01-01'; 
 			}
-			$sql="SELECT users.`user_id`,`nick`,s.`solved`,t.`submit` FROM `users` 
-					right join 
-					(select count(distinct problem_id) solved ,user_id from solution where in_date>'$s' and result=4 group by user_id order by solved desc limit " . strval ( $rank ) . ",".($page_size*2).") s on users.user_id=s.user_id
-					left join 
-		                       (select count( problem_id) submit ,user_id from solution where in_date>'$s' group by user_id order by submit desc limit 0,".($page_size*3+$rank).") t on users.user_id=t.user_id		
-                      ORDER BY s.`solved` DESC,t.submit  LIMIT  0,50
-			 ";
+			  $sql="SELECT users.`user_id`,`nick`,s.`solved`,t.`submit` FROM `users`
+                                        inner join
+                                        (select count(distinct problem_id) solved ,user_id from solution 
+                                                where in_date>str_to_date('$s','%Y-%m-%d') and result=4 
+                                                group by user_id order by solved desc limit " . strval ( $rank ) . ",$page_size) s 
+                                        on users.user_id=s.user_id
+                                        inner join
+                                        (select count( problem_id) submit ,user_id from solution 
+                                                where in_date>str_to_date('$s','%Y-%m-%d') 
+                                                group by user_id order by submit desc ) t 
+                                        on users.user_id=t.user_id
+                                ORDER BY s.`solved` DESC,t.submit,reg_time  LIMIT  0,50";
 		   //echo $sql;
 		}
 	if(isset($_GET['search'])){
