@@ -78,15 +78,12 @@
                 <?}?>
                 
                   <th><a href="./recent-contest.php">Recent Contest</a></th>
-
-
-
 		<th><a href="<?=isset($OJ_FAQ_LINK)?$OJ_FAQ_LINK:"faqs.php"?>"><?=$MSG_FAQ?></a></th>
 		<th><a href="../forum/"><?=$MSG_BBS?></a></th>
 		<th><a href="../"><?=$MSG_HOME?></a></th>
 		<th><a href="./problemset.php"><?=$MSG_PROBLEMS?></a></th>
 		<th><a href="./status.php"><?=$MSG_STATUS?></a></th>
-		<th><a href="./ranklist.php"><?=$MSG_RANKLIST?></a></th>
+                <th><a href="./ranklist.php?scope=m"><?=$MSG_RANKLIST?></a></th>
 		<th><a href="./contest.php"><?=checkcontest($MSG_CONTEST)?></a></th>
 		<?
 		       $flag=0;	
