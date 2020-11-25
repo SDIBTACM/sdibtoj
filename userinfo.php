@@ -117,7 +117,10 @@ echo "<tr id=pie bgcolor=#D7EBFF><td>Statistics<td><div id='PieDiv' style='posit
 </script> 
 
 <tr bgcolor=#D7EBFF><td>School:<td align=center><?=$school?></tr>
+<!--
 <tr bgcolor=#D7EBFF><td>Email:<td align=center><?=$email?></tr>
+-->
+
 
 
 </table>
