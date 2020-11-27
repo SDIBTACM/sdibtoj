@@ -231,6 +231,8 @@ for ($i=0;$i<$user_cnt;$i++){
 			$row_ip=mysql_fetch_row($result_ip);
                         echo "<td>".$row_ip[0]."</a>";
 		}	
+		mysql_free_result($result_ip);
+
          }        
 	echo "</tr>\n";
 }
