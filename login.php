@@ -37,7 +37,8 @@
                 {           
                     $today=date('Y-m-d');
                     $ip1=$_SERVER['REMOTE_ADDR'];
-                    $sql="SELECT * from `loginlog` WHERE `user_id`='$user_id' and `time`>='$today' and ip<>'$ip1' and user_id not in( select user_id from privilege where rightstr='administrator') order by time DESC limit 0,1 ";
+                    $sql="SELECT * from `loginlog` WHERE `user_id`='$user_id' and `time`>='".$VIP_CONTEST_STARTTIME."' and ip<>'$ip1' and user_id not in( select user_id from privilege where rightstr='administrator') order by time DESC limit 0,1 ";
+		    //$sql="SELECT * from `loginlog` WHERE `user_id`='$user_id' and `time`>='$today' and ip<>'$ip1' and user_id not in( select user_id from privilege where rightstr='administrator') order by time DESC limit 0,1 ";
               // echo $sql;
                     $result=mysql_query($sql);
                     $row_cnt=mysql_num_rows($result);
