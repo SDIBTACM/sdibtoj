@@ -21,6 +21,7 @@ static  $OJ_AUTO_SHARE=true;//true: One can view all AC submit if he/she has ACe
 static  $OJ_VCODE=true;
 static  $OJ_APPENDCODE=true;
 static  $OJ_VIP_CONTEST=false;//true:only can see the source code of contest's problem; 
+static  $VIP_CONTEST_STARTTIME="2020-12-16 06:50:00";  //set vip contest start time 
 static  $OJ_RANK_LOCK_PERCENT=0.2;//lock rank
 if (isset($_SESSION['OJ_LANG'])) $OJ_LANG=$_SESSION['OJ_LANG'];
 	if(mysql_pconnect($DB_HOST,$DB_USER,$DB_PASS));
