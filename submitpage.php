@@ -101,14 +101,15 @@ if(isset($_GET['sid'])){
           if ($row && $row->user_id==$_SESSION['user_id']) $ok=true;
          if(isset($OJ_VIP_CONTEST)&&$OJ_VIP_CONTEST)
           {
-                       $sql="SELECT 1 FROM `contest_problem` WHERE `problem_id`=$row->problem_id AND `contest_id` IN (
+               /*$sql="SELECT 1 FROM `contest_problem` WHERE `problem_id`=$row->problem_id AND `contest_id` IN (
                SELECT `contest_id` FROM `contest` WHERE `start_time`<NOW() AND `end_time`>NOW())";
                $rrs=mysql_query($sql);
                $flag=!(mysql_num_rows($rrs)>0);
                if($flag)
                   $ok=false;
                else
-                 $ok=true;
+                 $ok=true;*/
+		 $ok=false;
 
            } 
           if (isset($_SESSION['source_browser']))
