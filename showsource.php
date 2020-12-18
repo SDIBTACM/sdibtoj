@@ -52,7 +52,7 @@ if ((isset($_SESSION['user_id']) && $row && $sok)||(isset($_SESSION['user_id'])&
 #if ((isset($_SESSION['user_id'])&&$row && $row->user_id==$_SESSION['user_id'] && $sok)||(isset($_SESSION['user_id'])&&$suser_id==$_SESSION['user_id'])) $ok=true;
 if(isset($OJ_VIP_CONTEST)&&$OJ_VIP_CONTEST)
 {
-        $sql="SELECT 1 FROM `contest_problem` WHERE `problem_id`=$sproblem_id AND `contest_id` IN (
+       /* $sql="SELECT 1 FROM `contest_problem` WHERE `problem_id`=$sproblem_id AND `contest_id` IN (
         SELECT `contest_id` FROM `contest` WHERE `start_time`<NOW() AND `end_time`>NOW())";
          $rrs=mysql_query($sql);
          $flag=!(mysql_num_rows($rrs)>0);
@@ -60,7 +60,8 @@ if(isset($OJ_VIP_CONTEST)&&$OJ_VIP_CONTEST)
               $ok=false;
          else 
                $ok=true; 
-          mysql_free_result($rrs);
+          mysql_free_result($rrs);*/ 
+	  $ok=false;
 }
 
 
