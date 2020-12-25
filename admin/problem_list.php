@@ -57,7 +57,7 @@ echo "<tr><td>PID<td>Title<td>author<td>Date";
     echo "<td>Defunct<td>Edit<td>TestData<td>Action</tr>";
 //}
 for (;$row=mysql_fetch_object($result);){
-     if($row->defunct=="N"||isset($_SESSION['administrator'])||($row->author==$_SESSION['problem_editor']&&$row->author==$_SESSION['user_id']))
+     if($row->defunct=="N" ||($row->author==$_SESSION['problem_editor']&&$row->author==$_SESSION['user_id']))
      {
 	echo "<tr>";
 	echo "<td>".$row->problem_id;
