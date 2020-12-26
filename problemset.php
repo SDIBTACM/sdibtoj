@@ -69,7 +69,7 @@ else
    $filter_sql="  `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
         $filter_sql1=" 1 ";
 }
-if (!isset($_SESSION['administrator'])){
+//if (!isset($_SESSION['administrator'])){
       if(isset($_SESSION['user_id']))	
            $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date` FROM `problem` ".
            "WHERE (`defunct`='N'  or (`author`='".$_SESSION['user_id']."'". ")) AND $filter_sql1 AND `problem_id` NOT IN (
@@ -84,12 +84,12 @@ if (!isset($_SESSION['administrator'])){
       //  echo $sql10;
        
         $sql=$sql0."  `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
-}
-else{
+//}
+//else{
 	
-        $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date`  FROM `problem` WHERE ";
-       $sql=$sql0." `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
-}
+  //      $sql0="SELECT `problem_id`,`title`,`source`,`submit`,`accepted`,`in_date`  FROM `problem` WHERE ";
+ //      $sql=$sql0." `problem_id`>='".strval($pstart)."' AND `problem_id`<'".strval($pend)."' ";
+//}
 //echo $sql;
 if(isset($_GET['search'])){
     $search=trim(mysql_real_escape_string($_GET['search']));
