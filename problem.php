@@ -13,7 +13,7 @@ if (isset($_GET['id'])){
 	// practice
 	$id=intval($_GET['id']);
 	require_once("oj-header.php");
-	if (!isset($_SESSION['administrator'])){
+//	if (!isset($_SESSION['administrator'])){
             if(isset($_SESSION['user_id']))
 		$sql="SELECT * FROM `problem` WHERE `problem_id`=$id AND (`defunct`='N' or (`author`='".$_SESSION['user_id']."'". ")) AND `problem_id` NOT IN (
 				SELECT `problem_id` FROM `contest_problem` WHERE `contest_id` IN(
@@ -25,9 +25,9 @@ if (isset($_GET['id'])){
                                                 SELECT `contest_id` FROM `contest` WHERE `end_time`>NOW()))
                                 ";
 
-          }
-	else
-		$sql="SELECT * FROM `problem` WHERE `problem_id`=$id";
+//        }
+//	else
+//		$sql="SELECT * FROM `problem` WHERE `problem_id`=$id";
 
 	$pr_flag=true;
 }else if (isset($_GET['cid']) && isset($_GET['pid'])){
