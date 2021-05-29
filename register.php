@@ -1,6 +1,11 @@
 <?
 require_once("./include/db_info.inc.php");
 require_once("./include/my_func.inc.php");
+if(isset($OJ_VIP_CONTEST)&&$OJ_VIP_CONTEST)
+{
+    echo "正式比赛禁用此功能";
+    exit(0);
+}
 $err_str="";
 $err_cnt=0;
 $len;
