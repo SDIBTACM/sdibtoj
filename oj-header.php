@@ -103,7 +103,7 @@
 				}
 				print "</th><th><a href=logout.php>$MSG_LOGOUT</a></th>";
 			}else{
-				print "<th><a href=loginpage.php>$MSG_LOGIN</a></th>";
+				print "<th><a href=loginpageD.php>$MSG_LOGIN</a></th>";
 				print "<th><a href=registerpage.php>$MSG_REGISTER</a></th>";
 			}
 			if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])||isset($_SESSION['problem_editor'])){
