@@ -36,6 +36,18 @@ if ($len>100){
 	$err_str=$err_str."Nick Name Too Long!\\n";
 	$err_cnt++;
 }else if ($len==0) $nick=$user_id;
+
+if(!isLength($_POST['password'])){
+        $err_str=$err_str."密码长度至少8位!\\n";
+        $err_cnt++;
+
+}
+if(!isMulti($_POST['password'])){
+        $err_str=$err_str."密码要包含大写、小写、数字字符\\n";
+        $err_cnt++;
+
+}
+
 if (strcmp($_POST['password'],$_POST['rptpassword'])!=0){
 	$err_str=$err_str."Password Not Same!\\n";
 	$err_cnt++;
