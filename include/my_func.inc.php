@@ -206,6 +206,28 @@ function isIpMatchSubnetWithMask($ip, $subnet, $mask)
 
         return false;
     }
+function isLength($str){
+    $len=strlen($str);
+    if($len>=8) return true;
+    else return false;
+}
+
+function isMulti($str){
+    $myType=0;
+    //有数字
+    if(preg_match('/\d/',$str)) $myType++;
+    //有大写字母
+    if(preg_match('/[A-Z]/',$str)) $myType++;
+    //有小写写字母
+    if(preg_match('/[a-z]/',$str)) $myType++;
+    //有其它字符
+    $str2=preg_replace('/[A-Za-z0-9]/','',$str);
+    $len2=strlen($str2);
+    if($len2>=1) $myType++;
+
+    if($myType>=3) return true;
+    else return false;
+}
 
 ?>
 
