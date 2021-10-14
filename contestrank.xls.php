@@ -146,7 +146,8 @@ $rank=1;
 //echo "<style> td{font-size:14} </style>";
 //echo "<title>Contest RankList -- $title</title>";
 echo "<center><h3>Contest RankList -- $title</h3></center>";
-echo "<table border=1><tr><td>Rank<td>User<td>Nick<td>Solved<td>Mark";
+//echo "<table border=1><tr><td>Rank<td>User<td>Nick<td>Solved<td>Mark";
+echo "<table border=1><tr><td>Rank<td>User<td>Nick<td>Solved";
 for ($i=0;$i<$pid_cnt;$i++)
 	echo "<td>$PID[$i]";
 echo "</tr>";
@@ -164,17 +165,17 @@ for ($i=0;$i<$user_cnt;$i++){
 	}
 	echo "<td>".$U[$i]->nick."";
 	echo "<td>$usolved";
-	echo "<td>";
-	$rank_punish=intval(pow($rank,log((100-$mark_base)/4,$user_cnt)));
-	if($U[$i]->mark>$mark_base+$rank_punish||$pid_cnt==1)
-		$U[$i]->mark-=$rank_punish;
-        
-	if($U[$i]->mark<($mark_base+100)/2&&$usolved==$pid_cnt&&$pid_cnt>1)
-                $U[$i]->mark=($mark_base+100)/2;
-        
-	if($U[$i]->mark<$mark_base&&$usolved&&$pid_cnt>1)
-		$U[$i]->mark=$mark_base;
-	echo $U[$i]->mark>0?intval($U[$i]->mark):0;
+//	echo "<td>";
+//	$rank_punish=intval(pow($rank,log((100-$mark_base)/4,$user_cnt)));
+//	if($U[$i]->mark>$mark_base+$rank_punish||$pid_cnt==1)
+//		$U[$i]->mark-=$rank_punish;
+//        
+//	if($U[$i]->mark<($mark_base+100)/2&&$usolved==$pid_cnt&&$pid_cnt>1)
+//                $U[$i]->mark=($mark_base+100)/2;
+//        
+//	if($U[$i]->mark<$mark_base&&$usolved&&$pid_cnt>1)
+//		$U[$i]->mark=$mark_base;
+//	echo $U[$i]->mark>0?intval($U[$i]->mark):0;
 	for ($j=0;$j<$pid_cnt;$j++){
 		echo "<td>";
 		if(isset($U[$i])){
@@ -189,4 +190,3 @@ for ($i=0;$i<$user_cnt;$i++){
 echo "</table>";
 
 ?>
-
