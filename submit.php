@@ -2,7 +2,7 @@
 	session_start();
 if (!isset($_SESSION['user_id'])){
 	require_once("oj-header.php");
-	echo "<a href='loginpage.php'>Please Login First!</a>";
+	echo "<a href='loginpageD.php'>Please Login First!</a>";
 	require_once("oj-footer.php");
 	exit(0);
 }
