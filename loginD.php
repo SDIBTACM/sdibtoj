@@ -8,7 +8,7 @@
 //echo $vcode;
 //echo $_SESSION["vcode"].'ddd';
 if($OJ_VCODE&&($vcode!= $_SESSION["vcode"]||$vcode==""||$vcode==null) ){
-        $_SESSION["vcode"]=null;
+      //  $_SESSION["vcode"]=null;
           echo "<script language='javascript'>\n";
                echo "alert('验证码错误');\n";
                echo "history.go(-1);\n";
