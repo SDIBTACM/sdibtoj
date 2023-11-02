@@ -305,7 +305,7 @@ metal();
 
 function showlocktime()
 {
-	var endtime=<?echo $end_time?>;
+	var endtime=<?echo $end_time+$OJ_RANK_LOCK_DELAY?>;
 	var islock=<?echo $islock?>;
 	endtime=endtime*1000;
 	if(islock==1){	
