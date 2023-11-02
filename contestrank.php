@@ -81,7 +81,7 @@ if(!isset($OJ_RANK_LOCK_PERCENT)) $OJ_RANK_LOCK_PERCENT=0;
 $lock=$end_time-($end_time-$start_time)*$OJ_RANK_LOCK_PERCENT;
 $lock_sql="";
 $islock=0;//only to show the clock or not
-if(time()>$lock&&time()<$end_time){
+if(time()>$lock&&time()<$end_time+$OJ_RANK_LOCK_DELAY){
 	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))//show the rank or not
 		$lock_sql="and in_date<'".date("Y-m-d H:i:s",$lock)."'";
 	$islock=1;//to show the clock
@@ -165,7 +165,7 @@ if($islock){
 	echo "<div id=\"countdown\"></div>";
 }
 echo "<center><h3>Contest RankList -- $title</h3>";
-if(time()>$end_time) 
+if(time()>$end_time+$OJ_RANK_LOCK_DELAY) 
 	echo "<a href=contestrank.xls.php?cid=$cid>Download</a></center>";
 echo "<table id=rank><tr class=toprow align=center><td width=8%><td width=3%>Rank<td width=8%>User<td width=5%>Nick<td width=3%>Solved<td width=5%>Penalty";
 for ($i=0;$i<$pid_cnt;$i++)
@@ -231,8 +231,7 @@ for ($i=0;$i<$user_cnt;$i++){
 			$row_ip=mysql_fetch_row($result_ip);
                         echo "<td>".$row_ip[0]."</a>";
 		}	
-		mysql_free_result($result_ip);
-
+                mysql_free_result($result_ip);
          }        
 	echo "</tr>\n";
 }
@@ -279,19 +278,19 @@ function metal(){
                           cell.style.cssText="background-color:gold";
                           cell1.style.backgroundImage="url(./image/gold.gif)";
                       }     
-                     if(r>3&&r<=6){
+                     if(r>3&&r<=9){
                      // if(r>total*.1+1&&r<=total*.3+1)
                         cell.style.cssText="background-color:silver";
                         cell1.style.backgroundImage="url(./image/silver.gif)";
 
                      }
-                     if(r>6&&r<=9){
+                     if(r>9&&r<=18){
                     // if(r>total*.3+1&&r<=total*.6+1)
                         cell.style.cssText="background-color:saddlebrown;color:white";
                         cell1.style.backgroundImage="url(./image/bronze.gif)";
 
                      }
-                     if(r>9&&r<=18&&ac>0){
+                     if(r>18&&r<=27&&ac>0){
                      // if(r>total*.6&&ac>0)
                         cell.style.cssText="background-color:steelblue;color:white";
                          cell1.style.backgroundImage="url(./image/yousheng.gif)";
