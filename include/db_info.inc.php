@@ -24,6 +24,7 @@ static  $OJ_VIP_CONTEST=false;//true:only can see the source code of contest's p
 static  $VIP_CONTEST_STARTTIME="2020-12-16 06:50:00";  //set vip contest start time 
 static  $OJ_RANK_LOCK_PERCENT=0.2;//lock rank
 static  $OJ_RANK_LOCK_DELAY=600; //赛后封榜持续时间，单位秒。根据实际情况调整，在闭幕式颁奖结束后设为0即可立即解封。
+static  $OJ_NEED_LOGIN=false; //需要登录才能访问
 if (isset($_SESSION['OJ_LANG'])) $OJ_LANG=$_SESSION['OJ_LANG'];
 	if(mysql_pconnect($DB_HOST,$DB_USER,$DB_PASS));
 	else die('Could not connect: ' . mysql_error());

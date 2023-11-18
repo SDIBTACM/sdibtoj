@@ -69,7 +69,7 @@
 <h2><img id=logo src=./image/logo.png><font color="red">Welcome To <?=$OJ_NAME?> ACM-ICPC Online Judge</font></h2>
 <table width=96%> 
 	<tr align="center" class='hd' valign="top">
-                 <th><a href="../vjudge/"><font color=red>VIRTUAL JUDGE</font></a></th>
+                 <th><a href="/vjudge/toIndex.action"><font color=red>VIRTUAL JUDGE</font></a></th>
 		<?if(isset($OJ_DICT)&&$OJ_DICT&&$OJ_LANG=="cn"){?>
       <div class=hd>
 		      <span style="color:1a5cc8" id="dict_status"></span>
@@ -78,12 +78,15 @@
                 <?}?>
                 
                   <th><a href="./recent-contest.php">Recent Contest</a></th>
+
+
+
 		<th><a href="<?=isset($OJ_FAQ_LINK)?$OJ_FAQ_LINK:"faqs.php"?>"><?=$MSG_FAQ?></a></th>
-		<th><a href="../forum/"><?=$MSG_BBS?></a></th>
+	<!--    <th><a href="./discuss.php"><?=$MSG_BBS?></a></th>       -->
 		<th><a href="../"><?=$MSG_HOME?></a></th>
 		<th><a href="./problemset.php"><?=$MSG_PROBLEMS?></a></th>
 		<th><a href="./status.php"><?=$MSG_STATUS?></a></th>
-                <th><a href="./ranklist.php?scope=m"><?=$MSG_RANKLIST?></a></th>
+		<th><a href="./ranklist.php"><?=$MSG_RANKLIST?></a></th>
 		<th><a href="./contest.php"><?=checkcontest($MSG_CONTEST)?></a></th>
 		<?
 		       $flag=0;	
@@ -103,7 +106,7 @@
 				}
 				print "</th><th><a href=logout.php>$MSG_LOGOUT</a></th>";
 			}else{
-				print "<th><a href=loginpageD.php>$MSG_LOGIN</a></th>";
+				print "<th><a href=loginpage.php>$MSG_LOGIN</a></th>";
 				print "<th><a href=registerpage.php>$MSG_REGISTER</a></th>";
 			}
 			if (isset($_SESSION['administrator'])||isset($_SESSION['contest_creator'])||isset($_SESSION['problem_editor'])){
@@ -131,8 +134,21 @@ if (strlen($msg)>5){
 	echo "</marquee>";
 }
 ?>
-<script src="include/underlineTranslation.js" type="text/javascript"></script> 
-<script type="text/javascript">dictInit();</script> 
+<!--script src="include/underlineTranslation.js" type="text/javascript"></script> 
+<script type="text/javascript">dictInit();</script--!> 
+
+<?php
+$url = basename($_SERVER['REQUEST_URI']);
+if(isset($OJ_NEED_LOGIN) && $OJ_NEED_LOGIN
+        && ($url!='loginpage.php' && $url!='lostpassword.php'
+            && $url!='lostpassword2.php' && $url!='registerpage.php')
+        && !isset($_SESSION['user_id'])) {
+    header("location:"."loginpage.php");
+    exit();
+}
+?>
+
+
 <script>
 var mark=<?php echo $flag?>;
 if(mark)

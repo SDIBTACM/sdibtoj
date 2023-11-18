@@ -38,8 +38,8 @@
                     $today=date('Y-m-d');
                     $ip1=$_SERVER['REMOTE_ADDR'];
                     $sql="SELECT * from `loginlog` WHERE `user_id`='$user_id' and `time`>='".$VIP_CONTEST_STARTTIME."' and ip<>'$ip1' and user_id not in( select user_id from privilege where rightstr='administrator') order by time DESC limit 0,1 ";
-		    //$sql="SELECT * from `loginlog` WHERE `user_id`='$user_id' and `time`>='$today' and ip<>'$ip1' and user_id not in( select user_id from privilege where rightstr='administrator') order by time DESC limit 0,1 ";
-              // echo $sql;
+                    //$sql="SELECT * from `loginlog` WHERE `user_id`='$user_id' and `time`>='$today' and ip<>'$ip1' and user_id not in( select user_id from privilege where rightstr='administrator') order by time DESC limit 0,1 ";
+               //echo $sql;
                     $result=mysql_query($sql);
                     $row_cnt=mysql_num_rows($result);
                     if($row_cnt>0)
@@ -64,7 +64,10 @@
 //		$_SESSION['ac']=Array();
 //		$_SESSION['sub']=Array();
 		echo "<script language='javascript'>\n";
-		echo "history.go(-2);\n";
+                if ($OJ_NEED_LOGIN)
+	        	echo "window.location.href='index.php';\n";
+           	else
+	         	echo "history.go(-2);\n";
 		echo "</script>";
 	}else{
 		mysql_free_result($result);
@@ -90,7 +93,7 @@
         } catch (Exception $e) {
             return true;
         }
-
+	// isIpInSubnets($ip,$ipAllowedArray);
 	$ipBin = "";
         $ip = explode('.', $ip);
         foreach ($ip as $i) $ipBin .= sprintf("%08s",base_convert($i,10,2));
