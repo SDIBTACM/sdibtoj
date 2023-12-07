@@ -52,6 +52,23 @@
                         exit(0);
                     }
                 }
+		 if($OJ_VIP_CONTEST)
+                {           
+                    $today=date('Y-m-d');
+                    $ip1=$_SERVER['REMOTE_ADDR'];
+                    $sql="SELECT * from `loginlog` WHERE `ip`='$ip1' and `time`>='".$VIP_CONTEST_STARTTIME."' and user_id<>'$user_id' and user_id not in( select user_id from privilege where rightstr='administrator') order by time DESC limit 0,1 ";
+                    $result=mysql_query($sql);
+                    $row_cnt=mysql_num_rows($result);
+                    if($row_cnt>0)
+                    {  
+                        $row=mysql_fetch_row($result);
+                        echo "<script language='javascript'>\n";
+			echo "alert('Do not login in the same machine!');\n";  
+                        echo "history.go(-1);\n";
+                        echo "</script>";
+                        exit(0);
+                    }
+                }
 	        $_SESSION['user_id']=$row['user_id'];
                  //mysql_free_result($result);
 		$sql="INSERT INTO `loginlog` VALUES('$user_id','$password1','".$_SERVER['REMOTE_ADDR']."',NOW())";
