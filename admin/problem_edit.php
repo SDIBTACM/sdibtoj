@@ -66,7 +66,7 @@ include_once("kindeditor.php") ;
 </p>
 
 <p>Hint:<br>
-<textarea class="kindeditor" rows=13 name=hint cols=120><?php echo htmlspecialchars($row->output)?></textarea></p>
+<textarea class="kindeditor" rows=13 name=hint cols=120><?php echo htmlspecialchars($row->hint)?></textarea></p>
 </p>
 
 <p>SpecialJudge: 

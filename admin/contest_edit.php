@@ -1,10 +1,12 @@
 <?php require("admin-header.php");
+include_once("kindeditor.php") ;
 
 if(isset($_POST['cid']))
       $cid=intval($_POST['cid']);
 if(isset($_GET['cid']))
       $cid=intval($_GET['cid']);
-if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))
+//if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))
+if(!(isset($_SESSION["m$cid"])))
     {
       echo "You don't have the privilage";
       exit();
@@ -16,6 +18,13 @@ if (isset($_POST['syear']))
 
 	$starttime=intval($_POST['syear'])."-".intval($_POST['smonth'])."-".intval($_POST['sday'])." ".intval($_POST['shour']).":".intval($_POST['sminute']).":00";
 	$endtime=intval($_POST['eyear'])."-".intval($_POST['emonth'])."-".intval($_POST['eday'])." ".intval($_POST['ehour']).":".intval($_POST['eminute']).":00";
+
+	$running_time = strtotime($endtime) - strtotime($starttime);
+	if ($running_time > 60 * 60 * 24 * 15 || $running_time < 0) {
+		echo "<script> alert('The contest time is too long or too short');";
+		print "history.go(-1);</script>";	
+		exit();
+	}
 
 //	echo $starttime;
 //	echo $endtime;
@@ -46,17 +55,19 @@ if (isset($_POST['syear']))
    foreach($lang as $t){
 			$langmask+=1<<$t;
 	}
-	$langmask=15&(~$langmask);
-//	echo $langmask;
+	$langmask=127&(~$langmask);
+	// echo $langmask;
 
 	$cid=intval($_POST['cid']);
             //echo $cid;
-	if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))
+	//if(!(isset($_SESSION["m$cid"])||isset($_SESSION['administrator'])))
+	if(!(isset($_SESSION["m$cid"])))
          {
          echo "You don't have the privilage";
           exit();
 		 }
 	$ipList = json_encode(explode("\r\n", $_POST['ip_list']));
+	
 	$sql="UPDATE `contest` set `title`='$title',description='$description',`start_time`='$starttime',`reg_start_time`='$regstarttime',`reg_end_time`='$regendtime',`end_time`='$endtime',`private`='$private',`langmask`=$langmask, `allow_ips` = '$ipList' WHERE `contest_id`=$cid";
 	//echo $sql;
 	mysql_query($sql) or die(mysql_error());
@@ -72,7 +83,8 @@ if (isset($_POST['syear']))
 			if ($row->defunct == 'N') {
 				$pieces[] = $row->problem_id;
 			} else {
-				if (!strcmp($row->author, $_SESSION['user_id']) || isset($_SESSION['administrator'])) {
+			//	if (!strcmp($row->author, $_SESSION['user_id']) || isset($_SESSION['administrator'])) {
+				if (!strcmp($row->author, $_SESSION['user_id']) ) {
 					$pieces[] = $row->problem_id;
 				}
 			}
@@ -118,7 +130,7 @@ if (isset($_POST['syear']))
 		mysql_query($sql_1) or die(mysql_error());
 	}
 
-         echo "<script>window.location.href=\"contest_list.php\";</script>";
+        echo "<script>window.location.href=\"contest_list.php\";</script>";
 	exit();
 }else{
 	$cid=intval($_GET['cid']);
@@ -163,7 +175,6 @@ if (isset($_POST['syear']))
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script src="../ckeditor/ckeditor.js"></script>
     <title>Contest Editor</title>
 </head>
 
@@ -192,11 +203,13 @@ Public:<select name=private id=private onchange="JudgePrivate(this.value)">
 	<option value=1 <?php echo $private=='1'?'selected=selected':''?>>Private</option>
 	<option value=2 <?php echo $private=='2'?'selected=selected':''?>>Register</option>
 </select>
-<?php $lang=(~((int)$langmask))&1023;
+<?php $lang=(~((int)$langmask))&1023; 
  $C_select=($lang&1)>0?"selected":"";
  $CPP_select=($lang&2)>0?"selected":"";
  $P_select=($lang&4)>0?"selected":"";
  $J_select=($lang&8)>0?"selected":"";
+ $Rb_select=($lang & 16 ) > 0 ? "selected" : "";
+ $Py_select=($lang & 64 ) > 0 ? "selected" : "";
 // echo $lang;
 ?>
 Language:<select name="lang[]" multiple>
@@ -204,6 +217,8 @@ Language:<select name="lang[]" multiple>
 		<option value=1 <?php echo $CPP_select?>>C++</option>
 		<option value=2 <?php echo $P_select?>>Pascal</option>
 		<option value=3 <?php echo $J_select?>>Java</option>
+		<option value=4 <?php echo $Rb_select?>>Ruby</option>
+		<option value=6 <?php echo $Py_select?>>Python</option>
 	</select>
 <br>Problems:<input type=text size=60 name=cproblem value='<?php echo $plist?>'>
 	<div id="registertime" style="display:none">
@@ -221,11 +236,7 @@ Language:<select name="lang[]" multiple>
 	Minute:<input type=text name=reminute size=7 value=<?php echo substr($regendtime,14,2)?>></p>
 	</div>
 
-<p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
-    <p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
-        <textarea name="description">
-                <?php echo $description;?>
-            </textarea>
+<p align=left>Description:<br> <textarea class="kindeditor" rows=13 name=description cols=120><?php echo htmlspecialchars($description)?></textarea></p>
     </p>
 <br><br>
 Users:<textarea name="ulist" rows="20" cols="20"><?php if (isset($ulist)) { echo $ulist; } ?></textarea>
@@ -253,7 +264,6 @@ Allow Login IP:<textarea name="ip_list" rows="20" cols="20"><?php if (isset($ipL
         else
             divn.style.display='none';
     }
-    CKEDITOR.replace('description');
 </script>
 
 </body>

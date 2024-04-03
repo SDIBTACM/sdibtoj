@@ -1,6 +1,7 @@
 <?require_once("admin-header.php");
 //require_once("../include/db_info.inc.php");
-if (!(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))){
+//if (!(isset($_SESSION['administrator'])||isset($_SESSION['contest_creator']))){
+if (!isset($_SESSION['contest_creator'])){
         echo "<a href='../loginpage.php'>Please Login First!</a>";
         exit(1);
 }
@@ -12,7 +13,13 @@ if (isset($_POST['syear']))
         require_once("../include/check_post_key.php");
         $starttime=intval($_POST['syear'])."-".intval($_POST['smonth'])."-".intval($_POST['sday'])." ".intval($_POST['shour']).":".intval($_POST['sminute']).":00";
          $endtime=intval($_POST['eyear'])."-".intval($_POST['emonth'])."-".intval($_POST['eday'])." ".intval($_POST['ehour']).":".intval($_POST['eminute']).":00";
-
+	
+	$running_time = strtotime($endtime) - strtotime($starttime);
+        if ($running_time > 60 * 60 * 24 * 15 || $running_time < 0) {
+                echo "<script> alert('The contest time is too long or too short');";
+                print "history.go(-1);</script>";
+                exit();
+        }
        //	echo $starttime;
 	//	echo $endtime;
 	$title=mysql_real_escape_string($_POST['title']);
@@ -46,7 +53,7 @@ if (isset($_POST['syear']))
     	foreach($lang as $t){
 			$langmask+=1<<$t;
 	}
-	$langmask=15&(~$langmask);
+	$langmask=127&(~$langmask);
 
 	// 验证是否可以选择该题目
 	$plist = trim($_POST['cproblem']);
@@ -59,12 +66,20 @@ if (isset($_POST['syear']))
 			if ($row->defunct == 'N') {
 				$pieces[] = $row->problem_id;
 			} else {
-				if (!strcmp($row->author, $_SESSION['user_id']) || isset($_SESSION['administrator'])) {
+				//if (!strcmp($row->author, $_SESSION['user_id']) || isset($_SESSION['administrator'])) {
+				if (!strcmp($row->author, $_SESSION['user_id']) ) {
 					$pieces[] = $row->problem_id;
 				}
 			}
 		}
 	}
+        if ($title == "")
+          {
+		print "<script language='javascript'>\n";
+		print "alert('标题不能为空!\\n');\n";
+		print "history.go(-1);\n</script>";
+                exit(0);
+          }
 	if (count($_problemIds) != count($pieces)) {
 		print "<script language='javascript'>\n";
 		print "alert('选择的题目列表中有隐藏题目, 不能保存!\\n');\n";
@@ -74,7 +89,7 @@ if (isset($_POST['syear']))
 	$ipList = json_encode(explode("\r\n", $_POST['ip_list']));
 
 	//echo $langmask;
-         $sql="INSERT INTO `contest`(`title`,`start_time`,`end_time`,`private`,`langmask`,`description`,`reg_start_time`,`reg_end_time`, `allow_ips`)
+         $sql="INSERT INTO `contest`(`title`,`start_time`,`end_time`,`private`,`langmask`,`description`,`reg_start_time`,`reg_end_time`,`allow_ips`)
        VALUES('$title','$starttime','$endtime','$private',$langmask,'$description','$regstarttime','$regendtime', '$ipList')";
 //	echo $sql;
 	mysql_query($sql) or die(mysql_error());
@@ -138,10 +153,12 @@ else if(isset($_POST['problem2contest'])){
 	   }
 }
 ?>
+<?php
+include_once("kindeditor.php") ;
+?>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script src="../ckeditor/ckeditor.js"></script>
     <title>Add Contest</title>
 </head>
 	<body onload="JudgeUp()">
@@ -169,6 +186,8 @@ else if(isset($_POST['problem2contest'])){
 		<option value=1 selected>C++</option>
 		<option value=2 selected>Pascal</option>
 		<option value=3 selected>Java</option>
+		<option value=4 >Ruby</option>
+		<option value=6 >Python</option>
 		</select>
 	<div id="registertime" style="display:none">
 	<p align=left>Register Start:<br>&nbsp;&nbsp;&nbsp;
@@ -189,16 +208,15 @@ else if(isset($_POST['problem2contest'])){
 	<br>*题号与题号之间用英文逗号分开。例:1500,1501,1502
         <br>
         <p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
-            <textarea name="description">
-                <?php echo $description;?>
-            </textarea>
+                 <textarea class="kindeditor" rows=13 name=description cols=120><?php echo htmlspecialchars($row->description)?></textarea></p>
         </p>
     <br>
 	Users:<textarea name="ulist" rows="10" cols="20"></textarea>
 	Allow Login IP:<textarea name="ip_list" rows="10" cols="20"></textarea>
+
 	<br />
-    <p> * 可以将学生学号从Excel整列复制过来，然后要求他们用学号做UserID注册,就能进入Private的比赛作为作业和测验。</p>
-    <p>* Allow login ip 使用CIDR模式记录。</p>
+	<p> * 可以将学生学号从Excel整列复制过来，然后要求他们用学号做UserID注册,就能进入Private的比赛作为作业和测验。</p>
+	<p>* Allow login ip 使用CIDR模式记录。</p>
 	<p><input type=submit value=Submit name=submit"><input type=reset value=Reset name=reset></p>
 
 </form>
