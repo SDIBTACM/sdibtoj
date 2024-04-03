@@ -18,13 +18,10 @@ if(!isset($_SESSION['administrator'])&&isset($_SESSION['problem_editor'])&&$row-
 }
 
 ?>
-<?php
-include_once("kindeditor.php") ;
-?>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="../ckeditor/ckeditor.js"></script>
     <title>Edit Problem</title>
 </head>
 <body>
@@ -53,9 +50,19 @@ include_once("kindeditor.php") ;
     <input type=text name=memory_limit size=20 value='<?=$row->memory_limit?>'>MByte
 </p>
 
-<p>Description:<br><textarea class="kindeditor" rows=13 name=description cols=120><?php echo htmlspecialchars($row->description)?></textarea></p>
-<p>Input:<br><textarea class="kindeditor" rows=13 name=input cols=120><?php echo htmlspecialchars($row->input)?></textarea></p>
-<p>Output:<br><textarea class="kindeditor" rows=13 name=output cols=120><?php echo htmlspecialchars($row->output)?></textarea></p>
+<p align=left>Description:<br>
+    <textarea name="description"><?php echo htmlspecialchars($row->description)?></textarea>
+</p>
+
+<p align=left>Input:<br>
+
+    <textarea name="input"><?php echo htmlspecialchars($row->input)?></textarea>
+</p>
+
+</p>
+<p align=left>Output:<br>
+    <textarea name="output"><?php echo htmlspecialchars($row->output)?></textarea>
+</p>
 
 <p>Sample Input:<br>
     <textarea rows=13 name=sample_input cols=120><?=htmlspecialchars($row->sample_input)?></textarea>
@@ -65,8 +72,7 @@ include_once("kindeditor.php") ;
     <textarea rows=13 name=sample_output cols=120><?=htmlspecialchars($row->sample_output)?></textarea>
 </p>
 
-<p>Hint:<br>
-<textarea class="kindeditor" rows=13 name=hint cols=120><?php echo htmlspecialchars($row->output)?></textarea></p>
+<p>Hint:<!--<textarea rows=13 name=input cols=80></textarea>--><textarea name="hint"><?php echo htmlspecialchars($row->hint)?></textarea>
 </p>
 
 <p>SpecialJudge: 
@@ -83,6 +89,12 @@ Y<input type=radio name=spj value='1' <?=$row->spj=="1"?"checked":""?>>
 <input type=submit value=Submit name=submit>
 </div></form>
 
+<script>
+    CKEDITOR.replace('input');
+    CKEDITOR.replace('output');
+    CKEDITOR.replace('description') ;
+    CKEDITOR.replace('hint');
+</script>
 
 <p>
 
