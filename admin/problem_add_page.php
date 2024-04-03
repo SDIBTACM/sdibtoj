@@ -36,7 +36,7 @@ if (!(isset($_SESSION['administrator']))){
 <p align=left>Test Input:<br><textarea rows=13 name=test_input cols=80></textarea></p>
 <p align=left>Test Output:<br><textarea rows=13 name=test_output cols=80></textarea></p>
 <p align=left>Hint:<br>
-<textarea class="kindeditor" rows=13 name=hint cols=120><?php echo htmlspecialchars($row->output)?></textarea></p>
+<textarea class="kindeditor" rows=13 name=hint cols=120><?php echo htmlspecialchars($row->hint)?></textarea></p>
 </p>
 <p>SpecialJudge: N<input type=radio name=spj value='0' checked>Y<input type=radio name=spj value='1'></p>
 <p align=left>Source:<br><textarea name=source rows=1 cols=70></textarea></p>
