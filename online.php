@@ -66,7 +66,7 @@ endforeach;?>
 if (isset($_SESSION['administrator'])){
 
 echo "<center>";
-echo "<td width='100%' colspan='5'><form>IP(支持模糊查找)<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td></tr>";
+echo "<td width='100%' colspan='5'><form>IP或userid(支持模糊查找)<input type='text' name='search'><input type='submit' value='$MSG_SEARCH' ></form></td></tr>";
 echo "<center>";
 echo "<td width='100%' colspan='5'><form>UserName(支持模糊查找)<input type='text' name='diffip'><input type='submit' value='DiffIp' ></form></td></tr>";
 echo "<center>";
@@ -86,7 +86,7 @@ if(isset($_GET['search'])){
     $sql="SELECT * FROM `loginlog`";
     $search=trim(mysql_real_escape_string($_GET['search']));
     if ($search!='')
-    	$sql=$sql." WHERE ip like '%$search%' ";
+    	$sql=$sql." WHERE ip like '%$search%' or user_id like '%$search%' ";
     // else
       //  $sql=$sql." where user_id<> 'xiao'";
     $sql=$sql."  order by `time` desc LIMIT 0,100";
