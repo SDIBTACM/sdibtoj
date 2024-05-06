@@ -79,13 +79,13 @@ if (isset($_SESSION['source_browser']))
 }
 if (isset($_SESSION['administrator']))$ok=true;
 if ($ok==true){
-	$brush=strtolower($language_name[$row->language]);
+	$brush=strtolower($language_name[$slanguage]);
 	if ($brush=='pascal') $brush='delphi';
 	echo "<pre class=\"brush:".$brush.";\">";
 	ob_start();
 	echo "/**************************************************************\n";
 	echo "\tProblem: $sproblem_id\n\tUser: $suser_id\n";
-	echo "\tLanguage: ".$language_name[$slanguage]."\n\tResult: ".$judge_result[$row->result]."\n";
+	echo "\tLanguage: ".$language_name[$slanguage]."\n\tResult: ".$judge_result[$sresult]."\n";
 	if ($sresult==4){
 		echo "\tTime:".$stime." ms\n";
 		echo "\tMemory:".$smemory." kb\n";
