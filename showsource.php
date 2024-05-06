@@ -38,6 +38,12 @@ $smemory=$row->memory;
 $sproblem_id=$row->problem_id;
 $suser_id=$row->user_id;
 
+$sql="SELECT `contest_id` FROM `contest` WHERE (`end_time`>NOW() and `start_time`<NOW()) and `defunct`='N'";
+$result= mysql_query($sql);
+$row=mysql_num_rows($result);
+//暂时注释
+if($row)
+   $OJ_AUTO_SHARE=false;
 
 
 if (isset($OJ_AUTO_SHARE)&&$OJ_AUTO_SHARE&&isset($_SESSION['user_id'])){
