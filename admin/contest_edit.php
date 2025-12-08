@@ -77,7 +77,8 @@ if (isset($_POST['syear']))
 	$_problemIds = empty($plist) ? array() : explode(',', $plist);
 	$pieces = array();
 	if (count($_problemIds) > 0) {
-		$sql = "select defunct, author, problem_id from problem where problem_id in ($plist)";
+		//按 填写的题目编号排序
+         $sql = "select defunct, author, problem_id from problem where problem_id in ($plist) ORDER BY FIELD(problem_id, $plist)";
 		$result = mysql_query($sql);
 		while ($row = mysql_fetch_object($result)) {
 			if ($row->defunct == 'N') {
